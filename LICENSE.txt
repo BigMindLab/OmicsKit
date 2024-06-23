@@ -1,3 +1,5 @@
+Copyright (c) 2024 David Requena
+
 Attribution-NonCommercial-ShareAlike 4.0 International
 
 =======================================================================
