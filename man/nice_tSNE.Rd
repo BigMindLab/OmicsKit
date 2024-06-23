@@ -1,0 +1,60 @@
+% Edit documentation in R/nice_tSNE.R
+\name{nice_tSNE}
+\alias{nice_tSNE}
+\title{Function to make tSNE plots.}
+\usage{
+nice_tSNE(
+  object,
+  seed = 0,
+  perplexity = 3,
+  max_iterations = 10000,
+  returnData = FALSE,
+  variables = c(fill = "VarFill", shape = "VarShape"),
+  colors = NULL,
+  shapes = NULL,
+  size = 7,
+  alpha = 1,
+  legend_names = c(fill = "Label Fill", shape = "Label Shape"),
+  legend_title = 20,
+  legend_elements = 16,
+  legend_pos = c(0.8, 0.8, "right"),
+  labels = NULL,
+  name_tags = NULL
+)
+}
+\arguments{
+\item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+
+\item{seed}{To set the random seed.}
+
+\item{perplexity}{The average number of samples by patient (neighbors in a set).}
+
+\item{max_iterations}{Maximum number of iterations to perform.}
+
+\item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
+
+\item{variables}{To indicate the variables to be used as Shape and Fill of the markers.}
+
+\item{colors}{Vector of colors to be used for the categories of the variable assigned as Marker Fill.}
+
+\item{shapes}{Vector of shapes to be used for the categories of the variable assigned as Marker Shape.}
+
+\item{size}{Size of the marker. Default: 7.}
+
+\item{alpha}{Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 1.}
+
+\item{legend_names}{The names to be used for the legend of the Shape and Fill.}
+
+\item{legend_title}{Font of the legend title. Default: 20.}
+
+\item{legend_elements}{Font of the elements of the legend Default: 16.}
+
+\item{legend_pos}{Position of the legend in the plot. Default: c(0.80, 0.80, "right").}
+
+\item{labels}{A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).}
+
+\item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).}
+}
+\description{
+Function to make tSNE plots.
+}
