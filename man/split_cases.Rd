@@ -1,0 +1,37 @@
+% Edit documentation in R/split_cases.R
+\name{split_cases}
+\alias{split_cases}
+\title{Split Cases for Differential Expression Analysis}
+\usage{
+split_cases(
+  df.BvsA = NULL,
+  df.CvsA = NULL,
+  df.BvsC = NULL,
+  unique_id = "ensembl",
+  significance_var = "padj",
+  significance_cutoff = 0.25,
+  change_var = "log2FoldChange",
+  change_cutoff = 0
+)
+}
+\arguments{
+  \item{df.BvsA}{Data frame comparing the first condition to the baseline.}
+
+  \item{df.CvsA}{Data frame comparing the second condition to the baseline.}
+
+  \item{df.BvsC}{Data frame comparing the two conditions of the study.}
+
+  \item{unique_id}{Column name with the unique identifiers in the data tables (i.e., ensembl for DESeq2, set NAME for GSEA).}
+
+  \item{significance_var}{Variable of significance to filter by (padj for DESeq2 or FDR for GSEA).}
+
+  \item{significance_cutoff}{Cut-off of the significance variable.}
+
+  \item{change_var}{Variable that indicates the direction of the change (i.e., log2FoldChange in DESeq2, NES in GSEA).}
+
+  \item{change_cutoff}{The values of the change variable will be filtered by \code{|change_var| > change_cutoff}. Default: 0.}
+}
+\description{
+When performing differential expression analysis of a study with 3 phenotypes, including the baseline, there are 10 mutually exclusive cases where genes can fall into.
+This function allows us to obtain these 10 cases and saves them into a list.
+}
