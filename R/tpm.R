@@ -1,5 +1,5 @@
 ################
-# Function tmp #
+# Function tpm #
 ################
 
 #' Function to calculate the TPMs from a table of raw gene counts.
