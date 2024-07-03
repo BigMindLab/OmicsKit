@@ -5,13 +5,13 @@ A bioinformatics library for the analysis of omics data.
 
 ### Developed by:
 
-David R. Requena Anicama, Ph.D. (author's name: David Requena)
+David R. Requena Anicama, Ph.D.
 
-[Google Scholar](https://scholar.google.com/citations?user=uI01iS4AAAAJ&hl=en) / [ORCID: 0000-0002-5968-1133](https://orcid.org/0000-0002-5968-1133)
+Author's name: David Requena / [Google Scholar](https://scholar.google.com/citations?user=uI01iS4AAAAJ&hl=en) / [ORCID: 0000-0002-5968-1133](https://orcid.org/0000-0002-5968-1133)
 
-Daniel F. Guevara Díaz, Stdnt. (author's name: Daniel F. Guevara-Díaz)
+Daniel F. Guevara Díaz, B.Sc.(s)
 
-[Google Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ) / [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
+Author's name: Daniel F. Guevara-Díaz / [Google Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ) / [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
 
 ---
 
