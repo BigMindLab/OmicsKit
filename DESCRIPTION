@@ -7,3 +7,10 @@ Authors@R: c(
 Description: This library contains functions that help in manipulating tables and generating plots for transcriptomics and gene-set enrichment analysis.
 License: CC BY-NC-SA 4.0
 Encoding: UTF-8
+Imports:
+    DESeq2,
+    biomaRt,
+    matrixStats,
+    ggplot2,
+    tsne,
+    xlsx
