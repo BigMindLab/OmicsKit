@@ -23,10 +23,19 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
                          change_var = "log2FoldChange", change_cutoff = 0)
   
 {
-  # Row names as unique identifiers
-  rownames(df.BvsA) <- df.BvsA[, unique_id]
-  rownames(df.CvsA) <- df.CvsA[, unique_id]
-  rownames(df.BvsC) <- df.BvsC[, unique_id]
+  # Set row names as unique identifiers
+  if (!all(rownames(df.BvsA) == df.BvsA[, unique_id])) {
+    rownames(df.BvsA) <- df.BvsA[, unique_id]
+  }
+  
+  if (!all(rownames(df.CvsA) == df.CvsA[, unique_id])) {
+    rownames(df.CvsA) <- df.CvsA[, unique_id]
+  }
+  
+  if (!all(rownames(df.BvsC) == df.BvsC[, unique_id])) {
+    rownames(df.BvsC) <- df.BvsC[, unique_id]
+  }
+
   
   # Create subsets by significance
   df.BvsA.sig <- df.BvsA[df.BvsA[, significance_var] < significance_cutoff & !is.na(df.BvsA[, significance_var]), ]
@@ -48,15 +57,18 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # These genes would show a progressively increasing or decreasing expression,
   # particularly useful when comparing conditions over time, intensity or evolution
   
-  case1.up.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id])
+  
+  case1.up.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id]))
+  
   case1.up <- as.data.frame(df.BvsA.sig[case1.up.genes, ])
   case1.up$trend <- rep("up", nrow(case1.up))
   
-  case1.dn.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id])
+  case1.dn.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id]))
+  
   case1.dn <- as.data.frame(df.BvsA.sig[case1.dn.genes, ])
   case1.dn$trend <- rep("dn", nrow(case1.dn))
   
@@ -66,15 +78,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # Genes with stronger dysregulation in the first condition, which means that
   # they change their expression trend while still being significant
   
-  case2.up.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id])
+  case2.up.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id]))
+  
   case2.up <- as.data.frame(df.BvsA.sig[case2.up.genes, ])
   case2.up$trend <- rep("up", nrow(case2.up))
   
-  case2.dn.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id])
+  case2.dn.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id]))
+  
   case2.dn <- as.data.frame(df.BvsA.sig[case2.dn.genes, ])
   case2.dn$trend <- rep("dn", nrow(case2.dn))
   
@@ -84,15 +98,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # Genes with stronger dysregulation in the second condition, which means that
   # they change their expression trend while still being significant
   
-  case3.up.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id])
+  case3.up.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id]))
+  
   case3.up <- as.data.frame(df.BvsA.sig[case3.up.genes, ])
   case3.up$trend <- rep("up", nrow(case3.up))
   
-  case3.dn.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id])
+  case3.dn.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id]))
+  
   case3.dn <- as.data.frame(df.BvsA.sig[case3.dn.genes, ])
   case3.dn$trend <- rep("dn", nrow(case3.dn))
   
@@ -105,15 +121,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # These genes would be consider markers of the second condition since they are
   # dysregulated compared to the baseline and to the first condition only
   
-  case4.up.genes <- intersect(intersect(df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id],
-                                        df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id]),
-                              df.BvsA.nsig[, unique_id])
+  case4.up.genes <- Reduce(intersect, list(df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsA.nsig[, unique_id]))
+  
   case4.up <- as.data.frame(df.CvsA.sig[case4.up.genes, ])
   case4.up$trend <- rep("up", nrow(case4.up))
   
-  case4.dn.genes <- intersect(intersect(df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id],
-                                        df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id]),
-                              df.BvsA.nsig[, unique_id])
+  case4.dn.genes <- Reduce(intersect, list(df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsA.nsig[, unique_id]))
+  
   case4.dn <- as.data.frame(df.CvsA.sig[case4.dn.genes, ])
   case4.dn$trend <- rep("dn", nrow(case4.dn))
   
@@ -123,15 +141,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # These genes would be consider markers of the first condition since they are
   # dysregulated compared to the baseline and to the second condition only
   
-  case5.up.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
-                                        df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id]),
-                              df.CvsA.nsig[, unique_id])
+  case5.up.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.CvsA.nsig[, unique_id]))
+  
   case5.up <- as.data.frame(df.BvsA.sig[case5.up.genes, ])
   case5.up$trend <- rep("up", nrow(case5.up))
   
-  case5.dn.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
-                                        df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id]),
-                              df.CvsA.nsig[, unique_id])
+  case5.dn.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id],
+                                           df.CvsA.nsig[, unique_id]))
+  
   case5.dn <- as.data.frame(df.BvsA.sig[case5.dn.genes, ])
   case5.dn$trend <- rep("dn", nrow(case5.dn))
   
@@ -141,15 +161,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # According to the study's design, lets consider that genes dysregulated
   # in both conditions when compared to the baseline are the ones to focus on
   
-  case6.up.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id]),
-                              df.BvsC.nsig[, unique_id])
+  case6.up.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id],
+                                           df.BvsC.nsig[, unique_id]))
+  
   case6.up <- as.data.frame(df.BvsA.sig[case6.up.genes, ])
   case6.up$trend <- rep("up", nrow(case6.up))
   
-  case6.dn.genes <- intersect(intersect(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
-                                        df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id]),
-                              df.BvsC.nsig[, unique_id])
+  case6.dn.genes <- Reduce(intersect, list(df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id],
+                                           df.BvsC.nsig[, unique_id]))
+  
   case6.dn <- as.data.frame(df.BvsA.sig[case6.dn.genes, ])
   case6.dn$trend <- rep("dn", nrow(case6.dn))
   
@@ -163,13 +185,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # Case 7: Significant in data 3 only
   ########################################
   
-  case7.up.genes <- intersect(intersect(df.BvsA.nsig[, unique_id], df.CvsA.nsig[, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id])
+  case7.up.genes <- Reduce(intersect, list(df.BvsA.nsig[, unique_id],
+                                           df.CvsA.nsig[, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] > change_cutoff, unique_id]))
+  
   case7.up <- as.data.frame(df.BvsC.sig[case7.up.genes, ])
   case7.up$trend <- rep("up", nrow(case7.up))
   
-  case7.dn.genes <- intersect(intersect(df.BvsA.nsig[, unique_id], df.CvsA.nsig[, unique_id]),
-                              df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id])
+  case7.dn.genes <- Reduce(intersect, list(df.BvsA.nsig[, unique_id],
+                                           df.CvsA.nsig[, unique_id],
+                                           df.BvsC.sig[df.BvsC.sig[, change_var] < -change_cutoff, unique_id]))
+  
   case7.dn <- as.data.frame(df.BvsC.sig[case7.dn.genes, ])
   case7.dn$trend <- rep("dn", nrow(case7.dn))
   
@@ -177,13 +203,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # Case 8: Significant in data 2 only
   ########################################
   
-  case8.up.genes <- intersect(intersect(df.BvsA.nsig[, unique_id], df.BvsC.nsig[, unique_id]),
-                              df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id])
+  case8.up.genes <- Reduce(intersect, list(df.BvsA.nsig[, unique_id],
+                                           df.BvsC.nsig[, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] > change_cutoff, unique_id]))
+  
   case8.up <- as.data.frame(df.CvsA.sig[case8.up.genes, ])
   case8.up$trend <- rep("up", nrow(case8.up))
   
-  case8.dn.genes <- intersect(intersect(df.BvsA.nsig[, unique_id], df.BvsC.nsig[, unique_id]),
-                              df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id])
+  case8.dn.genes <- Reduce(intersect, list(df.BvsA.nsig[, unique_id],
+                                           df.BvsC.nsig[, unique_id],
+                                           df.CvsA.sig[df.CvsA.sig[, change_var] < -change_cutoff, unique_id]))
+  
   case8.dn <- as.data.frame(df.CvsA.sig[case8.dn.genes, ])
   case8.dn$trend <- rep("dn", nrow(case8.dn))
   
@@ -191,13 +221,17 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # Case 9: Significant in data 1 only
   ########################################
   
-  case9.up.genes <- intersect(intersect(df.CvsA.nsig[, unique_id], df.BvsC.nsig[, unique_id]),
-                              df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id])
+  case9.up.genes <- Reduce(intersect, list(df.CvsA.nsig[, unique_id],
+                                           df.BvsC.nsig[, unique_id],
+                                           df.BvsA.sig[df.BvsA.sig[, change_var] > change_cutoff, unique_id]))
+  
   case9.up <- as.data.frame(df.BvsA.sig[case9.up.genes, ])
   case9.up$trend <- rep("up", nrow(case9.up))
   
-  case9.dn.genes <- intersect(intersect(df.CvsA.nsig[, unique_id], df.BvsC.nsig[, unique_id]),
-                              df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id])
+  case9.dn.genes <- Reduce(intersect, list(df.CvsA.nsig[, unique_id],
+                                           df.BvsC.nsig[, unique_id],
+                                           df.BvsA.sig[df.BvsA.sig[, change_var] < -change_cutoff, unique_id]))
+  
   case9.dn <- as.data.frame(df.BvsA.sig[case9.dn.genes, ])
   case9.dn$trend <- rep("dn", nrow(case9.dn))
   
@@ -205,8 +239,10 @@ split_cases <- function (df.BvsA = NULL, df.CvsA = NULL, df.BvsC = NULL, unique_
   # Case 10: Significant in none
   ########################################
   
-  case10.genes <- intersect(intersect(df.BvsA.nsig[, unique_id], df.CvsA.nsig[, unique_id]),
-                            df.BvsC.nsig[, unique_id])
+  case10.genes <- Reduce(intersect, list(df.BvsA.nsig[, unique_id],
+                                         df.CvsA.nsig[, unique_id],
+                                         df.BvsC.nsig[, unique_id]))
+  
   case10 <- as.data.frame(df.BvsA.nsig[case10.genes, ])
   
   # Create data frames of results per cases

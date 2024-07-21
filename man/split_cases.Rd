@@ -32,6 +32,6 @@ split_cases(
   \item{change_cutoff}{The values of the change variable will be filtered by \code{|change_var| > change_cutoff}. Default: 0.}
 }
 \description{
-When performing differential expression analysis of a study with 3 phenotypes, including the baseline, there are 10 mutually exclusive cases where genes can fall into.
-This function allows us to obtain these 10 cases and saves them into a list.
+  When performing differential expression analysis of a study with 3 phenotypes, including the baseline, there are 10 mutually exclusive cases where genes can fall into.
+  This function allows us to obtain these 10 cases and saves them into a list.
 }
