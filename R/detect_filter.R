@@ -1,6 +1,6 @@
-#########################
-# Function detect_genes #
-#########################
+##########################
+# Function detect_filter #
+##########################
 
 #' This function identifies genes with measurable expression levels across samples.
 #' Detectable genes must meet two conditions: the baseMean and their mean normalized counts in the phenotypes of interest must be greater than a set threshold.
@@ -18,8 +18,8 @@
 #' @export
 
 
-detect_genes <- function(norm.counts, df.BvsA, df.CvsA = NULL, df.DvsA = NULL, cutoffs = c(50, 50, 0),
-                         samples.baseline, samples.condition1, samples.condition2 = NULL, samples.condition3 = NULL)
+detect_filter <- function(norm.counts, df.BvsA, df.CvsA = NULL, df.DvsA = NULL, cutoffs = c(50, 50, 0),
+			  samples.baseline, samples.condition1, samples.condition2 = NULL, samples.condition3 = NULL)
 
 {
   # Ensure cutoffs length is correct

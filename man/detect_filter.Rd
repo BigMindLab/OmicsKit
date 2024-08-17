@@ -1,9 +1,9 @@
-% Edit documentation in R/detect_genes.R
-\name{detect_genes}
-\alias{detect_genes}
+% Edit documentation in R/detect_filter.R
+\name{detect_filter}
+\alias{detect_filter}
 \title{Identify Genes with Detectable Expression Levels}
 \usage{
-detect_genes(
+detect_filter(
   norm.counts,
   df.BvsA,
   df.CvsA = NULL,
