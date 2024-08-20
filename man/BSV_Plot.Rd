@@ -1,9 +1,9 @@
-% Edit documentation in R/BoxScatter_Plot.R
-\name{BoxScatter_Plot}
-\alias{BoxScatter_Plot}
-\title{Function to make Box-Scatter plots.}
+% Edit documentation in R/BSV_Plot.R
+\name{BSV_Plot}
+\alias{BSV_Plot}
+\title{Function to make Box-Scatter-Violin plots.}
 \usage{
-BoxScatter_Plot(
+BSV_Plot(
   object = NULL,
   variables = c(fill = "VarFill", shape = "VarShape"),
   genename = NULL,
