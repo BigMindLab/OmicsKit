@@ -1,6 +1,6 @@
-############################
+#######################
 # Function BSV_Plot.R #
-############################
+#######################
 
 #' Function to make Box-Scatter-Violin plots.
 #'
@@ -50,8 +50,10 @@ BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "
                                labels = labels)
 
   # Plot
-  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) +
-    theme_bw() + geom_boxplot(width = 0.6, fill = "gray90") +
+  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
+    geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
+		show.legend = FALSE, trim = TRUE) +
+    geom_boxplot(width = 0.6, fill = "gray90") +
     labs(title = paste("Gene:", genename, symbol),
          x = expression("Sample Type"),
          y = expression("log"[2]*"(Normalized Gene Counts)")) +
