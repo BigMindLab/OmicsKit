@@ -1,4 +1,4 @@
-export(BoxScatter_Plot)
+export(BSV_Plot)
 export(add_annotations)
 export(get_annotations)
 export(nice_PCA)
