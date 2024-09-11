@@ -13,6 +13,7 @@ Imports:
     dplyr
     matrixStats,
     ggplot2,
+    ggrepel,
     tsne,
-    openxlsx
+    openxlsx,
     xlsx
