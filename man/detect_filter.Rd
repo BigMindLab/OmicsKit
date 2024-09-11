@@ -1,0 +1,41 @@
+% Edit documentation in R/detect_filter.R
+\name{detect_filter}
+\alias{detect_filter}
+\title{Identify Genes with Detectable Expression Levels}
+\usage{
+detect_filter(
+  norm.counts,
+  df.BvsA,
+  df.CvsA = NULL,
+  df.DvsA = NULL,
+  cutoffs = c(50, 50, 0),
+  samples.baseline,
+  samples.condition1,
+  samples.condition2 = NULL,
+  samples.condition3 = NULL
+)
+}
+\arguments{
+  \item{norm.counts}{Data frame of the normalized counts with Ensembl IDs as rows and Sample IDs as columns.}
+  
+  \item{df.BvsA}{Data frame comparing the first condition to the baseline.}
+  
+  \item{df.CvsA}{Data frame comparing the second condition to the baseline (optional).}
+  
+  \item{df.DvsA}{Data frame comparing the third condition to the baseline (optional).}
+  
+  \item{samples.baseline}{Vector of Sample IDs or indexes corresponding to the baseline.}
+  
+  \item{samples.condition1}{Vector of Sample IDs or indexes corresponding to the first condition.}
+  
+  \item{samples.condition2}{Vector of Sample IDs or indexes corresponding to the second condition (optional).}
+  
+  \item{samples.condition3}{Vector of Sample IDs or indexes corresponding to the third condition (optional).}
+  
+  \item{cutoffs}{Vector containing threshold values for baseMean, mean normalized counts, and Log2 Fold Change; respectively. Default: c(50, 50, 0).}
+}
+\description{
+  This function identifies genes with measurable expression levels across samples.
+  Detectable genes must meet two conditions: the baseMean and their mean normalized counts in the phenotypes of interest must be greater than a set threshold.
+  It returns a list of detectable genes and the comparisons in which they can be found.
+}

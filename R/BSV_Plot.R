@@ -1,8 +1,8 @@
-############################
-# Function BoxScatter_Plot #
-############################
+#######################
+# Function BSV_Plot.R #
+#######################
 
-#' Function to make Box-Scatter plots.
+#' Function to make Box-Scatter-Violin plots.
 #'
 #' This function will make a Boxplot, using a DEseq object.
 #' It will show the data points on top with a small deviation (jitter) for a better visualization.
@@ -27,13 +27,13 @@
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
 #' @export
 
-BoxScatter_Plot <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
-                             genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
-                             categories = c("normal", "primary", "recurrence", "metastasis"),
-                             colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
-                             width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
-                             title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
-                             legend_size = c(title = 14, elements = 12)) {
+BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
+			genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
+			categories = c("normal", "primary", "recurrence", "metastasis"),
+			colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
+			width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
+			title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
+			legend_size = c(title = 14, elements = 12)) {
   
   require("DESeq2")
   
@@ -50,8 +50,10 @@ BoxScatter_Plot <- function (object = NULL, variables = c(fill = "VarFill", shap
                                labels = labels)
 
   # Plot
-  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) +
-    theme_bw() + geom_boxplot(width = 0.6, fill = "gray90") +
+  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
+    geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
+		show.legend = FALSE, trim = TRUE) +
+    geom_boxplot(width = 0.6, fill = "gray90") +
     labs(title = paste("Gene:", genename, symbol),
          x = expression("Sample Type"),
          y = expression("log"[2]*"(Normalized Gene Counts)")) +
