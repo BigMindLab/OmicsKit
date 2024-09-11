@@ -17,6 +17,8 @@
 
 save_results <- function(df, name, l2fc = 0){
   
+  require("openxlsx")
+
   names(df)[names(df) == "padj"] <- "FDR"
   
   # Saving all genes:
