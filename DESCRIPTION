@@ -15,5 +15,4 @@ Imports:
     ggplot2,
     ggrepel,
     tsne,
-    openxlsx,
-    xlsx
+    openxlsx
