@@ -7,7 +7,7 @@
 #' @param object A DEseq object already transformed with the variance stabilizing or rlog transformations.
 #' @param neighbors Number of nearest neighbors to consider. Default: 4.
 #' @param components Number of components to be consider for the dimensional reduction. Default: 3.
-#' @param epochs Number of iterations. Default: 20000.
+#' @param epochs Number of iterations. Default: 10000.
 #' @param returnData Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.
 #' @param variables To indicate the variables to be used as Shape and Fill of the markers.
 #' @param legend_names The names to be used for the legend of the Shape and Fill.
@@ -22,7 +22,7 @@
 #' @param name_tags A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).
 #' @export
 
-nice_UMAP <- function(object, neighbors = 4, components = 3, epochs = 20000, returnData = FALSE,
+nice_UMAP <- function(object, neighbors = 4, components = 3, epochs = 10000, returnData = FALSE,
                       variables = c(fill = "VarFill", shape = "VarShape"),
                       colors = NULL, shapes = NULL, size = 7, alpha = 1,
                       legend_names = c(fill = "Label Fill", shape = "Label Shape"),
