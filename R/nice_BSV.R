@@ -27,13 +27,13 @@
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
 #' @export
 
-nice_BSV.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
-			genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
-			categories = c("normal", "primary", "recurrence", "metastasis"),
-			colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
-			width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
-			title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
-			legend_size = c(title = 14, elements = 12)) {
+nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
+		      genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
+		      categories = c("normal", "primary", "recurrence", "metastasis"),
+		      colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
+		      width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
+		      title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
+		      legend_size = c(title = 14, elements = 12)) {
 
   require("DESeq2")
   require("ggplot2")
