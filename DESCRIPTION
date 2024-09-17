@@ -10,10 +10,9 @@ Encoding: UTF-8
 Imports:
     DESeq2,
     biomaRt,
-    dplyr
+    dplyr,
     matrixStats,
     ggplot2,
     ggrepel,
     tsne,
-    openxlsx,
-    xlsx
+    openxlsx
