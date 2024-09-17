@@ -1,9 +1,9 @@
-% Edit documentation in R/BSV_Plot.R
-\name{BSV_Plot}
-\alias{BSV_Plot}
+% Edit documentation in R/nice_BSV.R
+\name{nice_BSV}
+\alias{nice_BSV}
 \title{Function to make Box-Scatter-Violin plots.}
 \usage{
-BSV_Plot(
+nice_BSV(
   object = NULL,
   variables = c(fill = "VarFill", shape = "VarShape"),
   genename = NULL,

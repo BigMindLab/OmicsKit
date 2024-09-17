@@ -1,5 +1,5 @@
 #######################
-# Function BSV_Plot.R #
+# Function nice_BSV.R #
 #######################
 
 #' Function to make Box-Scatter-Violin plots.
@@ -27,7 +27,7 @@
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
 #' @export
 
-BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
+nice_BSV.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
 			genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
 			categories = c("normal", "primary", "recurrence", "metastasis"),
 			colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,

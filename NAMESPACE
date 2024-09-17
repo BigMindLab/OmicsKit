@@ -1,6 +1,6 @@
-export(BSV_Plot)
 export(add_annotations)
 export(get_annotations)
+export(nice_BSV)
 export(nice_PCA)
 export(nice_tSNE)
 export(save_results)
