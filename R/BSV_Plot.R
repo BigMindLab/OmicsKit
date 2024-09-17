@@ -34,11 +34,12 @@ BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "
 			width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
 			title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
 			legend_size = c(title = 14, elements = 12)) {
-  
+
   require("DESeq2")
-  
+  require("ggplot2")
+
   # Extracting the vector of counts for that gene
-  gene_counts <- counts(object, normalized = TRUE)[genename, ]
+  gene_counts <- DESeq2::counts(object, normalized = TRUE)[genename, ]
   log2_gc <- log2(gene_counts)
 
   # Making a dataframe for the plot
@@ -50,7 +51,7 @@ BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "
                                labels = labels)
 
   # Plot
-  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
+  p.bs <- ggplot2::ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
     geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
 		show.legend = FALSE, trim = TRUE) +
     geom_boxplot(width = 0.6, fill = "gray90") +
@@ -81,7 +82,7 @@ BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "
                                    guide = guide_legend(override.aes = aes(shape = 21, size = 7)))
 
   if (save == T) {
-    ggsave(paste0(symbol,".jpg"), plot = p.bs, width = width, height = height, dpi = dpi)
+    ggplot2::ggsave(paste0(symbol,".jpg"), plot = p.bs, width = width, height = height, dpi = dpi)
 
   } else { return(p.bs) }
 }
