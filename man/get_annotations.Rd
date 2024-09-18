@@ -2,8 +2,7 @@
 % Please edit documentation in R/get_annotations.R
 \name{get_annotations}
 \alias{get_annotations}
-\title{This function annotates a column of transcripts or gene IDs (ENSEMBL) with information of the Biomart.
-If transcript IDs are provided, they are also annotated with information of the genes to which they belong.}
+\title{Get annotations from Ensembl.}
 \usage{
 get_annotations(
   ensembl_ids,
@@ -25,6 +24,10 @@ get_annotations(
 \item{format}{The output is saved in .csv or .xlsx formats. Default = csv.}
 }
 \description{
+This function annotates a column of transcripts or gene IDs (ENSEMBL) with information of the Biomart.
+If transcript IDs are provided, they are also annotated with information of the genes to which they belong.
+}
+\details{
 The Gene information added include:
 - Gene ENSEMBL ID, HGNC Symbol, Description, Biotype and Chromosome.
 - Gene start, end and length

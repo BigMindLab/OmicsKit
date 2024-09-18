@@ -2,9 +2,7 @@
 % Please edit documentation in R/detect_filter.R
 \name{detect_filter}
 \alias{detect_filter}
-\title{This function identifies genes with measurable expression levels across samples.
-Detectable genes must meet two conditions: the baseMean and their mean normalized counts in the phenotypes of interest must be greater than a set threshold.
-It returns a list of detectable genes and the comparisons in which they can be found.}
+\title{Find detectable genes across comparisons.}
 \usage{
 detect_filter(
   norm.counts,

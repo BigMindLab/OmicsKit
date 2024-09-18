@@ -2,10 +2,7 @@
 % Please edit documentation in R/split_cases.R
 \name{split_cases}
 \alias{split_cases}
-\title{When performing differential expression analysis of a study with 3 phenotypes,
-including the baseline, there are 10 mutually exclusive cases where genes can
-fall into. This function allows us to obtain these 10 cases and saves them
-into a list.}
+\title{Obtain 10 exclusive cases from 3 comparisons.}
 \usage{
 split_cases(
   df.BvsA = NULL,

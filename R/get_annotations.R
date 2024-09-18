@@ -2,6 +2,8 @@
 # Function get_annotations #
 ############################
 
+#' Get annotations from Ensembl.
+#' 
 #' This function annotates a column of transcripts or gene IDs (ENSEMBL) with information of the Biomart.
 #' If transcript IDs are provided, they are also annotated with information of the genes to which they belong.
 #' 

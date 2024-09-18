@@ -2,7 +2,7 @@
 % Please edit documentation in R/save_results.R
 \name{save_results}
 \alias{save_results}
-\title{This function will save the results of a Differential Expression analysis}
+\title{Save the results of a Differential Expression analysis}
 \usage{
 save_results(df, name, l2fc = 0)
 }

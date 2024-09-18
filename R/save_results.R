@@ -2,7 +2,7 @@
 # Function save_results #
 #########################
 
-#' This function will save the results of a Differential Expression analysis
+#' Save the results of a Differential Expression analysis
 #'
 #' This function takes as input the output of the function "results()" of DEseq2.
 #' And will save 3 tables:
