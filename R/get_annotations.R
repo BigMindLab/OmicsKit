@@ -23,13 +23,13 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
   require("biomaRt")
   
   if(version == "103"){
-    ensembl = useMart("ENSEMBL_MART_ENSEMBL",
-                      dataset = "hsapiens_gene_ensembl",
-                      host = "https://feb2021.archive.ensembl.org")
+    ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
+			       dataset = "hsapiens_gene_ensembl",
+			       host = "https://feb2021.archive.ensembl.org")
   } else {
-    ensembl = useMart("ENSEMBL_MART_ENSEMBL",
-                      dataset = "hsapiens_gene_ensembl",
-                      host = "https://useast.ensembl.org")
+    ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
+			       dataset = "hsapiens_gene_ensembl",
+			       host = "https://useast.ensembl.org")
   }
   
   annotations <- c("ensembl_gene_id", "hgnc_symbol", "gene_biotype",
@@ -46,10 +46,10 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
     
     df <- data.frame(transcriptID = ensembl_ids)
     
-    genemap <- getBM(attributes = c("ensembl_transcript_id_version", annotations),
-                     filters = "ensembl_transcript_id_version",
-                     values = df$transcriptID,
-                     mart = ensembl)
+    genemap <- biomaRt::getBM(attributes = c("ensembl_transcript_id_version", annotations),
+			      filters = "ensembl_transcript_id_version",
+			      values = df$transcriptID,
+			      mart = ensembl)
     
     idx <- match(df$transcriptID, genemap$ensembl_transcript_id_version)
     df <- merge(df, genemap[idx, c("ensembl_transcript_id_version", annotations)],
@@ -60,10 +60,10 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
     
     df <- data.frame(geneID = ensembl_ids)
     
-    genemap <- getBM(attributes = annotations,
-                     filters = "ensembl_gene_id",
-                     values = df$geneID,
-                     mart = ensembl)
+    genemap <- biomaRt::getBM(attributes = annotations,
+			      filters = "ensembl_gene_id",
+			      values = df$geneID,
+			      mart = ensembl)
     
     idx <- match(df$geneID, genemap$ensembl_gene_id)
     df <- merge(df, genemap[idx, annotations], by.x = "geneID", by.y = "ensembl_gene_id")
@@ -72,13 +72,13 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
   }
   
   df$gene_length <- df$gene_end - df$gene_start + 1
-  df <- df %>% relocate(gene_length, .before = "description")
+  df <- df %>% dplyr::relocate(gene_length, .before = "description")
   
   if(format == "xlsx"){
     require("openxlsx")
-    write.xlsx(df, file = paste0(filename, ".xlsx"), colNames = T, rowNames = F, append = F)
+    openxlsx::write.xlsx(df, file = paste0(filename, ".xlsx"), colNames = T, rowNames = F, append = F)
   } else {
-    write.csv(df, rowNames = F, file = paste0(filename, ".csv"))
+    utils::write.csv(df, rowNames = F, file = paste0(filename, ".csv"))
   }
   return(df)
 }
