@@ -1,36 +1,94 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # OmicsKit
-A bioinformatics library for the analysis of omics data.
 
----
+<!-- badges: start -->
+<!-- badges: end -->
 
-### Developed by:
+The goal of OmicsKit is to help in manipulating tables and generating
+plots for multi-omics analyses including genomics, transcriptomics,
+proteomics, methylomics and immunoinformatics.
 
-David R. Requena Anicama, Ph.D.
+## Installation
 
-- Author's name: David Requena / [Google Scholar](https://scholar.google.com/citations?user=uI01iS4AAAAJ&hl=en) / [ORCID: 0000-0002-5968-1133](https://orcid.org/0000-0002-5968-1133)
+You can install the development version of OmicsKit from
+[GitHub](https://github.com/) with:
 
-Daniel F. Guevara Díaz, B.Sc.(s)
+``` r
+# Install the remotes package if needed
+install.packages("remotes")
 
-- Author's name: Daniel F. Guevara-Díaz / [Google Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ) / [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
+# Install from GitHub
+remotes::install_github("BigMindLab/OmicsKit")
+```
 
----
+## Key features
 
-### Description
+- **Gene Annotation**: Retrieve information from Ensembl and BioMart to
+  annotate gene counts tables, including transcript and gene names,
+  genomic coordinates, and cross-references from various annotation
+  databases.
 
-This library contains functions that help in manipulating tables and generating plots for transcriptomics and gene-set enrichment analysis.
+``` r
+# Example on ge
 
-It contains:
-- Get information from Ensembl and BioMart to annotate gene counts tables. This information includes transcript and gene names, coordinates, and identifiers from different annotation databases.
-- Functions to make visually appealing plots: PCA, tSNE, UMAP, Volcano, Balloon, and BSV (Box-Scatter-Violin) plots.
-- Calculate and extract normalized counts, such as TPMs, RPKMs, FPKMs, and the normalized counts from DESeq2.
-- Filter and export differential expression analysis results in MS Excel or CSV formal. Filtering can be done by expression change (log2FC), significance (FDR), or detectability (Requena et al. 2024. Manuscript under review).
-- Organize the results from 3 pairwise differential expression analyses (i.e. B vs A, C vs A, C vs B) into 10 expression cases (BigMind. 2024. Manuscript in preparation.)
-- Organize the results from 3 pairwise gene set enrichment analyses (i.e. B vs A, C vs A, C vs B) into 10 expression cases (BigMind. 2024. Manuscript in preparation.)
+tx2gene <- get_annotations(rownames(txi$counts), version = "103", format = "xlsx")
+```
 
-### License
+- **Dimensionality Reduction**: Generate a range of visually appealing
+  plots to visualize high-dimensional data. Includes unsupervised
+  clustering methods as well.
+  - PCA (Principal Component Analysis)
 
-CC BY-NC-SA 4.0
+``` r
+nice_PCA(transf.data,
+         PCs = c(1, 2),
+         ntop =  nrow(assay(transf.data)),
+         variables = c("group", "sex"),
+         legend_names = c("Group", "Sex"),
+         size = 9, alpha = 1,
+         colors = my_colors,
+         shapes = 21:22,
+         legend_title = 10,
+         legend_elements = 8,
+         legend_pos = NULL,
+         labels = c(var = "id", size = 3))
+```
 
-### Contact
+    + tSNE (t-distributed Stochastic Neighbor Embedding)
 
-david[dot]requena[at]nyulangone[dot]org
+    + UMAP (Uniform Manifold Approximation and Projection)
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+``` r
+library(OmicsKit)
+## basic example code
+```
+
+What is special about using `README.Rmd` instead of just `README.md`?
+You can include R chunks like so:
+
+``` r
+summary(cars)
+#>      speed           dist       
+#>  Min.   : 4.0   Min.   :  2.00  
+#>  1st Qu.:12.0   1st Qu.: 26.00  
+#>  Median :15.0   Median : 36.00  
+#>  Mean   :15.4   Mean   : 42.98  
+#>  3rd Qu.:19.0   3rd Qu.: 56.00  
+#>  Max.   :25.0   Max.   :120.00
+```
+
+You’ll still need to render `README.Rmd` regularly, to keep `README.md`
+up-to-date. `devtools::build_readme()` is handy for this.
+
+You can also embed plots, for example:
+
+<img src="man/figures/README-pressure-1.png" width="100%" />
+
+In that case, don’t forget to commit and push the resulting figure
+files, so they display on GitHub and CRAN.

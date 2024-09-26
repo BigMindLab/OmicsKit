@@ -1,0 +1,93 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+OmicsKit
+========
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of OmicsKit is to help in manipulating tables and generating plots for multi-omics analyses including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
+
+Installation
+------------
+
+You can install the development version of OmicsKit from [GitHub](https://github.com/) with:
+
+``` r
+# Install the remotes package if needed
+install.packages("remotes")
+
+# Install from GitHub
+remotes::install_github("BigMindLab/OmicsKit")
+```
+
+Key features
+------------
+
++ **Gene Annotation**: Retrieve information from Ensembl and BioMart to annotate gene counts tables, including transcript and gene names, genomic coordinates, and cross-references from various annotation databases.  
+
+``` r
+# Example on ge
+
+tx2gene <- get_annotations(rownames(txi$counts), version = "103", format = "xlsx")
+```
+
++ **Dimensionality Reduction**: Generate a range of visually appealing plots to visualize high-dimensional data. Includes unsupervised clustering methods as well.
+    + PCA (Principal Component Analysis)
+
+``` r
+nice_PCA(transf.data,
+         PCs = c(1, 2),
+         ntop =  nrow(assay(transf.data)),
+         variables = c("group", "sex"),
+         legend_names = c("Group", "Sex"),
+         size = 9, alpha = 1,
+         colors = my_colors,
+         shapes = 21:22,
+         legend_title = 10,
+         legend_elements = 8,
+         legend_pos = NULL,
+         labels = c(var = "id", size = 3))
+```
+
+    + tSNE (t-distributed Stochastic Neighbor Embedding)
+
+    + UMAP (Uniform Manifold Approximation and Projection)
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(OmicsKit)
+## basic example code
+```
+
+What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+
+```{r cars}
+summary(cars)
+```
+
+You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+
+You can also embed plots, for example:
+
+```{r pressure, echo = FALSE}
+plot(pressure)
+```
+
+In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
