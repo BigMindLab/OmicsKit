@@ -10,7 +10,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "90%",
-  fig.align = "center",
   dpi = 1200
 )
 ```
@@ -86,10 +85,6 @@ nice_PCA(object = transf.data,
 ```{r pca, echo = FALSE}
 pca12
 ```
-
-<p align="center">
-  <img src="man/figures/README-pca-1.png" width="90%">
-</p>
 
 2. *tSNE* (t-distributed Stochastic Neighbor Embedding).  
 
@@ -218,7 +213,7 @@ Generate a range of visually appealing plots to display differential expression 
 
 1. *Volcano plots*
     
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.align='right'}
 knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
 ```
 

@@ -102,11 +102,7 @@ nice_PCA(object = transf.data,
          labels = c(var = "id", size = 3))
 ```
 
-<img src="man/figures/README-pca-1.png" width="90%" style="display: block; margin: auto;" />
-
-<p align="center">
-<img src="man/figures/README-pca-1.png" width="90%">
-</p>
+<img src="man/figures/README-pca-1.png" width="90%" />
 
 2.  *tSNE* (t-distributed Stochastic Neighbor Embedding).
 
@@ -128,7 +124,7 @@ nice_tSNE(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-tsne-1.png" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-tsne-1.png" width="90%" />
 
 3.  *UMAP* (Uniform Manifold Approximation and Projection).
 
@@ -150,7 +146,7 @@ nice_UMAP(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-umap-1.png" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-umap-1.png" width="90%" />
 
 ### **Counts Normalization**
 
@@ -423,19 +419,19 @@ expression analysis results. Here are some examples:
 
 1.  *Volcano plots*
 
-<img src="man/figures/README-Volcano_plot.jpg" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-Volcano_plot.jpg" width="90%" style="display: block; margin: auto 0 auto auto;" />
 
 2.  *Heatmaps*
 
-<img src="man/figures/README-Heatmap_plot.png" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-Heatmap_plot.png" width="90%" />
 
 3.  *Enrichment plots*
 
-<img src="man/figures/README-Balloon_plot.jpeg" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-Balloon_plot.jpeg" width="90%" />
 
 4.  *Box-Scatter-Violin (BSV) plots*
 
-<img src="man/figures/README-BSV_plot.jpg" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-BSV_plot.jpg" width="90%" />
 
 ## Examples
 
