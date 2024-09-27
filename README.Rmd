@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "90%",
+  out.width = "100%",
   dpi = 1200
 )
 ```
@@ -204,8 +204,6 @@ DEGs_sig <- lapply(DEGs_sig, function(x) {
 
 ```{r split cases, echo=FALSE}
 DEGs_sig[c(6, 8:9)]
-seq_along(DEGs_sig)
-DEGs_sig[5]
 ```
 
 ### **Customary plots**
@@ -213,7 +211,7 @@ Generate a range of visually appealing plots to display differential expression 
 
 1. *Volcano plots*
     
-```{r, echo = FALSE, fig.align='right'}
+```{r, echo = FALSE}
 knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
 ```
 
@@ -231,7 +229,7 @@ knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
 
 4. *Box-Scatter-Violin (BSV) plots*
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.dim=c(5,7)}
 knitr::include_graphics("man/figures/README-BSV_plot.jpg")
 ```
 

@@ -102,7 +102,7 @@ nice_PCA(object = transf.data,
          labels = c(var = "id", size = 3))
 ```
 
-<img src="man/figures/README-pca-1.png" width="90%" />
+<img src="man/figures/README-pca-1.png" width="100%" />
 
 2.  *tSNE* (t-distributed Stochastic Neighbor Embedding).
 
@@ -124,7 +124,7 @@ nice_tSNE(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-tsne-1.png" width="90%" />
+<img src="man/figures/README-tsne-1.png" width="100%" />
 
 3.  *UMAP* (Uniform Manifold Approximation and Projection).
 
@@ -146,7 +146,7 @@ nice_UMAP(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-umap-1.png" width="90%" />
+<img src="man/figures/README-umap-1.png" width="100%" />
 
 ### **Counts Normalization**
 
@@ -405,12 +405,6 @@ DEGs_sig <- lapply(DEGs_sig, function(x) {
     #>                 trend
     #> ENSG00000067840    dn
     #> ENSG00000102317    dn
-    #>  [1]  1  2  3  4  5  6  7  8  9 10
-    #> $Case5
-    #>  [1] baseMean       log2FoldChange lfcSE          stat           pvalue        
-    #>  [6] padj           ensembl        symbol         biotype        chromosome    
-    #> [11] gene_start     gene_end       gene_length    description    trend         
-    #> <0 rows> (or 0-length row.names)
 
 ### **Customary plots**
 
@@ -419,19 +413,19 @@ expression analysis results. Here are some examples:
 
 1.  *Volcano plots*
 
-<img src="man/figures/README-Volcano_plot.jpg" width="90%" style="display: block; margin: auto 0 auto auto;" />
+<img src="man/figures/README-Volcano_plot.jpg" width="100%" />
 
 2.  *Heatmaps*
 
-<img src="man/figures/README-Heatmap_plot.png" width="90%" />
+<img src="man/figures/README-Heatmap_plot.png" width="100%" />
 
 3.  *Enrichment plots*
 
-<img src="man/figures/README-Balloon_plot.jpeg" width="90%" />
+<img src="man/figures/README-Balloon_plot.jpeg" width="100%" />
 
 4.  *Box-Scatter-Violin (BSV) plots*
 
-<img src="man/figures/README-BSV_plot.jpg" width="90%" />
+<img src="man/figures/README-BSV_plot.jpg" width="100%" />
 
 ## Examples
 
