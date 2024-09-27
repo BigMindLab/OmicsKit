@@ -100,7 +100,7 @@ tx2gene <- get_annotations(rownames(txi$counts),
            labels = c(var = "id", size = 3))
   ```
 
-  <img src="man/figures/README-pca-1.png" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-pca-1.png" width="100%" style="display: block; margin: auto;" />
 
   - *tSNE* (t-distributed Stochastic Neighbor Embedding).
 
@@ -122,7 +122,7 @@ tx2gene <- get_annotations(rownames(txi$counts),
             labels = c(var = "num", size = 3))
   ```
 
-  <img src="man/figures/README-tsne-1.png" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-tsne-1.png" width="100%" style="display: block; margin: auto;" />
 
   - *UMAP* (Uniform Manifold Approximation and Projection).
 
@@ -144,7 +144,7 @@ tx2gene <- get_annotations(rownames(txi$counts),
             labels = c(var = "num", size = 3))
   ```
 
-  <img src="man/figures/README-umap-1.png" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-umap-1.png" width="100%" style="display: block; margin: auto;" />
 
 - **Counts Normalization**: Compute and extract normalized counts such
   as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
@@ -401,18 +401,18 @@ for (i in names(DEGs_sig)) {
 
   - *Volcano plots*
 
-  <img src="man/figures/README-Volcano_plot.jpg" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-Volcano_plot.jpg" width="100%" style="display: block; margin: auto;" />
 
   - *Heatmaps*  
-    <img src="man/figures/README-Heatmap_plot.png" width="80%" style="display: block; margin: auto;" />
+    <img src="man/figures/README-Heatmap_plot.png" width="100%" style="display: block; margin: auto;" />
 
   - *Enrichment plots*
 
-  <img src="man/figures/README-Balloon_plot.jpeg" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-Balloon_plot.jpeg" width="100%" style="display: block; margin: auto;" />
 
   - *Box-Scatter-Violin (BSV) plots*
 
-  <img src="man/figures/README-BSV_plot.jpeg" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-BSV_plot.jpeg" width="100%" style="display: block; margin: auto;" />
 
 ## Examples
 

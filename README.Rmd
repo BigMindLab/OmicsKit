@@ -9,8 +9,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "80%",
+  out.width = "100%",
   fig.align = "center",
+  fig.show = "asis",
   dpi = 600
 )
 ```
@@ -18,7 +19,6 @@ knitr::opts_chunk$set(
 # OmicsKit
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of OmicsKit is to help in manipulating tables and generating plots for multi-omics analyses including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
@@ -84,6 +84,7 @@ tx2gene
     ```{r pca, echo = FALSE}
     pca12
     ```
+    
          
     - *tSNE* (t-distributed Stochastic Neighbor Embedding).
 
@@ -108,6 +109,7 @@ tx2gene
     ```{r tsne, echo = FALSE}
     p.tsne
     ```
+   
    
     - *UMAP* (Uniform Manifold Approximation and Projection).  
 
