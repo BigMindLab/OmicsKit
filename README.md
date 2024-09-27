@@ -78,7 +78,7 @@ tx2gene <- get_annotations(rownames(txi$counts),
 - **Dimensionality Reduction**: Generate a range of visually appealing
   plots for high-dimensional data. Includes unsupervised clustering
   methods as well.
-  - PCA (Principal Component Analysis)
+  - *PCA* (Principal Component Analysis)
 
 ``` r
 nice_PCA(object = transf.data,
@@ -97,8 +97,9 @@ nice_PCA(object = transf.data,
          labels = c(var = "id", size = 3))
 ```
 
-<img src="man/figures/README-pca-1.png" width="80%" /> + tSNE
-(t-distributed Stochastic Neighbor Embedding)
+<img src="man/figures/README-pca-1.png" width="80%" />
+
+    - *tSNE* (t-distributed Stochastic Neighbor Embedding)
 
 ``` r
 nice_tSNE(object = transf.data,
@@ -118,8 +119,9 @@ nice_tSNE(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-tsne-1.png" width="80%" /> + UMAP (Uniform
-Manifold Approximation and Projection)
+<img src="man/figures/README-tsne-1.png" width="80%" />
+
+    - *UMAP* (Uniform Manifold Approximation and Projection)
 
 ``` r
 nice_UMAP(object = transf.data,
@@ -197,7 +199,7 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
   criteria include:
   - Expression change (log2 fold change).
   - Significance (False Discovery Rate, FDR).
-  - Detectability (`Requena et al., 2024, Nat. Comms.`).
+  - *Detectability* (`Requena et al., 2024, Nat. Comms.`).
 
 ``` r
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -332,6 +334,7 @@ DEGs_sig <- split_cases(df.BvsA = res.T_N,
                         change_cutoff = 0)
 
 # Filter the whole detectability list by a new threshold
+
 for (i in names(DEGs_sig)) {
   DEGs_sig[[i]] <- DEGs_sig[[i]][rownames(DEGs_sig[[i]]) %in% detect_list$DetectGenes, ]
   DEGs_sig[[i]] <- DEGs_sig[[i]][DEGs_sig[[i]]$padj < 0.05, ]
@@ -389,13 +392,14 @@ for (i in names(DEGs_sig)) {
     #> ENSG00000067840    dn
     #> ENSG00000102317    dn
 
-- **Common plots**: Generate a range of visually appealing plots to
+- **Customary plots**: Generate a range of visually appealing plots to
   display differential expression analysis results. Here are some
   examples
   - **Volcano plots**
 
-<img src="man/figures/README-Volcano_plot.jpg" width="100%" /> +
-**Heatmaps**
+<img src="man/figures/README-Volcano_plot.jpg" width="100%" />
+
+- **Heatmaps**
 
 ``` r
 heatmap_Ap_An
@@ -431,11 +435,11 @@ heatmap_Ap_An
 #> [1] "pheatmap"
 ```
 
-    + **Enrichment plots**
+- **Enrichment plots**
 
 <img src="man/figures/README-Balloon_plot.jpeg" width="100%" />
 
-    + **Box-Scatter-Violin (BSV) plots**
+- **Box-Scatter-Violin (BSV) plots**
 
 <img src="man/figures/README-BSV_plot.jpeg" width="100%" />
 
