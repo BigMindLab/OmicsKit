@@ -9,17 +9,20 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "80%"
+  out.width = "80%",
+  fig.align = "center",
+  dpi = 600
 )
 ```
 
 # OmicsKit
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of OmicsKit is to help in manipulating tables and generating plots for multi-omics analyses including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
+
+---
 
 ## Installation
 
@@ -42,7 +45,7 @@ load(".RData")
 
 ## Key features
 
-- **Gene Annotation**: Retrieve information from Ensembl and BioMart to annotate gene counts tables, including transcript and gene names, genomic coordinates, and cross-references from various annotation databases.
+1. **Gene Annotation**: Retrieve information from Ensembl and BioMart to annotate gene counts tables, including transcript and gene names, genomic coordinates, and cross-references from various annotation databases.
 
 ``` r
 # Example on generating transcript annotations file from Ensembl release 103
@@ -56,9 +59,8 @@ tx2gene <- get_annotations(rownames(txi$counts),
 tx2gene
 ```
 
-- **Dimensionality Reduction**: Generate a range of visually appealing plots for high-dimensional data. Includes unsupervised clustering methods as well.
-    - *PCA* (Principal Component Analysis)
-    
+2. **Dimensionality Reduction**: Generate a range of visually appealing plots for high-dimensional data. Includes unsupervised clustering methods as well.
+    - *PCA* (Principal Component Analysis).
 ```{r, eval = FALSE}
 nice_PCA(object = transf.data,
          PCs = c(1, 2),
@@ -75,13 +77,11 @@ nice_PCA(object = transf.data,
          legend_pos = c(0.80, 0.80, "right"),
          labels = c(var = "id", size = 3))
 ```
-
 ```{r pca, echo = FALSE}
 pca12
 ```
 
-    - *tSNE* (t-distributed Stochastic Neighbor Embedding)
-
+    - *tSNE* (t-distributed Stochastic Neighbor Embedding).  
 ```{r, eval = FALSE}
 nice_tSNE(object = transf.data,
           seed = 0,
@@ -99,13 +99,11 @@ nice_tSNE(object = transf.data,
           legend_pos = c(0.80, 0.80, "right"),
           labels = c(var = "num", size = 3))
 ```
-
 ```{r tsne, echo = FALSE}
 p.tsne
 ```
-    
-    - *UMAP* (Uniform Manifold Approximation and Projection)
-    
+
+    - *UMAP* (Uniform Manifold Approximation and Projection).  
 ```{r, eval = FALSE}
 nice_UMAP(object = transf.data,
           neighbors = 4,
@@ -123,13 +121,12 @@ nice_UMAP(object = transf.data,
           legend_pos = c(0.80, 0.80, "right"),
           labels = c(var = "num", size = 3))
 ```
-
 ```{r umap, echo = FALSE}
 p.umap
 ```
 
 
-- **Counts Normalization**: Compute and extract normalized counts such as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
+3. **Counts Normalization**: Compute and extract normalized counts such as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
 
 ``` r
 # Retrieve TPMs
@@ -149,10 +146,10 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
 gene.tpm.annotated
 ```
 
-- **Differential Expression Results**: Filter and export differential expression analysis results into MS Excel or CSV formats. Filtering criteria include:
+4. **Differential Expression Results**: Filter and export differential expression analysis results into MS Excel or CSV formats. Filtering criteria include:
     - Expression change (log2 fold change).
     - Significance (False Discovery Rate, FDR).
-    - *Detectability* (`Requena et al., 2024, Nat. Comms.`).
+    - *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
 
 ``` r
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -170,7 +167,7 @@ detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
 detect_list
 ```
 
-- **Case Organization**: Automatically categorize results from three pairwise differential expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive cases (`BigMind, 2024, manuscript in preparation`).
+5. **Case Organization**: Automatically categorize results from three pairwise differential expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive cases (`BigMind, 2024, manuscript in preparation`).
 
 ``` r
 DEGs_sig <- split_cases(df.BvsA = res.T_N,
@@ -194,34 +191,32 @@ for (i in names(DEGs_sig)) {
 DEGs_sig[c(6, 8:9)]
 ```
 
--   **Customary plots**: Generate a range of visually appealing plots to display differential expression analysis results. Here are some examples
-    -   **Volcano plots**
-
-```{r, echo = FALSE, out.width = "100%"}
+6. **Customary plots**: Generate a range of visually appealing plots to display differential expression analysis results. Here are some examples
+    - *Volcano plots*
+```{r, echo = FALSE}
 knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
 ```
 
--   **Heatmaps**
-
-```{r heatmap}
-heatmap_Ap_An
+    - *Heatmaps*
+```{r, echo = FALSE}
+knitr::include_graphics("man/figures/README-Heatmap_plot.png")
 ```
 
--   **Enrichment plots**
-
-```{r, echo = FALSE, out.width = "100%"}
+    - *Enrichment plots*
+```{r, echo = FALSE}
 knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
 ```
 
--   **Box-Scatter-Violin (BSV) plots**
-
-```{r, echo = FALSE, out.width = "100%"}
+    - *Box-Scatter-Violin (BSV) plots*
+```{r, echo = FALSE}
 knitr::include_graphics("man/figures/README-BSV_plot.jpeg")
 ```
+
 
 ## Examples
 
 For a more detailed workflow on Differential Expression Analysis with the application of the `OmicsKit` suit please check the custom [BigMind](https://github.com/BigMindLab)'s pipeline for [DESeq2](https://github.com/BigMindLab/DESeq2).
+
 
 ## Developed by
 
@@ -237,9 +232,11 @@ For a more detailed workflow on Differential Expression Analysis with the applic
     -   [Google Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ)
     -   [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
 
+
 ## License
 
 CC BY-NC-SA 4.0
+
 
 ## Contact
 

@@ -10,6 +10,8 @@ The goal of OmicsKit is to help in manipulating tables and generating
 plots for multi-omics analyses including genomics, transcriptomics,
 proteomics, methylomics and immunoinformatics.
 
+------------------------------------------------------------------------
+
 ## Installation
 
 You can install the development version of OmicsKit from
@@ -28,10 +30,10 @@ library(OmicsKit)
 
 ## Key features
 
-- **Gene Annotation**: Retrieve information from Ensembl and BioMart to
-  annotate gene counts tables, including transcript and gene names,
-  genomic coordinates, and cross-references from various annotation
-  databases.
+1.  **Gene Annotation**: Retrieve information from Ensembl and BioMart
+    to annotate gene counts tables, including transcript and gene names,
+    genomic coordinates, and cross-references from various annotation
+    databases.
 
 ``` r
 # Example on generating transcript annotations file from Ensembl release 103
@@ -75,10 +77,10 @@ tx2gene <- get_annotations(rownames(txi$counts),
     #> 9           heparan sulfate-glucosamine 3-sulfotransferase 1 [Source:HGNC Symbol;Acc:HGNC:5194]
     #> 10                                            semaphorin 3F [Source:HGNC Symbol;Acc:HGNC:10728]
 
-- **Dimensionality Reduction**: Generate a range of visually appealing
-  plots for high-dimensional data. Includes unsupervised clustering
-  methods as well.
-  - *PCA* (Principal Component Analysis)
+2.  **Dimensionality Reduction**: Generate a range of visually appealing
+    plots for high-dimensional data. Includes unsupervised clustering
+    methods as well.
+    - *PCA* (Principal Component Analysis).
 
 ``` r
 nice_PCA(object = transf.data,
@@ -97,9 +99,9 @@ nice_PCA(object = transf.data,
          labels = c(var = "id", size = 3))
 ```
 
-<img src="man/figures/README-pca-1.png" width="80%" />
+<img src="man/figures/README-pca-1.png" width="80%" style="display: block; margin: auto;" />
 
-    - *tSNE* (t-distributed Stochastic Neighbor Embedding)
+    - *tSNE* (t-distributed Stochastic Neighbor Embedding).  
 
 ``` r
 nice_tSNE(object = transf.data,
@@ -119,9 +121,9 @@ nice_tSNE(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-tsne-1.png" width="80%" />
+<img src="man/figures/README-tsne-1.png" width="80%" style="display: block; margin: auto;" />
 
-    - *UMAP* (Uniform Manifold Approximation and Projection)
+    - *UMAP* (Uniform Manifold Approximation and Projection).  
 
 ``` r
 nice_UMAP(object = transf.data,
@@ -141,10 +143,10 @@ nice_UMAP(object = transf.data,
           labels = c(var = "num", size = 3))
 ```
 
-<img src="man/figures/README-umap-1.png" width="80%" />
+<img src="man/figures/README-umap-1.png" width="80%" style="display: block; margin: auto;" />
 
-- **Counts Normalization**: Compute and extract normalized counts such
-  as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
+3.  **Counts Normalization**: Compute and extract normalized counts such
+    as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
 
 ``` r
 # Retrieve TPMs
@@ -194,12 +196,12 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
     #> ENSG00000001084                 glutamate-cysteine ligase catalytic subunit [Source:HGNC Symbol;Acc:HGNC:4311]
     #> ENSG00000001167                nuclear transcription factor Y subunit alpha [Source:HGNC Symbol;Acc:HGNC:7804]
 
-- **Differential Expression Results**: Filter and export differential
-  expression analysis results into MS Excel or CSV formats. Filtering
-  criteria include:
-  - Expression change (log2 fold change).
-  - Significance (False Discovery Rate, FDR).
-  - *Detectability* (`Requena et al., 2024, Nat. Comms.`).
+4.  **Differential Expression Results**: Filter and export differential
+    expression analysis results into MS Excel or CSV formats. Filtering
+    criteria include:
+    - Expression change (log2 fold change).
+    - Significance (False Discovery Rate, FDR).
+    - *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
 
 ``` r
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -318,10 +320,10 @@ detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
     #> ENSG00000051108 homocysteine inducible ER protein with ubiquitin like domain 1 [Source:HGNC Symbol;Acc:HGNC:13744]
     #> ENSG00000070366                       SMG6 nonsense mediated mRNA decay factor [Source:HGNC Symbol;Acc:HGNC:17809]
 
-- **Case Organization**: Automatically categorize results from three
-  pairwise differential expression analyses or Gene Set Enrichment
-  Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive
-  cases (`BigMind, 2024, manuscript in preparation`).
+5.  **Case Organization**: Automatically categorize results from three
+    pairwise differential expression analyses or Gene Set Enrichment
+    Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive
+    cases (`BigMind, 2024, manuscript in preparation`).
 
 ``` r
 DEGs_sig <- split_cases(df.BvsA = res.T_N,
@@ -392,56 +394,20 @@ for (i in names(DEGs_sig)) {
     #> ENSG00000067840    dn
     #> ENSG00000102317    dn
 
-- **Customary plots**: Generate a range of visually appealing plots to
-  display differential expression analysis results. Here are some
-  examples
-  - **Volcano plots**
+6.  **Customary plots**: Generate a range of visually appealing plots to
+    display differential expression analysis results. Here are some
+    examples
+    - *Volcano plots*
+      <img src="man/figures/README-Volcano_plot.jpg" width="80%" style="display: block; margin: auto;" />
 
-<img src="man/figures/README-Volcano_plot.jpg" width="100%" />
+    - *Heatmaps*
+      <img src="man/figures/README-Heatmap_plot.png" width="80%" style="display: block; margin: auto;" />
 
-- **Heatmaps**
+    - *Enrichment plots*
+      <img src="man/figures/README-Balloon_plot.jpeg" width="80%" style="display: block; margin: auto;" />
 
-``` r
-heatmap_Ap_An
-#> $tree_row
-#> 
-#> Call:
-#> hclust(d = d, method = method)
-#> 
-#> Cluster method   : mcquitty 
-#> Distance         : euclidean 
-#> Number of objects: 24 
-#> 
-#> 
-#> $tree_col
-#> [1] NA
-#> 
-#> $kmeans
-#> [1] NA
-#> 
-#> $gtable
-#> TableGrob (5 x 6) "layout": 8 grobs
-#>   z     cells                 name                          grob
-#> 1 1 (4-4,1-1)             row_tree polyline[GRID.polyline.22146]
-#> 2 2 (4-4,3-3)               matrix       gTree[GRID.gTree.22148]
-#> 3 3 (5-5,3-3)            col_names         text[GRID.text.22149]
-#> 4 4 (4-4,4-4)            row_names         text[GRID.text.22150]
-#> 5 5 (3-3,3-3)       col_annotation         rect[GRID.rect.22151]
-#> 6 6 (3-3,4-4) col_annotation_names         text[GRID.text.22152]
-#> 7 7 (3-5,6-6)    annotation_legend       gTree[GRID.gTree.22157]
-#> 8 8 (3-5,5-5)               legend       gTree[GRID.gTree.22160]
-#> 
-#> attr(,"class")
-#> [1] "pheatmap"
-```
-
-- **Enrichment plots**
-
-<img src="man/figures/README-Balloon_plot.jpeg" width="100%" />
-
-- **Box-Scatter-Violin (BSV) plots**
-
-<img src="man/figures/README-BSV_plot.jpeg" width="100%" />
+    - *Box-Scatter-Violin (BSV) plots*
+      <img src="man/figures/README-BSV_plot.jpeg" width="80%" style="display: block; margin: auto;" />
 
 ## Examples
 
