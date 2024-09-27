@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "80%"
 )
 ```
 
@@ -38,7 +38,7 @@ remotes::install_github("BigMindLab/OmicsKit")
 library(OmicsKit)
 ```
 
-```{r load data, echo=FALSE}
+```{r load data, echo = FALSE, message = FALSE}
 load(".RData")
 ```
 
@@ -78,11 +78,9 @@ nice_PCA(object = transf.data,
          legend_pos = c(0.80, 0.80, "right"),
          labels = c(var = "id", size = 3))
 ```
-
 ```{r pca, echo=FALSE}
 pca12
 ```
-
     + tSNE (t-distributed Stochastic Neighbor Embedding)
     
 ``` r
@@ -102,11 +100,9 @@ nice_tSNE(object = transf.data,
           legend_pos = c(0.80, 0.80, "right"),
           labels = c(var = "num", size = 3))
 ```
-
 ```{r tsne, echo=FALSE}
 p.tsne
 ```
-
     + UMAP (Uniform Manifold Approximation and Projection)
 
 ``` r
@@ -126,7 +122,6 @@ nice_UMAP(object = transf.data,
           legend_pos = c(0.80, 0.80, "right"),
           labels = c(var = "num", size = 3))
 ```
-
 ```{r umap, echo=FALSE}
 p.umap
 ```
@@ -169,10 +164,7 @@ detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
 ```
 
 ```{r detectability, echo=FALSE}
-print(detect_list[1])
-print(detect_list[3])
-print(detect_list[4])
-print(detect_list[2], max = 30)
+detect_list
 ```
 
 + **Case Organization**: Automatically categorize results from three pairwise differential expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive cases (`BigMind, 2024, manuscript in preparation`).
@@ -204,18 +196,19 @@ DEGs_sig[c(6, 8:9)]
 ```{r, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
 ```
-
     + **Heatmaps**
 
 ```{r heatmap}
 heatmap_Ap_An
 ```
-
     + **Enrichment plots**
-![Pathway Enrichment with GSEA](man/figures/README-Balloon_plot.jpeg)
+
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
+```
     
     + **Box-Scatter-Violin (BSV) plots**
-
+    
 ```{r, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("man/figures/README-BSV_plot.jpeg")
 ```
