@@ -14,7 +14,7 @@ proteomics, methylomics and immunoinformatics.
 
 ## Installation
 
-You can install the development version of OmicsKit from
+You can install the development version of `OmicsKit` from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -25,7 +25,7 @@ install.packages("remotes")
 remotes::install_github("BigMindLab/OmicsKit")
 
 # Call library for usage
-library(OmicsKit)
+library("OmicsKit")
 ```
 
 ## Key features
@@ -83,8 +83,7 @@ tx2gene <- get_annotations(rownames(txi$counts),
 Generate a range of visually appealing plots for high-dimensional data.
 Includes unsupervised clustering methods as well.
 
-\`\`\`\`  
-1. *PCA* (Principal Component Analysis).
+1.  *PCA* (Principal Component Analysis).
 
 ``` r
 nice_PCA(object = transf.data,
@@ -149,22 +148,24 @@ nice_UMAP(object = transf.data,
 
 <img src="man/figures/README-umap-1.png" width="90%" style="display: block; margin: auto;" />
 
+### **Counts Normalization**
 
-    ### **Counts Normalization**  
-    Compute and extract normalized counts such as TPM, RPKM, FPKM, and the normalized counts from DESeq2.  
+Compute and extract normalized counts such as TPM, RPKM, FPKM, and the
+normalized counts from DESeq2.
 
-    ``` r
-    # Retrieve TPMs
-    gene.tpm <- tpm(raw_counts = counts.gene,
-                    gene_lengths = counts.gene_annotations$gene_length)
+``` r
+# Retrieve TPMs
+gene.tpm <- tpm(raw_counts = counts.gene,
+                gene_lengths = counts.gene_annotations$gene_length)
 
-    # Convert to data frame
-    gene.tpm <- data.frame(gene.tpm)
+# Convert to data frame
+gene.tpm <- data.frame(gene.tpm)
 
-    # Add annotations
-    gene.tpm.annotated <- add_annotations(object = gene.tpm,
-                                          reference = geneID.details,
-                                          variables = annotations)
+# Add annotations
+gene.tpm.annotated <- add_annotations(object = gene.tpm,
+                                      reference = geneID.details,
+                                      variables = annotations)
+```
 
     #>                        S7505      S7588       S7644          geneID   symbol
     #> ENSG00000000003  0.007897175 0.01332420 0.005832601 ENSG00000000003   TSPAN6
@@ -203,9 +204,13 @@ nice_UMAP(object = transf.data,
 ### **Differential Expression Results**
 
 Filter and export differential expression analysis results into MS Excel
-or CSV formats. Filtering criteria include: 1. Expression change (log2
-fold change). 2. Significance (False Discovery Rate, FDR). 3.
-*Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
+or CSV formats. Filtering criteria include:
+
+1.  Expression change (log2 fold change).
+
+2.  Significance (False Discovery Rate, FDR).
+
+3.  *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
 
 ``` r
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -329,7 +334,7 @@ detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
 Automatically categorize results from three pairwise differential
 expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs
 A, C vs B) into 10 mutually exclusive cases
-(`BigMind, 2024, manuscript in preparation`).
+([`BigMind, 2024, manuscript in preparation`](#article)).
 
 ``` r
 DEGs_sig <- split_cases(df.BvsA = res.T_N,
@@ -343,10 +348,11 @@ DEGs_sig <- split_cases(df.BvsA = res.T_N,
 
 # Filter the whole detectability list by a new threshold
 
-for (i in names(DEGs_sig)) {
-  DEGs_sig[[i]] <- DEGs_sig[[i]][rownames(DEGs_sig[[i]]) %in% detect_list$DetectGenes, ]
-  DEGs_sig[[i]] <- DEGs_sig[[i]][DEGs_sig[[i]]$padj < 0.05, ]
-}
+DEGs_sig <- lapply(DEGs_sig, function(x) {
+  x <- x[rownames(x) %in% detect_list$DetectGenes, ]
+  x <- x[x$padj < 0.05, ]
+  return(x)
+})
 ```
 
     #> $Case6
@@ -399,27 +405,33 @@ for (i in names(DEGs_sig)) {
     #>                 trend
     #> ENSG00000067840    dn
     #> ENSG00000102317    dn
+    #>  [1]  1  2  3  4  5  6  7  8  9 10
+    #> $Case5
+    #>  [1] baseMean       log2FoldChange lfcSE          stat           pvalue        
+    #>  [6] padj           ensembl        symbol         biotype        chromosome    
+    #> [11] gene_start     gene_end       gene_length    description    trend         
+    #> <0 rows> (or 0-length row.names)
 
 ### **Customary plots**
 
 Generate a range of visually appealing plots to display differential
 expression analysis results. Here are some examples:
 
-    1.   *Volcano plots*  
+1.  *Volcano plots*
 
-    <img src="man/figures/README-Volcano_plot.jpg" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-Volcano_plot.jpg" width="90%" style="display: block; margin: auto;" />
 
-    2.   *Heatmaps*\
+2.  *Heatmaps*
 
-    <img src="man/figures/README-Heatmap_plot.png" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-Heatmap_plot.png" width="90%" style="display: block; margin: auto;" />
 
-    3.   *Enrichment plots*  
+3.  *Enrichment plots*
 
-    <img src="man/figures/README-Balloon_plot.jpeg" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-Balloon_plot.jpeg" width="90%" style="display: block; margin: auto;" />
 
-    4.   *Box-Scatter-Violin (BSV) plots*  
+4.  *Box-Scatter-Violin (BSV) plots*
 
-    <img src="man/figures/README-BSV_plot.jpg" width="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-BSV_plot.jpg" width="90%" style="display: block; margin: auto;" />
 
 ## Examples
 

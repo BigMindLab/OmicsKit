@@ -23,11 +23,11 @@ knitr::opts_chunk$set(
 
 The goal of OmicsKit is to help in manipulating tables and generating plots for multi-omics analyses including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.  
 
-------------------------------------------------------------------------
+---
 
 ## Installation  
 
-You can install the development version of OmicsKit from [GitHub](https://github.com/) with:  
+You can install the development version of `OmicsKit` from [GitHub](https://github.com/) with:  
 
 ``` r
 # Install the remotes package if needed
@@ -37,7 +37,7 @@ install.packages("remotes")
 remotes::install_github("BigMindLab/OmicsKit")
 
 # Call library for usage
-library(OmicsKit)
+library("OmicsKit")
 ```
 
 ```{r load data, echo = FALSE, message = FALSE}
@@ -65,7 +65,6 @@ tx2gene
 ### **Dimensionality Reduction**  
 Generate a range of visually appealing plots for high-dimensional data. Includes unsupervised clustering methods as well.  
 
-````         
 1. *PCA* (Principal Component Analysis).  
 
 ```{r, eval = FALSE}
@@ -88,7 +87,6 @@ nice_PCA(object = transf.data,
 ```{r pca, echo = FALSE}
 pca12
 ```
-
      
 2. *tSNE* (t-distributed Stochastic Neighbor Embedding).  
 
@@ -114,7 +112,6 @@ nice_tSNE(object = transf.data,
 p.tsne
 ```
 
-
 3. *UMAP* (Uniform Manifold Approximation and Projection).  
 
 ```{r, eval = FALSE}
@@ -137,7 +134,6 @@ nice_UMAP(object = transf.data,
 
 ```{r umap, echo = FALSE}
 p.umap
-```
 ```
 
 ### **Counts Normalization**  
@@ -163,9 +159,12 @@ gene.tpm.annotated
 
 ### **Differential Expression Results**  
 Filter and export differential expression analysis results into MS Excel or CSV formats. Filtering criteria include:
-    1. Expression change (log2 fold change).
-    2. Significance (False Discovery Rate, FDR).
-    3. *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
+
+1. Expression change (log2 fold change).
+
+2. Significance (False Discovery Rate, FDR).
+
+3. *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
 
 ```{r detect_filter, eval = FALSE}
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -184,7 +183,7 @@ detect_list
 ```
 
 ### **Case Organization**  
-Automatically categorize results from three pairwise differential expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive cases (`BigMind, 2024, manuscript in preparation`).
+Automatically categorize results from three pairwise differential expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive cases ([`BigMind, 2024, manuscript in preparation`](#article)).
 
 ``` r
 DEGs_sig <- split_cases(df.BvsA = res.T_N,
@@ -198,42 +197,45 @@ DEGs_sig <- split_cases(df.BvsA = res.T_N,
 
 # Filter the whole detectability list by a new threshold
 
-for (i in names(DEGs_sig)) {
-  DEGs_sig[[i]] <- DEGs_sig[[i]][rownames(DEGs_sig[[i]]) %in% detect_list$DetectGenes, ]
-  DEGs_sig[[i]] <- DEGs_sig[[i]][DEGs_sig[[i]]$padj < 0.05, ]
-}
+DEGs_sig <- lapply(DEGs_sig, function(x) {
+  x <- x[rownames(x) %in% detect_list$DetectGenes, ]
+  x <- x[x$padj < 0.05, ]
+  return(x)
+})
 ```
 
 ```{r split cases, echo=FALSE}
 DEGs_sig[c(6, 8:9)]
+seq_along(DEGs_sig)
+DEGs_sig[5]
 ```
 
 ### **Customary plots**
 Generate a range of visually appealing plots to display differential expression analysis results. Here are some examples:
 
-    1.   *Volcano plots*  
+1. *Volcano plots*
+    
+```{r, echo = FALSE}
+knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
+```
 
-    ```{r, echo = FALSE}
-    knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
-    ```
+2. *Heatmaps*
 
-    2.   *Heatmaps*\
+```{r, echo = FALSE}
+knitr::include_graphics("man/figures/README-Heatmap_plot.png")
+```
 
-    ```{r, echo = FALSE}
-    knitr::include_graphics("man/figures/README-Heatmap_plot.png")
-    ```
+3. *Enrichment plots*
 
-    3.   *Enrichment plots*  
+```{r, echo = FALSE}
+knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
+```
 
-    ```{r, echo = FALSE}
-    knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
-    ```
+4. *Box-Scatter-Violin (BSV) plots*
 
-    4.   *Box-Scatter-Violin (BSV) plots*  
-
-    ```{r, echo = FALSE}
-    knitr::include_graphics("man/figures/README-BSV_plot.jpg")
-    ```
+```{r, echo = FALSE}
+knitr::include_graphics("man/figures/README-BSV_plot.jpg")
+```
 
 ## Examples
 
