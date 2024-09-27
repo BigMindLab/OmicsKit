@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of OmicsKit is to help in manipulating tables and generating
+The goal of `OmicsKit` is to help in manipulating tables and generating
 plots for multi-omics analyses including genomics, transcriptomics,
 proteomics, methylomics and immunoinformatics.
 
@@ -30,7 +30,7 @@ library("OmicsKit")
 
 ## Key features
 
-#### **Gene Annotations**
+### **Gene Annotations**
 
 Retrieve information from Ensembl and BioMart to annotate gene counts
 tables, including transcript and gene names, genomic coordinates, and
@@ -103,6 +103,10 @@ nice_PCA(object = transf.data,
 ```
 
 <img src="man/figures/README-pca-1.png" width="90%" style="display: block; margin: auto;" />
+
+<p align="center">
+<img src="man/figures/README-pca-1.png" width="90%">
+</p>
 
 2.  *tSNE* (t-distributed Stochastic Neighbor Embedding).
 
