@@ -30,10 +30,10 @@ library(OmicsKit)
 
 ## Key features
 
-1.  **Gene Annotation**: Retrieve information from Ensembl and BioMart
-    to annotate gene counts tables, including transcript and gene names,
-    genomic coordinates, and cross-references from various annotation
-    databases.
+- **Gene Annotation**: Retrieve information from Ensembl and BioMart to
+  annotate gene counts tables, including transcript and gene names,
+  genomic coordinates, and cross-references from various annotation
+  databases.
 
 ``` r
 # Example on generating transcript annotations file from Ensembl release 103
@@ -77,76 +77,77 @@ tx2gene <- get_annotations(rownames(txi$counts),
     #> 9           heparan sulfate-glucosamine 3-sulfotransferase 1 [Source:HGNC Symbol;Acc:HGNC:5194]
     #> 10                                            semaphorin 3F [Source:HGNC Symbol;Acc:HGNC:10728]
 
-2.  **Dimensionality Reduction**: Generate a range of visually appealing
-    plots for high-dimensional data. Includes unsupervised clustering
-    methods as well.
-    - *PCA* (Principal Component Analysis).
+- **Dimensionality Reduction**: Generate a range of visually appealing
+  plots for high-dimensional data. Includes unsupervised clustering
+  methods as well.
 
-``` r
-nice_PCA(object = transf.data,
-         PCs = c(1, 2),
-         ntop =  200,
-         returnData = FALSE,
-         variables = c(fill = "group", shape = "sex"),
-         legend_names = c(fill = "Group", shape = "Sex"),
-         size = 9,
-         alpha = 1,
-         shapes = 21:22,
-         colors = my_colors,
-         legend_title = 10,
-         legend_elements = 8,
-         legend_pos = c(0.80, 0.80, "right"),
-         labels = c(var = "id", size = 3))
-```
+  - *PCA* (Principal Component Analysis).
 
-<img src="man/figures/README-pca-1.png" width="80%" style="display: block; margin: auto;" />
+  ``` r
+  nice_PCA(object = transf.data,
+           PCs = c(1, 2),
+           ntop =  200,
+           returnData = FALSE,
+           variables = c(fill = "group", shape = "sex"),
+           legend_names = c(fill = "Group", shape = "Sex"),
+           size = 9,
+           alpha = 1,
+           shapes = 21:22,
+           colors = my_colors,
+           legend_title = 10,
+           legend_elements = 8,
+           legend_pos = c(0.80, 0.80, "right"),
+           labels = c(var = "id", size = 3))
+  ```
 
-    - *tSNE* (t-distributed Stochastic Neighbor Embedding).  
+  <img src="man/figures/README-pca-1.png" width="80%" style="display: block; margin: auto;" />
 
-``` r
-nice_tSNE(object = transf.data,
-          seed = 0,
-          perplexity = 3,
-          max_iterations = 10000,
-          returnData = FALSE,
-          variables = c(fill = "group", shape = "sex"),
-          legend_names = c(fill = "Group", shape = "Sex"),
-          size = 9,
-          alpha = 1,
-          shapes = 21:22,
-          colors = my_colors,
-          legend_title = 10,
-          legend_elements = 8,
-          legend_pos = c(0.80, 0.80, "right"),
-          labels = c(var = "num", size = 3))
-```
+  - *tSNE* (t-distributed Stochastic Neighbor Embedding).
 
-<img src="man/figures/README-tsne-1.png" width="80%" style="display: block; margin: auto;" />
+  ``` r
+  nice_tSNE(object = transf.data,
+            seed = 0,
+            perplexity = 3,
+            max_iterations = 10000,
+            returnData = FALSE,
+            variables = c(fill = "group", shape = "sex"),
+            legend_names = c(fill = "Group", shape = "Sex"),
+            size = 9,
+            alpha = 1,
+            shapes = 21:22,
+            colors = my_colors,
+            legend_title = 10,
+            legend_elements = 8,
+            legend_pos = c(0.80, 0.80, "right"),
+            labels = c(var = "num", size = 3))
+  ```
 
-    - *UMAP* (Uniform Manifold Approximation and Projection).  
+  <img src="man/figures/README-tsne-1.png" width="80%" style="display: block; margin: auto;" />
 
-``` r
-nice_UMAP(object = transf.data,
-          neighbors = 4,
-          components = 3,
-          epochs = 10000,
-          returnData = FALSE,
-          variables = c(fill = "group", shape = "sex"),
-          legend_names = c(fill = "Group", shape = "Sex"),
-          shapes = 21:22,
-          colors = my_colors,
-          size = 9,
-          alpha = 1,
-          legend_title = 10,
-          legend_elements = 8,
-          legend_pos = c(0.80, 0.80, "right"),
-          labels = c(var = "num", size = 3))
-```
+  - *UMAP* (Uniform Manifold Approximation and Projection).
 
-<img src="man/figures/README-umap-1.png" width="80%" style="display: block; margin: auto;" />
+  ``` r
+  nice_UMAP(object = transf.data,
+            neighbors = 4,
+            components = 3,
+            epochs = 10000,
+            returnData = FALSE,
+            variables = c(fill = "group", shape = "sex"),
+            legend_names = c(fill = "Group", shape = "Sex"),
+            shapes = 21:22,
+            colors = my_colors,
+            size = 9,
+            alpha = 1,
+            legend_title = 10,
+            legend_elements = 8,
+            legend_pos = c(0.80, 0.80, "right"),
+            labels = c(var = "num", size = 3))
+  ```
 
-3.  **Counts Normalization**: Compute and extract normalized counts such
-    as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
+  <img src="man/figures/README-umap-1.png" width="80%" style="display: block; margin: auto;" />
+
+- **Counts Normalization**: Compute and extract normalized counts such
+  as TPM, RPKM, FPKM, and the normalized counts from DESeq2.
 
 ``` r
 # Retrieve TPMs
@@ -196,12 +197,12 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
     #> ENSG00000001084                 glutamate-cysteine ligase catalytic subunit [Source:HGNC Symbol;Acc:HGNC:4311]
     #> ENSG00000001167                nuclear transcription factor Y subunit alpha [Source:HGNC Symbol;Acc:HGNC:7804]
 
-4.  **Differential Expression Results**: Filter and export differential
-    expression analysis results into MS Excel or CSV formats. Filtering
-    criteria include:
-    - Expression change (log2 fold change).
-    - Significance (False Discovery Rate, FDR).
-    - *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
+- **Differential Expression Results**: Filter and export differential
+  expression analysis results into MS Excel or CSV formats. Filtering
+  criteria include:
+  - Expression change (log2 fold change).
+  - Significance (False Discovery Rate, FDR).
+  - *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
 
 ``` r
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -320,10 +321,10 @@ detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
     #> ENSG00000051108 homocysteine inducible ER protein with ubiquitin like domain 1 [Source:HGNC Symbol;Acc:HGNC:13744]
     #> ENSG00000070366                       SMG6 nonsense mediated mRNA decay factor [Source:HGNC Symbol;Acc:HGNC:17809]
 
-5.  **Case Organization**: Automatically categorize results from three
-    pairwise differential expression analyses or Gene Set Enrichment
-    Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive
-    cases (`BigMind, 2024, manuscript in preparation`).
+- **Case Organization**: Automatically categorize results from three
+  pairwise differential expression analyses or Gene Set Enrichment
+  Analysis (e.g., B vs A, C vs A, C vs B) into 10 mutually exclusive
+  cases (`BigMind, 2024, manuscript in preparation`).
 
 ``` r
 DEGs_sig <- split_cases(df.BvsA = res.T_N,
@@ -394,20 +395,24 @@ for (i in names(DEGs_sig)) {
     #> ENSG00000067840    dn
     #> ENSG00000102317    dn
 
-6.  **Customary plots**: Generate a range of visually appealing plots to
-    display differential expression analysis results. Here are some
-    examples
-    - *Volcano plots*
-      <img src="man/figures/README-Volcano_plot.jpg" width="80%" style="display: block; margin: auto;" />
+- **Customary plots**: Generate a range of visually appealing plots to
+  display differential expression analysis results. Here are some
+  examples
 
-    - *Heatmaps*
-      <img src="man/figures/README-Heatmap_plot.png" width="80%" style="display: block; margin: auto;" />
+  - *Volcano plots*
 
-    - *Enrichment plots*
-      <img src="man/figures/README-Balloon_plot.jpeg" width="80%" style="display: block; margin: auto;" />
+  <img src="man/figures/README-Volcano_plot.jpg" width="80%" style="display: block; margin: auto;" />
 
-    - *Box-Scatter-Violin (BSV) plots*
-      <img src="man/figures/README-BSV_plot.jpeg" width="80%" style="display: block; margin: auto;" />
+  - *Heatmaps*  
+    <img src="man/figures/README-Heatmap_plot.png" width="80%" style="display: block; margin: auto;" />
+
+  - *Enrichment plots*
+
+  <img src="man/figures/README-Balloon_plot.jpeg" width="80%" style="display: block; margin: auto;" />
+
+  - *Box-Scatter-Violin (BSV) plots*
+
+  <img src="man/figures/README-BSV_plot.jpeg" width="80%" style="display: block; margin: auto;" />
 
 ## Examples
 
