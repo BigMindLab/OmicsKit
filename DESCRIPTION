@@ -1,11 +1,11 @@
 Package: OmicsKit
-Title: A bioinformatics library for the analysis of omics data
+Title: A bioinformatics toolset for multiomics analysis
 Version: 1.0.0.0000
 Authors@R: c(
     person("David", "Requena", email =  "david.requena@nyulangone.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5968-1133")),
     person("Daniel", "Guevara", email = "dgdiaz011202@gmail.com", role = "aut", comment = c(ORCID = "0009-0001-2786-8729")))
-Description: This library contains functions that help in manipulating tables and generating plots for transcriptomics and gene-set enrichment analysis.
-License: CC BY-NC-SA 4.0
+Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
+License: CC BY 4.0
 Encoding: UTF-8
 Imports:
     DESeq2,
