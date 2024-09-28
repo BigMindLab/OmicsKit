@@ -15,5 +15,7 @@ Imports:
     ggplot2,
     ggrepel,
     tsne,
-    openxlsx
+    openxlsx,
+    magrittr,
+    rlang
 RoxygenNote: 7.3.2
