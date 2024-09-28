@@ -152,7 +152,7 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
 ```
 
 ```{r normalization, echo=FALSE}
-gene.tpm.annotated
+head(gene.tpm.annotated)
 ```
 
 ### **Differential Expression Results**  
@@ -229,7 +229,7 @@ knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
 
 4. *Box-Scatter-Violin (BSV) plots*
 
-```{r, echo = FALSE, fig.dim = c(1, 2)}
+```{r, echo = FALSE}
 knitr::include_graphics("man/figures/README-BSV_plot.jpg")
 ```
 

@@ -155,17 +155,13 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
                                       variables = annotations)
 ```
 
-    #>                        S7505      S7588       S7644          geneID   symbol
-    #> ENSG00000000003  0.007897175 0.01332420 0.005832601 ENSG00000000003   TSPAN6
-    #> ENSG00000000005  0.000000000 0.00000000 0.000000000 ENSG00000000005     TNMD
-    #> ENSG00000000419  0.425217339 0.31342321 0.266468292 ENSG00000000419     DPM1
-    #> ENSG00000000457  0.319121112 0.22306157 0.152358455 ENSG00000000457    SCYL3
-    #> ENSG00000000460  0.008210803 0.00826710 0.003325549 ENSG00000000460 C1orf112
-    #> ENSG00000000938 11.005523543 5.41430610 4.858797243 ENSG00000000938      FGR
-    #> ENSG00000000971  0.018119278 0.03191976 0.023222259 ENSG00000000971      CFH
-    #> ENSG00000001036  0.333962388 0.22842915 0.191101243 ENSG00000001036    FUCA2
-    #> ENSG00000001084  0.096533971 0.11264744 0.085116190 ENSG00000001084     GCLC
-    #> ENSG00000001167  0.617288475 0.58584127 0.330812387 ENSG00000001167     NFYA
+    #>                        S7505     S7588       S7644          geneID   symbol
+    #> ENSG00000000003  0.007897175 0.0133242 0.005832601 ENSG00000000003   TSPAN6
+    #> ENSG00000000005  0.000000000 0.0000000 0.000000000 ENSG00000000005     TNMD
+    #> ENSG00000000419  0.425217339 0.3134232 0.266468292 ENSG00000000419     DPM1
+    #> ENSG00000000457  0.319121112 0.2230616 0.152358455 ENSG00000000457    SCYL3
+    #> ENSG00000000460  0.008210803 0.0082671 0.003325549 ENSG00000000460 C1orf112
+    #> ENSG00000000938 11.005523543 5.4143061 4.858797243 ENSG00000000938      FGR
     #>                        biotype chromosome gene_start  gene_end gene_length
     #> ENSG00000000003 protein_coding          X  100627108 100639991       12884
     #> ENSG00000000005 protein_coding          X  100584936 100599885       14950
@@ -173,10 +169,6 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
     #> ENSG00000000457 protein_coding          1  169849631 169894267       44637
     #> ENSG00000000460 protein_coding          1  169662007 169854080      192074
     #> ENSG00000000938 protein_coding          1   27612064  27635185       23122
-    #> ENSG00000000971 protein_coding          1  196652043 196747504       95462
-    #> ENSG00000001036 protein_coding          6  143494812 143511720       16909
-    #> ENSG00000001084 protein_coding          6   53497341  53616970      119630
-    #> ENSG00000001167 protein_coding          6   41072945  41099976       27032
     #>                                                                                                    description
     #> ENSG00000000003                                              tetraspanin 6 [Source:HGNC Symbol;Acc:HGNC:11858]
     #> ENSG00000000005                                                tenomodulin [Source:HGNC Symbol;Acc:HGNC:17757]
@@ -184,10 +176,6 @@ gene.tpm.annotated <- add_annotations(object = gene.tpm,
     #> ENSG00000000457                                   SCY1 like pseudokinase 3 [Source:HGNC Symbol;Acc:HGNC:19285]
     #> ENSG00000000460                        chromosome 1 open reading frame 112 [Source:HGNC Symbol;Acc:HGNC:25565]
     #> ENSG00000000938              FGR proto-oncogene, Src family tyrosine kinase [Source:HGNC Symbol;Acc:HGNC:3697]
-    #> ENSG00000000971                                         complement factor H [Source:HGNC Symbol;Acc:HGNC:4883]
-    #> ENSG00000001036                                        alpha-L-fucosidase 2 [Source:HGNC Symbol;Acc:HGNC:4008]
-    #> ENSG00000001084                 glutamate-cysteine ligase catalytic subunit [Source:HGNC Symbol;Acc:HGNC:4311]
-    #> ENSG00000001167                nuclear transcription factor Y subunit alpha [Source:HGNC Symbol;Acc:HGNC:7804]
 
 ### **Differential Expression Results**
 
