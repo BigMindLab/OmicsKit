@@ -44,39 +44,27 @@ tx2gene <- get_annotations(rownames(txi$counts),
                            format = "xlsx")
 ```
 
-    #>          transcriptID          geneID  symbol        biotype chromosome
-    #> 1  ENST00000000233.10 ENSG00000004059    ARF5 protein_coding          7
-    #> 2   ENST00000000412.8 ENSG00000003056    M6PR protein_coding         12
-    #> 3  ENST00000000442.11 ENSG00000173153   ESRRA protein_coding         11
-    #> 4   ENST00000001008.6 ENSG00000004478   FKBP4 protein_coding         12
-    #> 5   ENST00000001146.7 ENSG00000003137 CYP26B1 protein_coding          2
-    #> 6   ENST00000002125.9 ENSG00000003509 NDUFAF7 protein_coding          2
-    #> 7  ENST00000002165.11 ENSG00000001036   FUCA2 protein_coding          6
-    #> 8  ENST00000002501.11 ENSG00000003249  DBNDD1 protein_coding         16
-    #> 9   ENST00000002596.6 ENSG00000002587  HS3ST1 protein_coding          4
-    #> 10  ENST00000002829.8 ENSG00000001617  SEMA3F protein_coding          3
-    #>    gene_start  gene_end gene_length
-    #> 1   127588386 127591700        3315
-    #> 2     8940361   8949761        9401
-    #> 3    64305497  64316743       11247
-    #> 4     2794970   2805423       10454
-    #> 5    72129238  72147862       18625
-    #> 6    37231631  37253403       21773
-    #> 7   143494812 143511720       16909
-    #> 8    90004871  90019890       15020
-    #> 9    11393150  11429564       36415
-    #> 10   50155045  50189075       34031
-    #>                                                                                     description
-    #> 1                                   ADP ribosylation factor 5 [Source:HGNC Symbol;Acc:HGNC:658]
-    #> 2             mannose-6-phosphate receptor, cation dependent [Source:HGNC Symbol;Acc:HGNC:6752]
-    #> 3                            estrogen related receptor alpha [Source:HGNC Symbol;Acc:HGNC:3471]
-    #> 4                                    FKBP prolyl isomerase 4 [Source:HGNC Symbol;Acc:HGNC:3720]
-    #> 5            cytochrome P450 family 26 subfamily B member 1 [Source:HGNC Symbol;Acc:HGNC:20581]
-    #> 6  NADH:ubiquinone oxidoreductase complex assembly factor 7 [Source:HGNC Symbol;Acc:HGNC:28816]
-    #> 7                                       alpha-L-fucosidase 2 [Source:HGNC Symbol;Acc:HGNC:4008]
-    #> 8                             dysbindin domain containing 1 [Source:HGNC Symbol;Acc:HGNC:28455]
-    #> 9           heparan sulfate-glucosamine 3-sulfotransferase 1 [Source:HGNC Symbol;Acc:HGNC:5194]
-    #> 10                                            semaphorin 3F [Source:HGNC Symbol;Acc:HGNC:10728]
+    #>         transcriptID          geneID  symbol        biotype chromosome
+    #> 1 ENST00000000233.10 ENSG00000004059    ARF5 protein_coding          7
+    #> 2  ENST00000000412.8 ENSG00000003056    M6PR protein_coding         12
+    #> 3 ENST00000000442.11 ENSG00000173153   ESRRA protein_coding         11
+    #> 4  ENST00000001008.6 ENSG00000004478   FKBP4 protein_coding         12
+    #> 5  ENST00000001146.7 ENSG00000003137 CYP26B1 protein_coding          2
+    #> 6  ENST00000002125.9 ENSG00000003509 NDUFAF7 protein_coding          2
+    #>   gene_start  gene_end gene_length
+    #> 1  127588386 127591700        3315
+    #> 2    8940361   8949761        9401
+    #> 3   64305497  64316743       11247
+    #> 4    2794970   2805423       10454
+    #> 5   72129238  72147862       18625
+    #> 6   37231631  37253403       21773
+    #>                                                                                    description
+    #> 1                                  ADP ribosylation factor 5 [Source:HGNC Symbol;Acc:HGNC:658]
+    #> 2            mannose-6-phosphate receptor, cation dependent [Source:HGNC Symbol;Acc:HGNC:6752]
+    #> 3                           estrogen related receptor alpha [Source:HGNC Symbol;Acc:HGNC:3471]
+    #> 4                                   FKBP prolyl isomerase 4 [Source:HGNC Symbol;Acc:HGNC:3720]
+    #> 5           cytochrome P450 family 26 subfamily B member 1 [Source:HGNC Symbol;Acc:HGNC:20581]
+    #> 6 NADH:ubiquinone oxidoreductase complex assembly factor 7 [Source:HGNC Symbol;Acc:HGNC:28816]
 
 ### **Dimensionality Reduction**
 

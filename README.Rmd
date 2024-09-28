@@ -57,7 +57,7 @@ tx2gene <- get_annotations(rownames(txi$counts),
 ```
 
 ```{r annotations, echo=FALSE}
-tx2gene
+head(tx2gene)
 ```
 
 ### **Dimensionality Reduction**  
@@ -229,7 +229,7 @@ knitr::include_graphics("man/figures/README-Balloon_plot.jpeg")
 
 4. *Box-Scatter-Violin (BSV) plots*
 
-```{r, echo = FALSE, fig.dim=c(5,7)}
+```{r, echo = FALSE, fig.dim = c(1, 2)}
 knitr::include_graphics("man/figures/README-BSV_plot.jpg")
 ```
 
