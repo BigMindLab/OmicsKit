@@ -4,12 +4,12 @@
 \alias{add_annotations}
 \title{A function to add annotations to a table of gene counts.}
 \usage{
-add_annotations(object, reference = geneID.details, variables = NULL)
+add_annotations(object, reference, variables = NULL)
 }
 \arguments{
 \item{object}{A table of gene counts (rows: genes, columns:samples, rownames: ENSEMBL gene IDs).}
 
-\item{reference}{A reference table with the annotations. Default: geneID.details.}
+\item{reference}{A reference table with the annotations. Default: geneID.details in our custom pipeline.}
 
 \item{variables}{Annotations (columns) from the reference table to add, i.e. gene symbol, gene_length, description.}
 }
