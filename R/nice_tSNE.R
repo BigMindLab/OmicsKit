@@ -61,7 +61,7 @@ nice_tSNE <- function(object, seed = 0, perplexity = 3, max_iterations = 10000, 
 
     p.tsne <- ggplot(data = df.tsne, aes_string(x = "X1", y = "X2", fill = variables[1])) +
       geom_point(size = size, alpha = alpha, shape = 21) +
-      scale_fill_manual(values = nice_colors, guide = guide_legend(override.aes = aes(shape = 21, size = 9)))
+      scale_fill_manual(values = colors, guide = guide_legend(override.aes = aes(shape = 21, size = 9)))
   }
 
   p.tsne <- p.tsne + coord_fixed() + theme_bw() +

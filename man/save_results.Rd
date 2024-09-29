@@ -4,7 +4,7 @@
 \alias{save_results}
 \title{Save the results of a Differential Expression analysis}
 \usage{
-save_results(df, name, l2fc = 0)
+save_results(df, name, l2fc = 0, cutoff_alpha = 0.25)
 }
 \arguments{
 \item{df}{A dataframe with the results of a Differential Expression analysis.}
@@ -12,6 +12,8 @@ save_results(df, name, l2fc = 0)
 \item{name}{The name to be used to save the tables, without file extension.}
 
 \item{l2fc}{The cut-off of Log2(Fold Change) for the over- and under-expressed tables. Default = 0.}
+
+\item{cutoff_alpha}{The cut-off of the False Discovery Rate (FDR o padj). Default = 0.25.}
 }
 \description{
 This function takes as input the output of the function "results()" of DEseq2.
