@@ -25,6 +25,7 @@
 #' @param title_size Font of the title and axis names. Default: c(axis = 20, fig = 24).
 #' @param label_size Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
+#' @import ggplot2
 #' @export
 
 nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
@@ -35,8 +36,12 @@ nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "Va
 		      title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
 		      legend_size = c(title = 14, elements = 12)) {
 
-  require("DESeq2")
-  require("ggplot2")
+  if (!requireNamespace("DESeq2", quietly = TRUE)) {
+    stop(
+      "Package \"DESeq2\" must be installed to use this function.",
+      call. = FALSE
+      )
+  }
 
   # Extracting the vector of counts for that gene
   gene_counts <- DESeq2::counts(object, normalized = TRUE)[genename, ]
@@ -51,7 +56,7 @@ nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "Va
                                labels = labels)
 
   # Plot
-  p.bs <- ggplot2::ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
+  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
     geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
 		show.legend = FALSE, trim = TRUE) +
     geom_boxplot(width = 0.6, fill = "gray90") +
@@ -82,7 +87,7 @@ nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "Va
                                    guide = guide_legend(override.aes = aes(shape = 21, size = 7)))
 
   if (save == T) {
-    ggplot2::ggsave(paste0(symbol,".jpg"), plot = p.bs, width = width, height = height, dpi = dpi)
+    ggsave(paste0(symbol,".jpg"), plot = p.bs, width = width, height = height, dpi = dpi)
 
   } else { return(p.bs) }
 }

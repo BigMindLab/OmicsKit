@@ -7,15 +7,18 @@ Authors@R: c(
 Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
 License: CC BY 4.0
 Encoding: UTF-8
+RoxygenNote: 7.3.2
 Imports:
     DESeq2,
     biomaRt,
     dplyr,
     matrixStats,
     ggplot2,
-    ggrepel,
     tsne,
-    openxlsx,
     magrittr,
-    rlang
-RoxygenNote: 7.3.2
+    rlang,
+    SummarizedExperiment,
+    stats
+Suggests: 
+    ggrepel,
+    openxlsx
