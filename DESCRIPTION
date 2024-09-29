@@ -18,7 +18,9 @@ Imports:
     magrittr,
     rlang,
     SummarizedExperiment,
-    stats
+    stats,
+    tibble,
+    umap
 Suggests: 
     ggrepel,
     openxlsx

@@ -20,6 +20,8 @@
 #' @param legend_pos Position of the legend in the plot. Default: c(0.80, 0.80, "right").
 #' @param labels A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).
 #' @param name_tags A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).
+#' @import ggplot2
+#' @importFrom SummarizedExperiment assay colData
 #' @export
 
 nice_tSNE <- function(object, seed = 0, perplexity = 3, max_iterations = 10000, returnData = FALSE,
@@ -31,14 +33,19 @@ nice_tSNE <- function(object, seed = 0, perplexity = 3, max_iterations = 10000, 
                       name_tags = NULL) # c(var = "label", size = 3, minlen = 2, box = 0.5))
 {
 
-  require("tsne")
+  if (!requireNamespace("tsne", quietly = TRUE)) {
+    stop(
+      "Package \"tsne\" must be installed to use this function.",
+      call. = FALSE
+      )
+  }
 
   set.seed(seed) # set the seed so the results can be reproducible
 
   # Calculate the euclidean distances between samples
-  sampleDists <- dist(t(assay(object)))
+  sampleDists <- stats::dist(t(assay(object)))
 
-  samples.tsne <- tsne(sampleDists, perplexity = perplexity, max_iter = max_iterations, epoch = 1000)
+  samples.tsne <- tsne::tsne(sampleDists, perplexity = perplexity, max_iter = max_iterations, epoch = 1000)
 
   df.tsne <- cbind(data.frame(samples.tsne),
                    colData(object)[, variables, drop = FALSE])
@@ -76,17 +83,22 @@ nice_tSNE <- function(object, seed = 0, perplexity = 3, max_iterations = 10000, 
 
   if (is.null(name_tags) == FALSE) {
 
-    require("ggrepel")
+    if (!requireNamespace("ggrepel", quietly = TRUE)) {
+      stop(
+        "Package \"ggrepel\" must be installed to use this function.",
+        call. = FALSE
+        )
+    }
 
     # Add the column of name tags to the data frame
     df.tsne <- data.frame(df.tsne, colData(object)[, name_tags[1], drop = FALSE])
 
     # Add the name tags to the plot
     p.tsne <- p.tsne +
-      geom_text_repel(aes(label = df.tsne[,name_tags[1]]),
-                      color = "black", cex = as.numeric(name_tags[2]),
-                      min.segment.length = unit(as.numeric(name_tags[3]), "lines"),
-                      box.padding = unit(as.numeric(name_tags[4]), "lines"))
+      ggrepel::geom_text_repel(aes(label = df.tsne[,name_tags[1]]),
+                               color = "black", cex = as.numeric(name_tags[2]),
+                               min.segment.length = unit(as.numeric(name_tags[3]), "lines"),
+                               box.padding = unit(as.numeric(name_tags[4]), "lines"))
   }
 
   if (returnData) {
