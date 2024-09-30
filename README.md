@@ -5,9 +5,9 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/BigMindLab/OmicsKit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BigMindLab/OmicsKit/actions/workflows/R-CMD-check.yaml)
 [![License: CC BY-NC-SA
 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![R-CMD-check](https://github.com/BigMindLab/OmicsKit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BigMindLab/OmicsKit/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of `OmicsKit` is to help in manipulating tables and generating
