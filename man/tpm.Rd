@@ -14,7 +14,9 @@ tpm(raw_counts, gene_lengths)
 \description{
 TPM: Transcript per million. See https://www.biostars.org/p/273537/
 The input table is numeric:
-- The row names are the gene identifiers (ensembl ID).
-- The column names represent the samples.
+\itemize{
+\item The row names are the gene identifiers (ensembl ID).
+\item The column names represent the samples.
 The gene lengths are in a column of a dataframe with the same row order.
+}
 }

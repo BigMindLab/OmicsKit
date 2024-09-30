@@ -29,6 +29,8 @@ If transcript IDs are provided, they are also annotated with information of the 
 }
 \details{
 The Gene information added include:
-- Gene ENSEMBL ID, HGNC Symbol, Description, Biotype and Chromosome.
-- Gene start, end and length
+\itemize{
+\item Gene ENSEMBL ID, HGNC Symbol, Description, Biotype and Chromosome.
+\item Gene start, end and length
+}
 }

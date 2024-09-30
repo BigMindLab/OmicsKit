@@ -20,7 +20,9 @@ Imports:
     SummarizedExperiment,
     stats,
     tibble,
-    umap
+    umap,
+    lifecycle
 Suggests: 
     ggrepel,
     openxlsx
+Roxygen: list(markdown = TRUE)

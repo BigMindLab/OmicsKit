@@ -18,7 +18,9 @@ save_results(df, name, l2fc = 0, cutoff_alpha = 0.25)
 \description{
 This function takes as input the output of the function "results()" of DEseq2.
 And will save 3 tables:
-- A table with all genes
-- A table including only the over-expressed genes
-- A table including only the under-expressed genes
+\itemize{
+\item A table with all genes
+\item A table including only the over-expressed genes
+\item A table including only the under-expressed genes
+}
 }
