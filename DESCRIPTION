@@ -5,7 +5,7 @@ Authors@R: c(
     person("David", "Requena", email =  "david.requena@nyulangone.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5968-1133")),
     person("Daniel", "Guevara", email = "dgdiaz011202@gmail.com", role = "aut", comment = c(ORCID = "0009-0001-2786-8729")))
 Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
-License: CC BY 4.0
+License: CC BY-NC-SA 4.0
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Imports:
