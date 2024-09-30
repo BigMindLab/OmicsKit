@@ -56,7 +56,7 @@ nice_PCA(
 \description{
 This was inspired on the plotPCA function from DESeq2, made by Wolfgang Huber
 But including some improvements made by David Requena. Now it allows:
-- To choose which PCs to plot.
-- To use one or two features to represent as the fill or shape of the markers.
-- To provide the colors, shapes and fonts.
+* To choose which PCs to plot.
+* To use one or two features to represent as the fill or shape of the markers.
+* To provide the colors, shapes and fonts.
 }

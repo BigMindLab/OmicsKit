@@ -55,7 +55,7 @@ nice_UMAP <- function(object, neighbors = 4, components = 3, epochs = 20000, ret
   umap_data <- umap::umap(t(assay(object)))
   df.umap <- data.frame(umap_data$layout) %>%
     tibble::rownames_to_column("id") %>%
-    dplyr::inner_join(colData(object), by = "id")
+    dplyr::inner_join(as.data.frame(colData(object)), by = "id")
 
   # Create plot
   if (length(variables) == 2) {
