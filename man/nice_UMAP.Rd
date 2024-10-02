@@ -8,7 +8,7 @@ nice_UMAP(
   object,
   neighbors = 4,
   components = 3,
-  epochs = 20000,
+  epochs = 10000,
   returnData = FALSE,
   variables = c(fill = "VarFill", shape = "VarShape"),
   colors = NULL,
@@ -30,7 +30,7 @@ nice_UMAP(
 
 \item{components}{Number of components to be consider for the dimensional reduction. Default: 3.}
 
-\item{epochs}{Number of iterations. Default: 20000.}
+\item{epochs}{Number of iterations. Default: 10000.}
 
 \item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 
