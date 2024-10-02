@@ -25,9 +25,6 @@
 #' @param legend_pos Position of the legend in the plot. Default: c(0.80, 0.80, "right").
 #' @param labels A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).
 #' @param name_tags A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 2, minlen = 2, box = 0.6). Default: NULL (no name tags).
-#' @import matrixStats
-#' @import ggplot2
-#' @import ggrepel
 #' @export
 
 nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
@@ -39,6 +36,8 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
                      name_tags = NULL) # c(var = "label", size = 2, minlen = 2, box = 0.6)
 
 {
+  require("matrixStats")
+  require("ggplot2")
 
   # Estimate the variance in each row (gene or transcript)
   variances <- rowVars(assay(object))
@@ -95,6 +94,8 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
   }
 
   if (is.null(name_tags) == FALSE) {
+
+    require("ggrepel")
 
     # Add the column of name tags to the data frame
     d <- data.frame(d, colData(object)[,c(name_tags[1]), drop = FALSE])

@@ -14,12 +14,11 @@
 #' @param version This function can use the version 103 or the current version of the Biomart. Default = Current.
 #' @param filename The name of the output file, which is table. Default = gene_annotations.
 #' @param format The output is saved in .csv or .xlsx formats. Default = csv.
-#' @import biomaRt
-#' @import dplyr
-#' @import openxlsx
 #' @export
 
 get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annotations", version = "", format = "csv") {
+  
+  require("biomaRt")
   
   if(version == "103"){
     ensembl = useMart("ENSEMBL_MART_ENSEMBL",
@@ -74,6 +73,7 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
   df <- df %>% relocate(gene_length, .before = "description")
   
   if(format == "xlsx"){
+    require("openxlsx")
     write.xlsx(df, file = paste0(filename, ".xlsx"), colNames = T, rowNames = F, append = F)
   } else {
     write.csv(df, rowNames = F, file = paste0(filename, ".csv"))
