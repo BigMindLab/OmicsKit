@@ -1,5 +1,5 @@
 #######################
-# Function BSV_Plot.R #
+# Function nice_BSV.R #
 #######################
 
 #' Function to make Box-Scatter-Violin plots.
@@ -25,32 +25,39 @@
 #' @param title_size Font of the title and axis names. Default: c(axis = 20, fig = 24).
 #' @param label_size Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
+#' @import ggplot2
+#' @importFrom rlang .data
 #' @export
 
-BSV_Plot.R <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
-			genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
-			categories = c("normal", "primary", "recurrence", "metastasis"),
-			colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
-			width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
-			title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
-			legend_size = c(title = 14, elements = 12)) {
-  
-  require("DESeq2")
-  
+nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
+		      genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
+		      categories = c("normal", "primary", "recurrence", "metastasis"),
+		      colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
+		      width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
+		      title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
+		      legend_size = c(title = 14, elements = 12)) {
+
+  if (!requireNamespace("DESeq2", quietly = TRUE)) {
+    stop(
+      "Package \"DESeq2\" must be installed to use this function.",
+      call. = FALSE
+      )
+  }
+
   # Extracting the vector of counts for that gene
-  gene_counts <- counts(object, normalized = TRUE)[genename, ]
+  gene_counts <- DESeq2::counts(object, normalized = TRUE)[genename, ]
   log2_gc <- log2(gene_counts)
 
   # Making a dataframe for the plot
   df.box <- data.frame(object@colData[, c("id", "sample_type", variables)], log2_gc)
 
   # Re-ordering sample_type for the plot
-  df.box$sample_type <- factor(df.box$sample_type,
-                               levels = categories,
-                               labels = labels)
+  df.box[, "sample_type"] <- factor(df.box[, "sample_type"],
+                                    levels = categories,
+                                    labels = labels)
 
   # Plot
-  p.bs <- ggplot(df.box, aes(x = sample_type, y = log2_gc)) + theme_bw() +
+  p.bs <- ggplot(df.box, aes(x = .data$sample_type, y = log2_gc)) + theme_bw() +
     geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
 		show.legend = FALSE, trim = TRUE) +
     geom_boxplot(width = 0.6, fill = "gray90") +

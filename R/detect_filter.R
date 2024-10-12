@@ -2,6 +2,8 @@
 # Function detect_filter #
 ##########################
 
+#' Find detectable genes across comparisons.
+#'
 #' This function identifies genes with measurable expression levels across samples.
 #' Detectable genes must meet two conditions: the baseMean and their mean normalized counts in the phenotypes of interest must be greater than a set threshold.
 #' It returns a list of detectable genes and the comparisons in which they can be found.

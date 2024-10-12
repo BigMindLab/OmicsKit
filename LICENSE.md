@@ -1,4 +1,6 @@
-Copyright (c) 2024 David Requena
+Copyright (c) 2024 David Requena and Daniel Guevara
+
+For a plain text version of this license please check the [Creative Commons website](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt)
 
 Attribution-NonCommercial-ShareAlike 4.0 International
 
@@ -437,4 +439,5 @@ the avoidance of doubt, this paragraph does not form part of the
 public licenses.
 
 Creative Commons may be contacted at creativecommons.org.
+
 
