@@ -3,6 +3,7 @@
 export(add_annotations)
 export(detect_filter)
 export(get_annotations)
+export(merge_GSEA)
 export(nice_BSV)
 export(nice_PCA)
 export(nice_UMAP)
