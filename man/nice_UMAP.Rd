@@ -7,7 +7,7 @@
 nice_UMAP(
   object,
   neighbors = 4,
-  components = 3,
+  components = 2,
   epochs = 10000,
   returnData = FALSE,
   variables = c(fill = "VarFill", shape = "VarShape"),
