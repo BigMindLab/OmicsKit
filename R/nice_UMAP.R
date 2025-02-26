@@ -25,7 +25,7 @@
 #' @importFrom SummarizedExperiment assay colData
 #' @export
 
-nice_UMAP <- function(object, neighbors = 4, components = 3, epochs = 10000, returnData = FALSE,
+nice_UMAP <- function(object, neighbors = 4, components = 2, epochs = 10000, returnData = FALSE,
                       variables = c(fill = "VarFill", shape = "VarShape"),
                       colors = NULL, shapes = NULL, size = 7, alpha = 1,
                       legend_names = c(fill = "Label Fill", shape = "Label Shape"),
@@ -53,9 +53,8 @@ nice_UMAP <- function(object, neighbors = 4, components = 3, epochs = 10000, ret
 
   # Create data frame
   umap_data <- umap::umap(t(assay(object)))
-  df.umap <- data.frame(umap_data$layout) %>%
-    tibble::rownames_to_column("id") %>%
-    dplyr::inner_join(as.data.frame(colData(object)), by = "id")
+  df.umap <- cbind(data.frame(umap_data$layout),
+		   colData(object)[, variables, drop = FALSE])
 
   # Create plot
   if (length(variables) == 2) {
