@@ -34,7 +34,7 @@ The goal of `OmicsKit` is to help in manipulating tables and generating plots fo
     -   [Google Scholar](https://scholar.google.com/citations?user=uI01iS4AAAAJ&hl=en)
     -   [ORCID: 0000-0002-5968-1133](https://orcid.org/0000-0002-5968-1133)
 
--   Daniel F. Guevara Díaz, B.Sc.(s)
+-   Daniel F. Guevara Díaz, B.Sc.
 
     -   Author's name: Daniel F. Guevara-Díaz
     -   [Google Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ)

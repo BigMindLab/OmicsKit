@@ -6,8 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/BigMindLab/OmicsKit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BigMindLab/OmicsKit/actions/workflows/R-CMD-check.yaml)
-[![License: CC BY-NC-SA
-4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![License: CC
+BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
@@ -16,23 +16,23 @@ The goal of `OmicsKit` is to help in manipulating tables and generating
 plots for multi-omics analyses including genomics, transcriptomics,
 proteomics, methylomics and immunoinformatics.
 
-------------------------------------------------------------------------
+-----
 
 ## Developed by
 
-- David R. Requena Anicama, Ph.D.
+  - David R. Requena Anicama, Ph.D.
+    
+      - Author’s name: David Requena
+      - [Google
+        Scholar](https://scholar.google.com/citations?user=uI01iS4AAAAJ&hl=en)
+      - [ORCID: 0000-0002-5968-1133](https://orcid.org/0000-0002-5968-1133)
 
-  - Author’s name: David Requena
-  - [Google
-    Scholar](https://scholar.google.com/citations?user=uI01iS4AAAAJ&hl=en)
-  - [ORCID: 0000-0002-5968-1133](https://orcid.org/0000-0002-5968-1133)
-
-- Daniel F. Guevara Díaz, B.Sc.(s)
-
-  - Author’s name: Daniel F. Guevara-Díaz
-  - [Google
-    Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ)
-  - [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
+  - Daniel F. Guevara Díaz, B.Sc.
+    
+      - Author’s name: Daniel F. Guevara-Díaz
+      - [Google
+        Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ)
+      - [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
 
 ## License
 
@@ -125,6 +125,8 @@ Includes unsupervised clustering methods as well.
 
 1.  *PCA* (Principal Component Analysis).
 
+<!-- end list -->
+
 ``` r
 nice_PCA(object = transf.data,
          PCs = c(1, 2),
@@ -145,6 +147,8 @@ nice_PCA(object = transf.data,
 <img src="man/figures/README-pca-1.png" width="100%" />
 
 2.  *tSNE* (t-distributed Stochastic Neighbor Embedding).
+
+<!-- end list -->
 
 ``` r
 nice_tSNE(object = transf.data,
@@ -167,6 +171,8 @@ nice_tSNE(object = transf.data,
 <img src="man/figures/README-tsne-1.png" width="100%" />
 
 3.  *UMAP* (Uniform Manifold Approximation and Projection).
+
+<!-- end list -->
 
 ``` r
 nice_UMAP(object = transf.data,
@@ -239,6 +245,8 @@ or CSV formats. Filtering criteria include:
 2.  Significance (False Discovery Rate, FDR).
 
 3.  *Detectability* ([`Requena et al., 2024, Nat. Comms.`](#article)).
+
+<!-- end list -->
 
 ``` r
 detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
@@ -361,8 +369,8 @@ detect_list <- detect_filter(norm.counts = normalized.counts[, 1:21],
 
 Automatically categorize results from three pairwise differential
 expression analyses or Gene Set Enrichment Analysis (e.g., B vs A, C vs
-A, C vs B) into 10 mutually exclusive cases
-([`BigMind, 2024, manuscript in preparation`](#article)).
+A, C vs B) into 10 mutually exclusive cases ([`BigMind, 2024, manuscript
+in preparation`](#article)).
 
 ``` r
 DEGs_sig <- split_cases(df.BvsA = res.T_N,
