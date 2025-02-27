@@ -20,9 +20,11 @@
 #' @param legend_pos Position of the legend in the plot. Default: c(0.80, 0.80, "right").
 #' @param labels A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).
 #' @param name_tags A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).
+#' @param cluster_data Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.
+#' @param min_points Minimum number of neighbors to form a cluster. Default: 5.
 #' @import ggplot2
 #' @importFrom magrittr %>%
-#' @importFrom SummarizedExperiment assay colData
+#' @importFrom SummarizedExperiment assay colData colData<-
 #' @export
 
 nice_UMAP <- function(object, neighbors = 4, components = 2, epochs = 10000, returnData = FALSE,
@@ -31,7 +33,8 @@ nice_UMAP <- function(object, neighbors = 4, components = 2, epochs = 10000, ret
                       legend_names = c(fill = "Label Fill", shape = "Label Shape"),
                       legend_title = 20, legend_elements = 16, legend_pos = c(0.80, 0.80, "right"),
                       labels = NULL, # c(var = "patient", size = 2)
-                      name_tags = NULL) # c(var = "label", size = 3, minlen = 2, box = 0.5)
+                      name_tags = NULL, # c(var = "label", size = 3, minlen = 2, box = 0.5)
+                      cluster_data = FALSE, min_points = 5)
 
 {
 
@@ -40,6 +43,14 @@ nice_UMAP <- function(object, neighbors = 4, components = 2, epochs = 10000, ret
       "Package \"umap\" must be installed to use this function.",
       call. = FALSE
       )
+  }
+
+  if (cluster_data) {
+    # Perform HDBSCAN clustering
+    hdbscan_result <- dbscan::hdbscan(t(assay(object)), minPts = min_points)
+
+    # Add cluster labels to colData
+    colData(object)[, "cluster"] <- as.factor(hdbscan_result$cluster)
   }
 
   # Initialize umap

@@ -19,7 +19,9 @@ nice_PCA(
   legend_elements = 16,
   legend_pos = c(0.8, 0.8, "right"),
   labels = NULL,
-  name_tags = NULL
+  name_tags = NULL,
+  cluster_data = FALSE,
+  n_clusters = 3
 )
 }
 \arguments{
@@ -52,6 +54,10 @@ nice_PCA(
 \item{labels}{A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).}
 
 \item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 2, minlen = 2, box = 0.6). Default: NULL (no name tags).}
+
+\item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
+
+\item{n_clusters}{Number of cluster categories. Default: 3.}
 }
 \description{
 This was inspired on the plotPCA function from DESeq2, made by Wolfgang Huber
