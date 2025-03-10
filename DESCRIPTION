@@ -19,9 +19,9 @@ Imports:
     rlang,
     SummarizedExperiment,
     stats,
-    tibble,
     umap,
-    lifecycle
+    lifecycle,
+    dbscan
 Suggests: 
     ggrepel,
     openxlsx

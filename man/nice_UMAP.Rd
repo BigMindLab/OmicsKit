@@ -7,7 +7,7 @@
 nice_UMAP(
   object,
   neighbors = 4,
-  components = 3,
+  components = 2,
   epochs = 10000,
   returnData = FALSE,
   variables = c(fill = "VarFill", shape = "VarShape"),
@@ -20,7 +20,9 @@ nice_UMAP(
   legend_elements = 16,
   legend_pos = c(0.8, 0.8, "right"),
   labels = NULL,
-  name_tags = NULL
+  name_tags = NULL,
+  cluster_data = FALSE,
+  min_points = 5
 )
 }
 \arguments{
@@ -55,6 +57,10 @@ nice_UMAP(
 \item{labels}{A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).}
 
 \item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).}
+
+\item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
+
+\item{min_points}{Minimum number of neighbors to form a cluster. Default: 5.}
 }
 \description{
 Function to make UMAP plots.

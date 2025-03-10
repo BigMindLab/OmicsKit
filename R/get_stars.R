@@ -9,6 +9,7 @@
 #' @param geneID Ensembl ID of the gene of interest.
 #' @param object DESeq2 results object of a comparison.
 #' @param thresholds Vector with 4 values of significance. Default c(0.001, 0.01, 0.1, 0.25).
+#' @export
 
 get_stars <- function(geneID, object, thresholds = c(0.001, 0.01, 0.1, 0.25))
 {

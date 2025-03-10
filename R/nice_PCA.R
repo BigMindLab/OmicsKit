@@ -25,8 +25,10 @@
 #' @param legend_pos Position of the legend in the plot. Default: c(0.80, 0.80, "right").
 #' @param labels A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).
 #' @param name_tags A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 2, minlen = 2, box = 0.6). Default: NULL (no name tags).
+#' @param cluster_data Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.
+#' @param n_clusters Number of cluster categories. Default: 3.
 #' @import ggplot2
-#' @importFrom SummarizedExperiment assay colData
+#' @importFrom SummarizedExperiment assay colData colData<-
 #' @export
 
 nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
@@ -35,7 +37,8 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
                      size = 7, alpha = 1, colors = NULL, shapes = NULL,
                      legend_title = 20, legend_elements = 16, legend_pos = c(0.80, 0.80, "right"),
                      labels = NULL, # c(var = "patient", size = 2)
-                     name_tags = NULL) # c(var = "label", size = 2, minlen = 2, box = 0.6)
+                     name_tags = NULL, # c(var = "label", size = 2, minlen = 2, box = 0.6)
+                     cluster_data = FALSE, n_clusters = 3)
 
 {
 
@@ -44,6 +47,18 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
 
   # Select the top variances (value passed as ntop)
   top.variances <- order(variances, decreasing = TRUE)[1:min(ntop, length(variances))]
+
+  # Extract data for clustering if `cluster_data` is TRUE
+  if (cluster_data) {
+    # Apply hierarchical clustering with Ward.D2 method
+    hc <- stats::hclust(stats::dist(t(assay(object)[top.variances, ])), method = "ward.D2")
+
+    # Create cluster labels based on `n_clusters`
+    cluster_labels <- stats::cutree(hc, k = n_clusters)
+
+    # Add cluster labels to colData
+    colData(object)[, "cluster"] <- as.factor(cluster_labels)
+  }
 
   # Principal Component Analysis
   pca <- stats::prcomp(t(assay(object)[top.variances, ]))
