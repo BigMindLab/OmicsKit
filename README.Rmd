@@ -40,6 +40,12 @@ The goal of `OmicsKit` is to help in manipulating tables and generating plots fo
     -   [Google Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ)
     -   [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
 
+-   Jennifer Z. Almeyda Tejada, B.Sc.
+
+    -   Author's name: Jennifer Z. Almeyda-Tejada
+    -   [Google Scholar]()
+    -   [ORCID: 0009-0003-9589-1167](https://orcid.org/0009-0003-9589-1167)
+
 ## License
 
 CC BY-NC-SA 4.0
@@ -255,9 +261,9 @@ DEGs_sig[c(6, 8:9)]
 
 ### **Customary plots**
 Generate a range of visually appealing plots to display differential expression analysis results. Here are some examples:
-
+   
 1. *Volcano plots*
-    
+
 ```{r, echo = FALSE}
 knitr::include_graphics("man/figures/README-Volcano_plot.jpg")
 ```
