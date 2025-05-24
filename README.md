@@ -34,6 +34,13 @@ proteomics, methylomics and immunoinformatics.
         Scholar](https://scholar.google.com/citations?hl=en&user=tqT7vr8AAAAJ)
       - [ORCID: 0009-0001-2786-8729](https://orcid.org/0009-0001-2786-8729)
 
+  - Jennifer Z. Almeyda Tejada, B.Sc.
+
+      - Author's name: Jennifer Z. Almeyda-Tejada
+      - [Google
+	Scholar]()
+      - [ORCID: 0009-0003-9589-1167](https://orcid.org/0009-0003-9589-1167)
+
 ## License
 
 CC BY-NC-SA 4.0
