@@ -10,7 +10,6 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 Imports:
     DESeq2,
-    biomaRt,
     dplyr,
     matrixStats,
     ggplot2,
@@ -20,9 +19,10 @@ Imports:
     SummarizedExperiment,
     stats,
     umap,
-    lifecycle,
-    dbscan
+    lifecycle
 Suggests: 
+    biomaRt,
+    dbscan,
     ggrepel,
     openxlsx
 Roxygen: list(markdown = TRUE)

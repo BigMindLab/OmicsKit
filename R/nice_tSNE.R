@@ -47,6 +47,12 @@ nice_tSNE <- function(object, seed = 0, perplexity = 3, max_iterations = 10000, 
   set.seed(seed) # set the seed so the results can be reproducible
 
   if (cluster_data) {
+    if (!requireNamespace("dbscan", quietly = TRUE)) {
+      stop(
+        "Package \"dbscan\" must be installed to perform clustering.",
+        call. = FALSE
+      )
+    }
     # Perform HDBSCAN clustering
     hdbscan_result <- dbscan::hdbscan(t(assay(object)), minPts = min_points)
 
@@ -97,7 +103,7 @@ nice_tSNE <- function(object, seed = 0, perplexity = 3, max_iterations = 10000, 
 
     if (!requireNamespace("ggrepel", quietly = TRUE)) {
       stop(
-        "Package \"ggrepel\" must be installed to use this function.",
+        "Package \"ggrepel\" must be installed to annotate plot.",
         call. = FALSE
         )
     }

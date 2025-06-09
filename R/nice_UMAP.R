@@ -46,6 +46,13 @@ nice_UMAP <- function(object, neighbors = 4, components = 2, epochs = 10000, ret
   }
 
   if (cluster_data) {
+    if (!requireNamespace("dbscan", quietly = TRUE)) {
+      stop(
+        "Package \"dbscan\" must be installed to perform clustering.",
+        call. = FALSE
+      )
+    }
+
     # Perform HDBSCAN clustering
     hdbscan_result <- dbscan::hdbscan(t(assay(object)), minPts = min_points)
 
@@ -105,7 +112,7 @@ nice_UMAP <- function(object, neighbors = 4, components = 2, epochs = 10000, ret
 
     if (!requireNamespace("ggrepel", quietly = TRUE)) {
       stop(
-        "Package \"ggrepel\" must be installed to use this function.",
+        "Package \"ggrepel\" must be installed to annotate plot.",
         call. = FALSE
         )
     }
