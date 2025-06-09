@@ -50,6 +50,12 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
 
   # Extract data for clustering if `cluster_data` is TRUE
   if (cluster_data) {
+    if (!requireNamespace("stats", quietly = TRUE)) {
+      stop(
+        "Package \"stats\" must be installed to perform clustering.",
+        call. = FALSE
+      )
+    }
     # Apply hierarchical clustering with Ward.D2 method
     hc <- stats::hclust(stats::dist(t(assay(object)[top.variances, ])), method = "ward.D2")
 
@@ -76,14 +82,14 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
 
   if (length(variables) == 2) {
 
-    p.nicePCA <- ggplot(data = d, aes_string(x = "PCx", y = "PCy", fill = variables[1], shape = variables[2])) +
+    p.nicePCA <- ggplot(data = d, aes(x = .data[["PCx"]], y = .data[["PCy"]], fill = .data[[variables[1]]], shape = .data[[variables[2]]])) +
       geom_point(size = size, alpha = alpha) + scale_shape_manual(values = shapes) +
       scale_fill_manual(values = colors, guide = guide_legend(override.aes = aes(shape = 21))) +
       labs(fill = legend_names[1], shape = legend_names[2])
 
   } else if (length(variables) == 1) {
 
-    p.nicePCA <- ggplot(data = d, aes_string(x = "PCx", y = "PCy", fill = variables)) +
+    p.nicePCA <- ggplot(data = d, aes(x = .data[["PCx"]], y = .data[["PCy"]], fill = .data[[variables]])) +
       geom_point(size = size, alpha = alpha, shape = 21) +
       scale_fill_manual(values = colors, guide = guide_legend(override.aes = aes(shape = 21))) +
       labs(fill = legend_names)
