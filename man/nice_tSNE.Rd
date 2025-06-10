@@ -22,7 +22,7 @@ nice_tSNE(
   labels = NULL,
   name_tags = NULL,
   cluster_data = FALSE,
-  min_points = 5
+  min_points = 7
 )
 }
 \arguments{
@@ -60,7 +60,7 @@ nice_tSNE(
 
 \item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
 
-\item{min_points}{Minimum number of neighbors to form a cluster. Default: 5.}
+\item{min_points}{Minimum number of neighbors to form a cluster. Default: 7.}
 }
 \description{
 Function to make tSNE plots.

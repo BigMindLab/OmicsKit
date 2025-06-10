@@ -28,6 +28,7 @@
 #' @param cluster_data Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.
 #' @param n_clusters Number of cluster categories. Default: 3.
 #' @import ggplot2
+#' @importFrom rlang .data
 #' @importFrom SummarizedExperiment assay colData colData<-
 #' @export
 
@@ -128,7 +129,7 @@ nice_PCA <- function(object, PCs = c(1,2), ntop = 200, returnData = FALSE,
 
     # Add the name tags to the plot
     p.nicePCA <- p.nicePCA +
-      ggrepel::geom_text_repel(aes(label = d[,name_tags[1]]),
+      ggrepel::geom_text_repel(aes(label = d[, name_tags[1]]),
                                color = "black", cex = as.numeric(name_tags[2]),
                                min.segment.length = unit(as.numeric(name_tags[3]), "lines"),
                                box.padding = unit(as.numeric(name_tags[4]), "lines"))

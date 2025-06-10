@@ -6,7 +6,7 @@
 \usage{
 nice_UMAP(
   object,
-  neighbors = 4,
+  neighbors = 5,
   components = 2,
   epochs = 10000,
   returnData = FALSE,
@@ -22,13 +22,13 @@ nice_UMAP(
   labels = NULL,
   name_tags = NULL,
   cluster_data = FALSE,
-  min_points = 5
+  min_points = 7
 )
 }
 \arguments{
 \item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
 
-\item{neighbors}{Number of nearest neighbors to consider. Default: 4.}
+\item{neighbors}{Number of nearest neighbors to consider. Default: 5.}
 
 \item{components}{Number of components to be consider for the dimensional reduction. Default: 3.}
 
@@ -60,7 +60,7 @@ nice_UMAP(
 
 \item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
 
-\item{min_points}{Minimum number of neighbors to form a cluster. Default: 5.}
+\item{min_points}{Minimum number of neighbors to form a cluster. Default: 7.}
 }
 \description{
 Function to make UMAP plots.
