@@ -74,6 +74,8 @@ nice_UMAP <- function(object, annotations, neighbors = 5, components = 2, epochs
 
   # Create data frame
   umap_data <- umap::umap(t(expr), config = umap.params, preserve.seed = TRUE)
+  colnames(umap_data$layout) <- c("X1", "X2")
+
   df.umap <- as.data.frame(umap_data$layout) %>%
     tibble::rownames_to_column(var = "id") %>%
     dplyr::inner_join(annotations, by = "id")
@@ -81,14 +83,14 @@ nice_UMAP <- function(object, annotations, neighbors = 5, components = 2, epochs
   # Create plot
   if (length(variables) == 2) {
 
-    p.umap <- ggplot(data = df.umap, aes(x = X1, y = X2, fill = .data[[variables[1]]], shape = .data[[variables[2]]])) +
+    p.umap <- ggplot(data = df.umap, aes(x = .data[["X1"]], y = .data[["X2"]], fill = .data[[variables[1]]], shape = .data[[variables[2]]])) +
       geom_point(size = size, alpha = alpha) + labs(fill = legend_names[1], shape = legend_names[2]) +
       scale_fill_manual(values = colors, guide = guide_legend(override.aes = aes(shape = 21, size = 9))) +
       scale_shape_manual(values = shapes, guide = guide_legend(override.aes = list(size = 7), keyheight = 1.7))
 
   } else if (length(variables) == 1) {
 
-    p.umap <- ggplot(data = df.umap, aes(x = X1, y = X2, fill = .data[[variables[1]]])) +
+    p.umap <- ggplot(data = df.umap, aes(x = .data[["X1"]], y = .data[["X2"]], fill = .data[[variables[1]]])) +
       geom_point(size = size, alpha = alpha, shape = 21) +
       scale_fill_manual(values = colors, guide = guide_legend(override.aes = aes(shape = 21, size = 9)))
 
