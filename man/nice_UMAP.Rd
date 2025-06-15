@@ -6,6 +6,7 @@
 \usage{
 nice_UMAP(
   object,
+  annotations,
   neighbors = 5,
   components = 2,
   epochs = 10000,
@@ -13,20 +14,23 @@ nice_UMAP(
   variables = c(fill = "VarFill", shape = "VarShape"),
   colors = NULL,
   shapes = NULL,
-  size = 7,
+  size = 3,
   alpha = 1,
   legend_names = c(fill = "Label Fill", shape = "Label Shape"),
-  legend_title = 20,
-  legend_elements = 16,
+  legend_title = 16,
+  legend_elements = 14,
   legend_pos = c(0.8, 0.8, "right"),
   labels = NULL,
   name_tags = NULL,
   cluster_data = FALSE,
-  min_points = 7
+  min_points = 7,
+  transform = FALSE
 )
 }
 \arguments{
-\item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+\item{object}{A matrix of counts with genes as rows and sample ids as columns.}
+
+\item{annotations}{A data frame of annotation, including sample ids and variables to plot.}
 
 \item{neighbors}{Number of nearest neighbors to consider. Default: 5.}
 
@@ -38,19 +42,19 @@ nice_UMAP(
 
 \item{variables}{To indicate the variables to be used as Shape and Fill of the markers.}
 
-\item{colors}{Vector of colors to be used for the categories of the variable assigned as Marker Fill.}
+\item{colors}{Vector of colors to be used for the categories of the variable assigned as VarFill.}
 
-\item{shapes}{Vector of shapes to be used for the categories of the variable assigned as Marker Shape.}
+\item{shapes}{Vector of shapes to be used for the categories of the variable assigned as VarShape.}
 
-\item{size}{Size of the marker. Default: 7.}
+\item{size}{Size of the marker. Default: 3.}
 
 \item{alpha}{Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 1.}
 
 \item{legend_names}{The names to be used for the legend of the Shape and Fill.}
 
-\item{legend_title}{Font of the legend title. Default: 20.}
+\item{legend_title}{Font of the legend title. Default: 16.}
 
-\item{legend_elements}{Font of the elements of the legend Default: 16.}
+\item{legend_elements}{Font of the elements of the legend Default: 14.}
 
 \item{legend_pos}{Position of the legend in the plot. Default: c(0.80, 0.80, "right").}
 
@@ -61,6 +65,8 @@ nice_UMAP(
 \item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
 
 \item{min_points}{Minimum number of neighbors to form a cluster. Default: 7.}
+
+\item{tran}{Logical. Indicates whether to log2 transform the input \code{object} or not. Default: FALSE.}
 }
 \description{
 Function to make UMAP plots.
