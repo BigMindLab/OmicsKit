@@ -119,7 +119,7 @@ nice_UMAP <- function(object, annotations, neighbors = 5, components = 2, epochs
 
     # Add the labels to the plot
     p.umap <- p.umap +
-      geom_text(aes(label = .data[["label"]]), color = "black", size = lab_size)
+      geom_text(data = df.umap, aes(label = .data[["label"]]), color = "black", size = lab_size)
   }
 
   if(is.null(name_tags) == FALSE) {
@@ -151,7 +151,7 @@ nice_UMAP <- function(object, annotations, neighbors = 5, components = 2, epochs
 
     # Add the name tags to the plot
     p.umap <- p.umap +
-      ggrepel::geom_text_repel(aes(label = .data[["tag"]]), color = "black", size = tag_size,
+      ggrepel::geom_text_repel(data = df.umap, aes(label = .data[["tag"]]), color = "black", size = tag_size,
                                min.segment.length = unit(minlen, "lines"), box.padding = unit(boxpad, "lines"))
   }
 
