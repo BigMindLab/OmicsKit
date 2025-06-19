@@ -8,6 +8,7 @@
 #' It will show the data points on top with a small deviation (jitter) for a better visualization.
 #'
 #' @param object A DEseq object already transformed with the variance stabilizing or rlog transformations.
+#' @param annotations Data frame with annotations.
 #' @param variables To indicate the variables to be used as Shape and Fill of the markers.
 #' @param genename The gene name to be used for the plot.
 #' @param symbol The gene symbol to be used for the plot.
@@ -17,39 +18,28 @@
 #' @param shapes Vector of shapes to be used for the categories of the variable assigned as Marker Shape.
 #' @param markersize Size of the marker.
 #' @param alpha Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 0.8.
-#' @param width Width of the plot.
-#' @param height Height of the plot.
 #' @param jitter Random deviation added to the dots. Default: 0.2.
-#' @param dpi DPI of the plot. Default: 150.
-#' @param save To save the plot. Default: FALSE.
 #' @param title_size Font of the title and axis names. Default: c(axis = 20, fig = 24).
 #' @param label_size Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
 #' @import ggplot2
+#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
 
-nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
-		      genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
-		      categories = c("normal", "primary", "recurrence", "metastasis"),
-		      colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
-		      width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
-		      title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
-		      legend_size = c(title = 14, elements = 12)) {
-
-  if (!requireNamespace("DESeq2", quietly = TRUE)) {
-    stop(
-      "Package \"DESeq2\" must be installed to use this function.",
-      call. = FALSE
-      )
-  }
-
+nice_BSV <- function (object = NULL, annotations, variables = c(fill = "VarFill", shape = "VarShape"),
+                      genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
+                      categories = c("normal", "primary", "recurrence", "metastasis"),
+                      colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8, jitter = 0.2,
+                      title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
+                      legend_size = c(title = 14, elements = 12))
+{
   # Extracting the vector of counts for that gene
-  gene_counts <- DESeq2::counts(object, normalized = TRUE)[genename, ]
+  gene_counts <- object[genename, ]
   log2_gc <- log2(gene_counts)
 
   # Making a dataframe for the plot
-  df.box <- data.frame(object@colData[, c("id", "sample_type", variables)], log2_gc)
+  df.box <- cbind(annotations, log2_gc)
 
   # Re-ordering sample_type for the plot
   df.box[, "sample_type"] <- factor(df.box[, "sample_type"],
@@ -87,8 +77,5 @@ nice_BSV <- function (object = NULL, variables = c(fill = "VarFill", shape = "Va
   p.bs <- p.bs + scale_fill_manual(name = variables[1], values = colors,
                                    guide = guide_legend(override.aes = aes(shape = 21, size = 7)))
 
-  if (save == T) {
-    ggsave(paste0(symbol,".jpg"), plot = p.bs, width = width, height = height, dpi = dpi)
-
-  } else { return(p.bs) }
+  return(p.bs)
 }

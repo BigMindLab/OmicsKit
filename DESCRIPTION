@@ -19,18 +19,18 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 Imports:
     dplyr,
-    matrixStats,
     ggplot2,
     tsne,
     magrittr,
     rlang,
     stats,
     umap,
-    lifecycle,
     tibble
 Suggests: 
     biomaRt,
     dbscan,
+    ggnewscale,
     ggrepel,
+    matrixStats,
     openxlsx
 Roxygen: list(markdown = TRUE)

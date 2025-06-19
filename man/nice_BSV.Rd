@@ -6,6 +6,7 @@
 \usage{
 nice_BSV(
   object = NULL,
+  annotations,
   variables = c(fill = "VarFill", shape = "VarShape"),
   genename = NULL,
   symbol = NULL,
@@ -15,11 +16,7 @@ nice_BSV(
   shapes = NULL,
   markersize = NULL,
   alpha = 0.8,
-  width = NULL,
-  height = NULL,
   jitter = 0.2,
-  dpi = 150,
-  save = FALSE,
   title_size = c(axis = 20, fig = 24),
   label_size = c(x = 20, y = 16),
   legend_size = c(title = 14, elements = 12)
@@ -27,6 +24,8 @@ nice_BSV(
 }
 \arguments{
 \item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+
+\item{annotations}{Data frame with annotations.}
 
 \item{variables}{To indicate the variables to be used as Shape and Fill of the markers.}
 
@@ -46,15 +45,7 @@ nice_BSV(
 
 \item{alpha}{Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 0.8.}
 
-\item{width}{Width of the plot.}
-
-\item{height}{Height of the plot.}
-
 \item{jitter}{Random deviation added to the dots. Default: 0.2.}
-
-\item{dpi}{DPI of the plot. Default: 150.}
-
-\item{save}{To save the plot. Default: FALSE.}
 
 \item{title_size}{Font of the title and axis names. Default: c(axis = 20, fig = 24).}
 
