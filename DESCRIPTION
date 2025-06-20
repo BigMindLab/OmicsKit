@@ -25,7 +25,8 @@ Imports:
     rlang,
     stats,
     umap,
-    tibble
+    tibble,
+    scales
 Suggests: 
     biomaRt,
     dbscan,
