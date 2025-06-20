@@ -32,5 +32,7 @@ Suggests:
     ggnewscale,
     ggrepel,
     matrixStats,
-    openxlsx
+    openxlsx,
+    survival,
+    survminer
 Roxygen: list(markdown = TRUE)
