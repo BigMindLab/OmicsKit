@@ -25,12 +25,15 @@ Imports:
     rlang,
     stats,
     umap,
-    tibble
+    tibble,
+    scales
 Suggests: 
     biomaRt,
     dbscan,
     ggnewscale,
     ggrepel,
     matrixStats,
-    openxlsx
+    openxlsx,
+    survival,
+    survminer
 Roxygen: list(markdown = TRUE)
