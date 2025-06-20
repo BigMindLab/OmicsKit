@@ -2,14 +2,14 @@
 # Function nice_KM    #
 ########################
 
-#' Function to generate Kaplan–Meier survival plots for a given binary gene variable
+#' Function to generate Kaplan Meier survival plots for a given binary gene variable
 #'
-#' This function fits Kaplan–Meier survival curves stratified by status (e.g., “No” vs “Yes”) for a specified gene column in a data frame. It allows:
+#' This function fits Kaplan Meier survival curves stratified by status (e.g., 'No' vs 'Yes') for a specified gene column in a data frame. It allows:
 #' * Automatic placement of the p-value at the midpoint of the time range (if coord = NULL).
-#' * Automatic handling of cases where only one category (“No” or “Yes”) is present, returning an “empty” placeholder plot with a warning message.
+#' * Automatic handling of cases where only one category ('No' or 'Yes') is present, returning an 'empty' placeholder plot with a warning message.
 #'
 #' @param data Data.frame. Must contain columns specified by `gene`, `time_var`, and `event_var`.
-#' @param gene String. Name of the column in `data` indicating mutation status (values “No”/“Yes”).
+#' @param gene String. Name of the column in `data` indicating mutation status (values 'No'/'Yes').
 #' @param time_var String. Name of the column for survival time.
 #' @param event_var String. Name of the column for event indicator (0/1).
 #' @param coord Numeric or NULL. X-coordinate at which to display the log-rank p-value. If NULL, placed at midpoint of time range.
@@ -25,9 +25,6 @@
 #' @param pval_size Numeric. Font size for the p-value annotation.
 #' @param returnData Logical. If `TRUE`, returns a list with `km_fit` and `plot`; if `FALSE`, returns only the `ggplot` object. Default `FALSE`.
 #' @return A `ggplot` object (or a list with `km_fit` and `plot` if `returnData = TRUE`).
-#' @importFrom survival survfit Surv
-#' @importFrom survminer ggsurvplot
-#' @importFrom ggplot2 ggplot theme_void annotate theme element_text
 #' @export
 
 nice_KM <- function(data, gene, time_var, event_var, coord = NULL, title_prefix = "Mut ", colors = c("#1F8FFF", "#ED4D4D"), 
@@ -45,12 +42,12 @@ nice_KM <- function(data, gene, time_var, event_var, coord = NULL, title_prefix 
   # Count categories and handle singleton
   counts <- table(data[[gene]])
   if (length(counts) < 2 || any(counts == 0)) {
-    warning("Sólo una categoría en ", gene)
+    warning("Solo una categoria en ", gene)
     empty_plot <- ggplot2::ggplot() +
       ggplot2::theme_void() +
       ggplot2::annotate(
         "text", x = .5, y = .5, hjust = .5, size = 6,
-        label = paste0("Sólo una\ncategoría en\n", sub("_muts$", "", gene))
+        label = paste0("Solo una\ncategoria en\n", sub("_muts$", "", gene))
       )
     
     if (returnData) {
@@ -60,7 +57,14 @@ nice_KM <- function(data, gene, time_var, event_var, coord = NULL, title_prefix 
     }
   }
   
-  # Fit Kaplan–Meier model
+  if (!requireNamespace("survival", quietly = TRUE)) {
+    stop(
+      "Package \"survival\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+  
+  # Fit Kaplan Meier model
   km_fit <- eval(substitute(
     survival::survfit(
       survival::Surv(t, e) ~ g,
@@ -76,6 +80,13 @@ nice_KM <- function(data, gene, time_var, event_var, coord = NULL, title_prefix 
   
   # Legend labels with counts
   legend_labs <- paste0(names(counts), " (n=", as.integer(counts), ")")
+  
+  if (!requireNamespace("survminer", quietly = TRUE)) {
+    stop(
+      "Package \"survminer\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
   
   # Generate survminer plot
   km_out <- survminer::ggsurvplot(
