@@ -26,7 +26,8 @@ Imports:
     stats,
     umap,
     tibble,
-    scales
+    scales,
+    grid
 Suggests: 
     biomaRt,
     dbscan,
