@@ -28,6 +28,7 @@
 #' @param labels A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).
 #' @param name_tags A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).
 #' @param cluster_data Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.
+#' @param scale Logical. Indicates whether to scale the data to have unit variances or not. Default: FALSE.
 #' @param n_clusters Number of cluster categories. Default: 3.
 #' @param transform Logical. Indicates whether to log2 transform the input `object` or not. Default: FALSE.
 #' @param outPCs Number of Principal Components to keep if `returnData` is TRUE. Default: 50.
@@ -42,22 +43,24 @@ nice_PCA <- function(object, annotations = NULL, PCs = c(1,2), ntop = NULL,
                      legend_names = c(fill = "Sample Type", shape = "Library"),
                      size = 5, alpha = 1, colors = NULL, shapes = NULL, title = NULL,
                      legend_title = 16, legend_elements = 14, legend_pos = NULL,
-                     labels = NULL, name_tags = NULL, cluster_data = FALSE,
+                     labels = NULL, name_tags = NULL, cluster_data = FALSE, scale = FALSE,
                      n_clusters = 3, transform = FALSE, outPCs = 50, returnData = FALSE)
 
 {
   expr <- if (transform) log2(object + 0.001) else object
+  
+  if (scale) {
+    expr <- expr[matrixStats::rowVars(expr) > 0, , drop = FALSE]
+  }
 
   if (!is.null(ntop)) {
     # Estimate and select the top variances
     top.variances <- order(matrixStats::rowVars(expr), decreasing = TRUE)[1:min(ntop, nrow(expr))]
-
-    # Principal Component Analysis
-    pca <- stats::prcomp(t(expr[top.variances, , drop = FALSE]), scale = TRUE)
-
-  } else {
-    pca <- stats::prcomp(t(expr), scale = TRUE)
+    expr <- expr[top.variances, , drop = FALSE]
   }
+
+  # Principal Component Analysis
+  pca <- stats::prcomp(t(expr), scale. = scale)
 
   # Calculate the percent of variance per component
   percentVar <- pca$sdev^2 / sum(pca$sdev^2)

@@ -22,6 +22,7 @@ nice_PCA(
   labels = NULL,
   name_tags = NULL,
   cluster_data = FALSE,
+  scale = FALSE,
   n_clusters = 3,
   transform = FALSE,
   outPCs = 50,
@@ -62,6 +63,8 @@ nice_PCA(
 \item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).}
 
 \item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
+
+\item{scale}{Logical. Indicates whether to scale the data to have unit variances or not. Default: FALSE.}
 
 \item{n_clusters}{Number of cluster categories. Default: 3.}
 
