@@ -53,10 +53,10 @@ nice_PCA <- function(object, annotations = NULL, PCs = c(1,2), ntop = NULL,
     top.variances <- order(matrixStats::rowVars(expr), decreasing = TRUE)[1:min(ntop, nrow(expr))]
 
     # Principal Component Analysis
-    pca <- stats::prcomp(t(expr[top.variances, , drop = FALSE]), center = TRUE)
+    pca <- stats::prcomp(t(expr[top.variances, , drop = FALSE]), scale = TRUE)
 
   } else {
-    pca <- stats::prcomp(t(expr), center = TRUE)
+    pca <- stats::prcomp(t(expr), scale = TRUE)
   }
 
   # Calculate the percent of variance per component
