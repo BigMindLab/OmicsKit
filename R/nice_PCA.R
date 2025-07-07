@@ -47,6 +47,9 @@ nice_PCA <- function(object, annotations = NULL, PCs = c(1,2), ntop = NULL,
                      n_clusters = 3, transform = FALSE, outPCs = 50, returnData = FALSE)
 
 {
+  # Coerce to matrix
+  object <- as.matrix(object)
+
   expr <- if (transform) log2(object + 0.001) else object
   
   if (scale) {
