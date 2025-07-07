@@ -42,7 +42,7 @@ knitr::opts_chunk$set(
 
 -   Daniel E. Garbozo Santillan, BSc
 
-    -   Author's name: Daniel E. Garbozo
+    -   Author's name: Daniel Garbozo
     -   [Google Scholar]()
     -   [ORCID: 0009-0003-2495-6568](https://orcid.org/0009-0003-2495-6568)
 
