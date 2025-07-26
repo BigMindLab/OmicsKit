@@ -6,55 +6,70 @@
 \usage{
 nice_tSNE(
   object,
-  seed = 0,
+  annotations = NULL,
   perplexity = 3,
   max_iterations = 10000,
-  returnData = FALSE,
+  seed = 0,
   variables = c(fill = "VarFill", shape = "VarShape"),
+  legend_names = c(fill = "Label Fill", shape = "Label Shape"),
+  size = 5,
+  alpha = 1,
   colors = NULL,
   shapes = NULL,
-  size = 7,
-  alpha = 1,
-  legend_names = c(fill = "Label Fill", shape = "Label Shape"),
-  legend_title = 20,
-  legend_elements = 16,
-  legend_pos = c(0.8, 0.8, "right"),
+  title = NULL,
+  legend_title = 16,
+  legend_elements = 14,
+  legend_pos = NULL,
   labels = NULL,
-  name_tags = NULL
+  name_tags = NULL,
+  cluster_data = FALSE,
+  min_points = 7,
+  transform = TRUE,
+  returnData = FALSE
 )
 }
 \arguments{
-\item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+\item{object}{A matrix of counts with genes as rows and sample ids as columns.}
 
-\item{seed}{To set the random seed.}
+\item{annotations}{A data frame of annotation, including sample ids and variables to plot. Default: NULL.}
 
-\item{perplexity}{The average number of samples by patient (neighbors in a set).}
+\item{perplexity}{The average number of samples by patient (neighbors in a set). Default: 3}
 
-\item{max_iterations}{Maximum number of iterations to perform.}
+\item{max_iterations}{Maximum number of iterations to perform. Default: 10000.}
 
-\item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
+\item{seed}{To set the random seed. Default: 0.}
 
 \item{variables}{To indicate the variables to be used as Shape and Fill of the markers.}
 
-\item{colors}{Vector of colors to be used for the categories of the variable assigned as Marker Fill.}
+\item{legend_names}{The names to be used for the legend of the Shape and Fill.}
 
-\item{shapes}{Vector of shapes to be used for the categories of the variable assigned as Marker Shape.}
-
-\item{size}{Size of the marker. Default: 7.}
+\item{size}{Size of the marker. Default: 5.}
 
 \item{alpha}{Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 1.}
 
-\item{legend_names}{The names to be used for the legend of the Shape and Fill.}
+\item{colors}{Vector of colors to be used for the categories of the variable assigned as VarFill.}
 
-\item{legend_title}{Font of the legend title. Default: 20.}
+\item{shapes}{Vector of shapes to be used for the categories of the variable assigned as VarShape.}
 
-\item{legend_elements}{Font of the elements of the legend Default: 16.}
+\item{title}{Plot title. Default: NULL.}
 
-\item{legend_pos}{Position of the legend in the plot. Default: c(0.80, 0.80, "right").}
+\item{legend_title}{Font of the legend title. Default: 16.}
+
+\item{legend_elements}{Font of the elements of the legend Default: 14.}
+
+\item{legend_pos}{Position of the legend inside the plot. Example: c(0.80, 0.80). Default: NULL.}
 
 \item{labels}{A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).}
 
 \item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).}
+
+\item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
+
+\item{min_points}{Minimum number of neighbors to form a cluster. Default: 7.}
+
+\item{transform}{Logical. Indicates whether to log2 transform the input \code{object} or not. Default: FALSE.}
+
+\item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 }
 \description{
 Function to make tSNE plots.

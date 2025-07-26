@@ -2,27 +2,39 @@ Package: OmicsKit
 Title: A bioinformatics toolset for multiomics analysis
 Version: 1.0.0.0000
 Authors@R: c(
-    person("David", "Requena", email =  "david.requena@nyulangone.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5968-1133")),
-    person("Daniel", "Guevara", email = "dgdiaz011202@gmail.com", role = "aut", comment = c(ORCID = "0009-0001-2786-8729")))
+    person("Daniel", "Guevara", , "dgdiaz011202@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0001-2786-8729")),
+    person("Daniel", "Garbozo", , "dan.garbozo.1201.urp@gmail.com", role = "aut",
+           comment = c(ORCID = "0009-0003-2495-6568")),
+    person("Angela", "Alarcon", , "alarcondcg@gmail.com", role = "aut",
+           comment = c(ORCID = "0000-0003-0293-5603")),
+    person("Jennifer", "Almeyda", , "jalmeydatz@gmail.com", role = "aut",
+           comment = c(ORCID = "0009-0003-9589-1167")),
+    person("David", "Requena", , "david.requena@nyulangone.org", role = "aut",
+           comment = c(ORCID = "0000-0002-5968-1133"))
+  )
 Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
 License: CC BY-NC-SA 4.0
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Imports:
-    DESeq2,
-    biomaRt,
     dplyr,
-    matrixStats,
     ggplot2,
     tsne,
     magrittr,
     rlang,
-    SummarizedExperiment,
     stats,
-    tibble,
     umap,
-    lifecycle
+    tibble,
+    scales,
+    grid
 Suggests: 
+    biomaRt,
+    dbscan,
+    ggnewscale,
     ggrepel,
-    openxlsx
+    matrixStats,
+    openxlsx,
+    survival,
+    survminer
 Roxygen: list(markdown = TRUE)

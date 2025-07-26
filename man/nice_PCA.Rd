@@ -6,36 +6,43 @@
 \usage{
 nice_PCA(
   object,
+  annotations = NULL,
   PCs = c(1, 2),
-  ntop = 200,
-  returnData = FALSE,
+  ntop = NULL,
   variables = c(fill = "VarFill", shape = "VarShape"),
   legend_names = c(fill = "Sample Type", shape = "Library"),
-  size = 7,
+  size = 5,
   alpha = 1,
   colors = NULL,
   shapes = NULL,
-  legend_title = 20,
-  legend_elements = 16,
-  legend_pos = c(0.8, 0.8, "right"),
+  title = NULL,
+  legend_title = 16,
+  legend_elements = 14,
+  legend_pos = NULL,
   labels = NULL,
-  name_tags = NULL
+  name_tags = NULL,
+  cluster_data = FALSE,
+  scale = FALSE,
+  n_clusters = 3,
+  transform = FALSE,
+  outPCs = 50,
+  returnData = FALSE
 )
 }
 \arguments{
-\item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+\item{object}{A matrix of counts with genes as rows and sample ids as columns.}
+
+\item{annotations}{A data frame of annotation, including sample ids and variables to plot. Default: NULL.}
 
 \item{PCs}{A vector indicating the two Principal Components to plot. Default: c(1,2).}
 
-\item{ntop}{Number of top genes to use for principal components, selected by highest row variance.}
-
-\item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
+\item{ntop}{Number of top genes to use for principal components, selected by highest row variance. Default: NULL.}
 
 \item{variables}{To indicate the variables to be used as Shape and Fill of the markers.}
 
 \item{legend_names}{The names to be used for the legend of the Shape and Fill.}
 
-\item{size}{Size of the marker. Default: 7.}
+\item{size}{Size of the marker. Default: 5.}
 
 \item{alpha}{Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 1.}
 
@@ -43,15 +50,29 @@ nice_PCA(
 
 \item{shapes}{Vector of shapes to be used for the categories of the variable assigned as Marker Shape.}
 
-\item{legend_title}{Font of the legend title. Default: 20.}
+\item{title}{Plot title. Default: NULL.}
 
-\item{legend_elements}{Font of the elements of the legend Default: 16.}
+\item{legend_title}{Font of the legend title. Default: 16.}
 
-\item{legend_pos}{Position of the legend in the plot. Default: c(0.80, 0.80, "right").}
+\item{legend_elements}{Font of the elements of the legend Default: 14.}
+
+\item{legend_pos}{Position of the legend inside the plot. Example: c(0.80, 0.80). Default: NULL.}
 
 \item{labels}{A vector containing the variable to be used as labels (name inside the marker), and the label size. Example: c(var = "patient", size = 2). Default: NULL (no labels).}
 
-\item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 2, minlen = 2, box = 0.6). Default: NULL (no name tags).}
+\item{name_tags}{A vector containing the variable to be used as name tags (name outside the marker), tag size, minimum distance in order to add an arrow connecting the tag and the marker, and minimum distance from the tag and the center of the marker. Example: c(var = "label", size = 3, minlen = 2, box = 0.5). Default: NULL (no name tags).}
+
+\item{cluster_data}{Indicates if the function generates the clusters (TRUE) or not (FALSE). This new cluster variable can be used as fill or shape. Default: FALSE.}
+
+\item{scale}{Logical. Indicates whether to scale the data to have unit variances or not. Default: FALSE.}
+
+\item{n_clusters}{Number of cluster categories. Default: 3.}
+
+\item{transform}{Logical. Indicates whether to log2 transform the input \code{object} or not. Default: FALSE.}
+
+\item{outPCs}{Number of Principal Components to keep if \code{returnData} is TRUE. Default: 50.}
+
+\item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 }
 \description{
 This was inspired on the plotPCA function from DESeq2, made by Wolfgang Huber

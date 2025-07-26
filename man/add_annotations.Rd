@@ -4,14 +4,16 @@
 \alias{add_annotations}
 \title{A function to add annotations to a table of gene counts.}
 \usage{
-add_annotations(object, reference, variables = NULL)
+add_annotations(object, reference, variables = NULL, data_frame = FALSE)
 }
 \arguments{
-\item{object}{A table of gene counts (rows: genes, columns:samples, rownames: ENSEMBL gene IDs).}
+\item{object}{A table of gene counts (rows: genes, columns: samples, rownames are ENSEMBL gene IDs).}
 
-\item{reference}{A reference table with the annotations. Default: geneID.details in our custom pipeline.}
+\item{reference}{A reference table with the annotations including a column named "geneID".}
 
-\item{variables}{Annotations (columns) from the reference table to add, i.e. gene symbol, gene_length, description.}
+\item{variables}{Character vector of columns in \code{reference} to add. If NULL (default), all columns except geneID are used.}
+
+\item{data_frame}{Logical; if TRUE, coerce \code{object} to a data.frame first. Default: FALSE.}
 }
 \description{
 A function to add annotations to a table of gene counts.
