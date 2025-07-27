@@ -1,5 +1,5 @@
 #########################
-# Function gsea_barplot #
+# Function barplot_GSEA #
 #########################
 
 #' Create and save a customized barplot for GSEA results
@@ -13,15 +13,12 @@
 #' @param data A data frame containing GSEA results with columns such as `datatype`, `NES`, `-Log10FDR`, and `New_name`.
 #' @param output_path The file path where the barplot will be saved (SVG format).
 #' @param custom_labels A named vector of custom expressions for x-axis labels.
-#' @param height Height of the saved plot in inches. Default: 49.
-#' @param width Width of the saved plot in inches. Default: 30.
 #' @param axis_y Name of the column to use for the y-axis aesthetic, as a string. Default: "NES".
 #' @import ggplot2
 #' @importFrom rlang .data
 #' @export
 
-gsea_barplot <- function(data, output_path, custom_labels,
-                         height = 49, width = 30, axis_y = "NES")
+barplot_GSEA <- function(data, output_path, custom_labels, axis_y = "NES")
 
 {
   # Generate the barplot
@@ -56,6 +53,5 @@ gsea_barplot <- function(data, output_path, custom_labels,
     facet_wrap(~ .data$New_name, ncol = 2, strip.position = "left", scales = "free_y") +
     scale_x_discrete(labels = custom_labels)
 
-  # Save the barplot
-  ggsave(filename = output_path, plot = barplot, height = height, width = width, limitsize = FALSE)
+  return(barplot)
 }
