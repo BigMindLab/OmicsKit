@@ -4,7 +4,7 @@
 \alias{merge_GSEA}
 \title{Merge GSEA results data frames.}
 \usage{
-merge_GSEA(input_directory, output_file)
+merge_GSEA(input_directory, output_file = "collections_merged_gsea_data.tsv")
 }
 \arguments{
 \item{input_directory}{The directory containing the GSEA collection results in TSV format.}
@@ -12,5 +12,5 @@ merge_GSEA(input_directory, output_file)
 \item{output_file}{The output file to save the merged data. If not provided, the file will be saved in the input directory.}
 }
 \description{
-After run GSEA_all.sh from GSEA.sh, move the .tsv files to a single directory
+After running GSEA_all.sh from GSEA.sh, merge_GSEA function joins .tsv files to a single file
 }

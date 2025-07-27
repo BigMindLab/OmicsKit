@@ -27,14 +27,22 @@ Imports:
     umap,
     tibble,
     scales,
-    grid
+    grid,
+    utils,
+    patchwork
 Suggests: 
     biomaRt,
+    cowplot,
     dbscan,
     ggnewscale,
     ggrepel,
+    grDevices,
     matrixStats,
     openxlsx,
+    pheatmap,
+    readr,
     survival,
-    survminer
+    survminer,
+    tidyr,
+    tidyselect
 Roxygen: list(markdown = TRUE)

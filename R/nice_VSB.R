@@ -1,8 +1,8 @@
-#######################
-# Function nice_BSV.R #
-#######################
+#####################
+# Function nice_VSB #
+#####################
 
-#' Function to make Box-Scatter-Violin plots.
+#' Function to make Violin-Scatter-Box plots.
 #'
 #' This function will make a Boxplot, using a DEseq object.
 #' It will show the data points on top with a small deviation (jitter) for a better visualization.
@@ -27,7 +27,7 @@
 #' @importFrom rlang .data
 #' @export
 
-nice_BSV <- function (object = NULL, annotations, variables = c(fill = "VarFill", shape = "VarShape"),
+nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill", shape = "VarShape"),
                       genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
                       categories = c("normal", "primary", "recurrence", "metastasis"),
                       colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8, jitter = 0.2,
