@@ -27,7 +27,7 @@
 #' @importFrom rlang .data
 #' @export
 
-volcano_plot <- function(results, x_range = 9, y_max = 8, cutoff_y = 0.05, cutoff_x = 1,
+nice_Volcano <- function(results, x_range = 9, y_max = 8, cutoff_y = 0.05, cutoff_x = 1,
                          nice_y = NULL, nice_x = NULL, y_var, x_var, label_var, legend = TRUE,
                          title, colors = c("red", "grey70", "blue"), genes = NULL)
 {
