@@ -8,7 +8,7 @@ get_annotations(
   ensembl_ids,
   mode = "genes",
   filename = "gene_annotations",
-  version = "",
+  version = "Current",
   format = "csv"
 )
 }
@@ -19,7 +19,7 @@ get_annotations(
 
 \item{filename}{The name of the output file, which is table. Default = gene_annotations.}
 
-\item{version}{This function can use the version 103 or the current version of the Biomart. Default = Current.}
+\item{version}{This function can use the versions 102, 103, and 112 of Ensembl. Default = "Current".}
 
 \item{format}{The output is saved in .csv or .xlsx formats. Default = csv.}
 }
