@@ -13,27 +13,30 @@
 #'
 #' @param ensembl_ids The column of transcripts to be used as input.
 #' @param mode To specify the IDs provided, between "transcripts" or "genes". Default = genes.
-#' @param version This function can use the version 103 or the current version of the Biomart. Default = Current.
+#' @param version This function can use the versions 102, 103, and 112 of Ensembl. Default = "Current".
 #' @param filename The name of the output file, which is table. Default = gene_annotations.
 #' @param format The output is saved in .csv or .xlsx formats. Default = csv.
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
 
-get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annotations", version = "", format = "csv") {
+get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annotations", version = "Current", format = "csv") {
 
-  if (!requireNamespace("biomaRt", quietly = TRUE)) {
-    stop(
-      "Package \"biomaRt\" must be installed to use this function.",
-      call. = FALSE
-      )
-  }
+  if (!requireNamespace("biomaRt", quietly = TRUE)) stop("Package \"biomaRt\" must be installed to use this function.", call. = FALSE)
 
-  if(version == "103"){
+  if (version == "102") {
+    ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
+                               dataset = "hsapiens_gene_ensembl",
+                               host = "https://nov2020.archive.ensembl.org")
+  } else if (version == "103") {
     ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
                                dataset = "hsapiens_gene_ensembl",
                                host = "https://feb2021.archive.ensembl.org")
-  } else {
+  } else if (version == "112") {
+    ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
+                               dataset = "hsapiens_gene_ensembl",
+                               host = "https://may2024.archive.ensembl.org")
+  } else if (version == "Current") {
     ensembl = biomaRt::useMart("ENSEMBL_MART_ENSEMBL",
                                dataset = "hsapiens_gene_ensembl",
                                host = "https://useast.ensembl.org")
@@ -49,7 +52,7 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
   # There are more annotations available in the biomaRt, check listAttributes(mart = ensembl)
   # The terms "go_id" and "name_1006" can be added in a future release.
 
-  if(mode == "transcripts"){
+  if (mode == "transcripts") {
 
     df <- data.frame(transcriptID = ensembl_ids)
 
@@ -81,7 +84,7 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
   df$gene_length <- df$gene_end - df$gene_start + 1
   df <- df %>% dplyr::relocate(.data$gene_length, .before = "description")
 
-  if(format == "xlsx"){
+  if (format == "xlsx") {
     if (!requireNamespace("openxlsx", quietly = TRUE)) {
       stop(
         "Package \"openxlsx\" must be installed to use this function.",
@@ -93,5 +96,6 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
   } else {
     utils::write.csv(df, rowNames = F, file = paste0(filename, ".csv"))
   }
+
   return(df)
 }
