@@ -15,6 +15,7 @@ volcano_plot(
   y_var,
   x_var,
   label_var,
+  legend = TRUE,
   title,
   colors = c("red", "grey70", "blue"),
   genes = NULL
@@ -40,6 +41,8 @@ volcano_plot(
 \item{x_var}{Name of the column in \code{results} to plot on the x-axis (e.g. log₂FC).}
 
 \item{label_var}{to be defined.}
+
+\item{legend}{Logical. Control legend display. Default: TRUE.}
 
 \item{title}{title.}
 

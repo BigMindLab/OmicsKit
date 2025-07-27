@@ -13,6 +13,7 @@
 #' @param x_var Name of the column in `results` to plot on the x-axis (e.g. log₂FC).
 #' @param y_var Name of the column in `results` to plot on the y-axis (e.g. FDR).
 #' @param label_var to be defined.
+#' @param legend Logical. Control legend display. Default: TRUE.
 #' @param title title.
 #' @param colors colors.
 #' @param x_range X-axis range of values.
@@ -27,7 +28,7 @@
 #' @export
 
 volcano_plot <- function(results, x_range = 9, y_max = 8, cutoff_y = 0.05, cutoff_x = 1,
-                         nice_y = NULL, nice_x = NULL, y_var, x_var, label_var,
+                         nice_y = NULL, nice_x = NULL, y_var, x_var, label_var, legend = TRUE,
                          title, colors = c("red", "grey70", "blue"), genes = NULL)
 {
   if (!requireNamespace("ggrepel", quietly = TRUE)) {
@@ -74,17 +75,16 @@ volcano_plot <- function(results, x_range = 9, y_max = 8, cutoff_y = 0.05, cutof
                        breaks = seq(-x_range, x_range, by = x_range*0.5),
                        minor_breaks = seq(-x_range, x_range, by = x_range*0.1)) +
 
-    # Datapoints, in different colors:
     geom_point(data = d.volcano,
                aes(x = .data[[x_var]], y = -log10(.data[[y_var]]), fill = colors, shape = .data[["shapes"]]),
-               size = 5.5, color = "gray10", alpha = 0.4, show.legend = TRUE) +
+               size = 5.5, color = "gray10", alpha = 0.4, show.legend = legend) +
 
     # Vertical lines and labels:
     geom_vline(xintercept = c(-cutoff_x, cutoff_x), color = "grey20", alpha = 0.9, linetype = 2, linewidth = 1.2) +
 
     # Horizontal line and label:
     geom_hline(yintercept = -log10(cutoff_y), color = "grey20", alpha = 0.9, linetype = 2, linewidth = 1.2) +
-    geom_text(aes(x = -6, y = -log10(cutoff_y) + 0.5, label = paste("q =", cutoff_y)), color = "grey20", size = 6.2) +
+    geom_text(aes(x = -x_range*0.7, y = -log10(cutoff_y) + 0.5, label = paste("q =", cutoff_y)), color = "grey20", size = 6.2) +
 
     # Color settings
     scale_fill_manual(name = "Expression",
@@ -103,7 +103,7 @@ volcano_plot <- function(results, x_range = 9, y_max = 8, cutoff_y = 0.05, cutof
     ggrepel::geom_label_repel(data = d.volcano[cond, ],
                      aes(x = .data[[x_var]], y = -log10(.data[[y_var]]), label = .data[[label_var]]),
                      inherit.aes = FALSE, parse = FALSE, max.iter = 5000, color = "black", size = 5,
-                     segment.alpha = 1.5, box.padding = unit(0.8, "lines"), min.segment.length = unit(0.01, "lines")) +
+                     segment.alpha = 1.5, box.padding = grid::unit(0.8, "lines"), min.segment.length = grid::unit(0.01, "lines")) +
 
     # Axis labels:
     labs(x = expression("log"[2]*"(Fold Change)"),
