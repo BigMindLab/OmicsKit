@@ -2,37 +2,87 @@
 % Please edit documentation in R/plot_GSEA.R
 \name{plot_GSEA}
 \alias{plot_GSEA}
-\title{Plot global GSEA results}
+\title{Unified GSEA plotting function with theme configuration}
 \usage{
 plot_GSEA(
   data,
+  Comparison = "Comparison",
+  custom_labels = NULL,
+  axis_y = "NES",
+  fdr_col = "FDR",
+  logFDR = TRUE,
   geneset_col,
   collection_col,
   nes_col,
   logfdr_col,
-  text_size_genesets = 5,
-  text_size_collection = 5
+  order = c("desc", "asc"),
+  ncol_wrap = 2,
+  free_y = TRUE,
+  fill_limits = NULL,
+  fill_palette = c("white", "red"),
+  theme_params = list()
 )
 }
 \arguments{
-\item{data}{Data frame containing the GSEA results.}
+\item{data}{A data frame containing GSEA results.}
 
-\item{geneset_col}{Name of the column containing the genesets.}
+\item{Comparison}{Name of the column defining different comparisons. Default: "Comparison".}
 
-\item{collection_col}{Name of the column containing the collections.}
+\item{custom_labels}{Named vector of labels for the x-axis discrete scale (barplot mode only). Default: NULL.}
 
-\item{nes_col}{Name of the column containing the NES values.}
+\item{axis_y}{Name of the column to use for the y-axis aesthetic. Default: "NES".}
 
-\item{logfdr_col}{Name of the column containing \eqn{-\log_{10}(FDR)} values.}
+\item{fdr_col}{Name of the column containing FDR values. Default: "FDR".}
 
-\item{text_size_genesets}{Text size for the geneset labels.}
+\item{logFDR}{Logical; if TRUE, compute -log10(FDR) from \code{fdr_col}, otherwise use \code{fdr_col} directly. Default: TRUE.}
 
-\item{text_size_collection}{Text size for the collection labels.}
+\item{geneset_col}{Name of the column containing the geneset labels (single comparison mode).}
+
+\item{collection_col}{Name of the column containing the MSigDB collections (single comparison mode).}
+
+\item{nes_col}{Name of the column containing NES values (single comparison mode).}
+
+\item{logfdr_col}{Name of the column containing -log10(FDR) or similar (single comparison mode).}
+
+\item{order}{One of "desc" or "asc"; order of \code{axis_y} values. Default: c("desc","asc").}
+
+\item{ncol_wrap}{Number of columns for \code{facet_wrap} in barplot mode. Default: 2.}
+
+\item{free_y}{Logical; if TRUE, allow free y scales in facets. Default: TRUE.}
+
+\item{fill_limits}{Numeric vector of length 2 to set fill gradient limits (barplot mode). Default: NULL.}
+
+\item{fill_palette}{Character vector of two colors for fill gradient. Default: c("white","red").}
+
+\item{theme_params}{Named list to override default theme parameters (see details).}
 }
 \value{
-GSEA barplots arranged in a grid.
+A ggplot or patchwork object for the GSEA plot.
 }
 \description{
-Generates a composite plot displaying NES values, pathway labels,
-and a \emph{logFDR} legend, organized by MSigDB collections.
+Creates either a global GSEA plot or a faceted barplot depending on the number of unique
+comparisons in the \code{Comparison} column. Allows customizing all previously hard-coded theme
+parameters via a single \code{theme_params} list.
+}
+\details{
+theme_params may include:
+\describe{
+\item{side_label_size}{Size for side panel labels (default 35)}
+\item{geneset_text_size}{Text size for geneset labels (default 5)}
+\item{collection_text_size}{Text size for collection labels (default 5)}
+\item{panel_widths}{Patchwork widths vector (default c(4,25,15,3,10,3))}
+\item{bar_col}{Bar/col border color (default "black")}
+\item{bar_size}{Border size for bars (default 0.5)}
+\item{bar_width}{Width for bars (default 0.6)}
+\item{col_size}{Border size for geom_col (default 1)}
+\item{hline_size}{Size for horizontal line at y=0 (default 2)}
+\item{axis_title_size}{Font size for axis titles (default 45)}
+\item{axis_text_size_x}{Font size for x-axis text (default 30)}
+\item{axis_text_size_y}{Font size for y-axis text (default 50)}
+\item{tick_size}{Size for axis ticks (default 1.5)}
+\item{tick_length}{Length for axis ticks in cm (default 0.3)}
+\item{strip_text_size}{Font size for strip text (default 50)}
+\item{panel_spacing_single}{Facet spacing single mode (default 4)}
+\item{panel_spacing_multi}{Facet spacing multi mode (default 0.6)}
+}
 }
