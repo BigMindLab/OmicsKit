@@ -3,7 +3,7 @@
 # August, 2025
 # Source: https://gdc-hub.s3.us-east-1.amazonaws.com/download/TCGA-LUAD.star_counts.tsv.gz
 
-raw_counts <- read.delim("data-raw/TCGA-LUAD.star_counts.tsv.gz", sep = "\t", header = TRUE)
+raw_counts <- read.delim("../TCGA-LUAD.star_counts.tsv.gz", sep = "\t", header = TRUE)
 sampledata <- read.csv("../TCGA-LUAD.samples.reduced.tsv", sep = "\t", header = TRUE)
 
 raw_counts[, -1] <- as.matrix(raw_counts[, -1])
