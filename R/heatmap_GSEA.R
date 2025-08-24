@@ -23,6 +23,11 @@ heatmap_GSEA <- function(main_dir = NULL, expression_file, metadata_file, gmt_fi
                          ranked_genes_file, gsea_file, output_dir = "leading_edge_heatmaps",
                          sample_col = "Sample", group_col = "group", save_dataframe = FALSE)
 {
+  # Avoid check NOTES for global variables across multiple functions
+  utils::globalVariables(c(
+    "NAME", "GENES", "SIZE", "tags", "L.EDGE_size"
+  ))
+  
   # Ensure required packages are installed
   if (!requireNamespace("readr", quietly = TRUE)) stop("Package \"readr\" must be installed to use this function.", call. = FALSE)
   if (!requireNamespace("grDevices", quietly = TRUE)) stop("Package \"grDevices\" must be installed to use this function.", call. = FALSE)

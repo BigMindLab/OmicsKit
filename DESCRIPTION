@@ -29,10 +29,10 @@ Imports:
     scales,
     grid,
     utils,
-    patchwork
+    patchwork,
+    cowplot
 Suggests: 
     biomaRt,
-    cowplot,
     dbscan,
     ggnewscale,
     ggrepel,

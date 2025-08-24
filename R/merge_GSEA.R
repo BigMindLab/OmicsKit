@@ -10,10 +10,15 @@
 #' @param output_file The output file to save the merged data. If not provided, the file will be saved in the input directory.
 #' @importFrom magrittr %>%
 #' @export
-
-
 merge_GSEA <- function(input_directory, output_file = "collections_merged_gsea_data.tsv") {
-
+  
+  # Avoid check NOTES for global variables across multiple functions
+  utils::globalVariables(c(
+    "...12", "numeric_cols", "LEADING EDGE", "tags", "signal",
+    "FDR q-val", "Log10FDR", "FWER p-val", "Comparison"
+  ))
+  
+  # Ensure required packages are installed
   if (!requireNamespace("dplyr", quietly = TRUE)) stop("Package \"dplyr\" must be installed to use this function.", call. = FALSE)
   if (!requireNamespace("readr", quietly = TRUE)) stop("Package \"readr\" must be installed to use this function.", call. = FALSE)
   if (!requireNamespace("tidyr", quietly = TRUE)) stop("Package \"tidyr\" must be installed to use this function.", call. = FALSE)
