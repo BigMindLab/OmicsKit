@@ -1,10 +1,10 @@
 #########################
-# Function heatmap_GSEA #
+# Function heatmap_PA #
 #########################
 
-#' Plot leading edge heatmaps from GSEA results.
+#' Plot leading edge heatmaps from GSEA/CAMERA/PADOG results.
 #'
-#' Generates heatmaps of leading edge genes for each gene set from GSEA output.
+#' Generates heatmaps based on normalized data of genes for each gene set from GSEA/CAMERA/PADOG output.
 #'
 #' @param main_dir Optional base directory. If supplied, it will be prepended to all relative file paths.
 #' @param expression_file Path to the expression data file (tab-delimited) or relative to main_dir.
@@ -19,7 +19,7 @@
 #' @return Saves one PDF and one JPG heatmap per gene set under output_dir; optionally saves intermediate TSV.
 #' @export
 
-heatmap_GSEA <- function(main_dir = NULL, expression_file, metadata_file, gmt_file,
+heatmap_PA <- function(main_dir = NULL, expression_file, metadata_file, gmt_file,
                          ranked_genes_file, gsea_file, output_dir = "leading_edge_heatmaps",
                          sample_col = "Sample", group_col = "group", save_dataframe = FALSE)
 {
