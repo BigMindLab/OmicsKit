@@ -1,16 +1,16 @@
 #######################
-# Function merge_GSEA #
+# Function merge_PA #
 #######################
 
 #' Merge GSEA results data frames.
 #'
-#' After running GSEA_all.sh from GSEA.sh, merge_GSEA function joins .tsv files to a single file
+#' After running GSEA_all.sh from GSEA.sh, merge_PA function joins .tsv files to a single file
 #'
 #' @param input_directory The directory containing the GSEA collection results in TSV format.
 #' @param output_file The output file to save the merged data. If not provided, the file will be saved in the input directory.
 #' @importFrom magrittr %>%
 #' @export
-merge_GSEA <- function(input_directory, output_file = "collections_merged_gsea_data.tsv") {
+merge_PA <- function(input_directory, output_file = "collections_merged_gsea_data.tsv") {
   
   # Avoid check NOTES for global variables across multiple functions
   utils::globalVariables(c(

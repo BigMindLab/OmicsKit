@@ -4,7 +4,7 @@ utils::globalVariables(c(
   "FDR q-val","Log10FDR","FWER p-val","Comparison"
 ))
 
-#' Unified GSEA plotting function with theme configuration
+#' Unified Pathway analysis results plotting function with theme configuration
 #'
 #' Creates either a global GSEA plot or a faceted barplot depending on the number of unique
 #' comparisons in the `Comparison` column. Allows customizing all previously hard-coded theme
@@ -53,7 +53,7 @@ utils::globalVariables(c(
 #' @importFrom cowplot get_legend
 #' @importFrom utils modifyList
 #' @export
-plot_GSEA <- function(
+plot_PA <- function(
     data,
     Comparison = "Comparison",
     custom_labels = NULL,
