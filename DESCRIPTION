@@ -16,7 +16,7 @@ Authors@R: c(
 Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
 License: CC BY-NC-SA 4.0
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
     dplyr,
     ggplot2,
@@ -30,7 +30,9 @@ Imports:
     grid,
     utils,
     patchwork,
-    cowplot
+    cowplot,
+    igraph,
+    visNetwork
 Suggests: 
     biomaRt,
     dbscan,
