@@ -4,13 +4,13 @@
 
 #' Plot a gene set network based on clustering output
 #'
-#' This function takes the output of \code{\link{build_net()}},
+#' This function takes the output of [build_net()],
 #' constructs a gene set similarity network using Jaccard similarity as edge
 #' weights, and generates both a static igraph object and an interactive
 #' \code{visNetwork} visualization.
 #'
 #' @param clustering_output A named list as returned by
-#'   \code{\link{build_net}}, containing at least
+#'    [build_net()], containing at least
 #'   \code{clusters} (a tibble with columns \code{pathway} and \code{cluster})
 #'   and \code{jaccard_matrix} (a symmetric numeric matrix).
 #' @param edge_threshold A numeric scalar specifying the minimum Jaccard

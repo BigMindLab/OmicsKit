@@ -8,7 +8,7 @@ view_net(clustering_output, edge_threshold = 0.25, save_html_path = NULL)
 }
 \arguments{
 \item{clustering_output}{A named list as returned by
-\code{\link{build_net}}, containing at least
+\code{\link[=build_net]{build_net()}}, containing at least
 \code{clusters} (a tibble with columns \code{pathway} and \code{cluster})
 and \code{jaccard_matrix} (a symmetric numeric matrix).}
 
@@ -33,7 +33,7 @@ visualization.
 }
 }
 \description{
-This function takes the output of \code{\link{build_net()}},
+This function takes the output of \code{\link[=build_net]{build_net()}},
 constructs a gene set similarity network using Jaccard similarity as edge
 weights, and generates both a static igraph object and an interactive
 \code{visNetwork} visualization.

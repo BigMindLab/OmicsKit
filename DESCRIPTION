@@ -32,7 +32,8 @@ Imports:
     patchwork,
     cowplot,
     igraph,
-    visNetwork
+    visNetwork,
+    cluster
 Suggests: 
     biomaRt,
     dbscan,

@@ -74,10 +74,10 @@
 #' @importFrom utils read.delim
 #' @importFrom cluster silhouette
 #' @importFrom dplyr filter pull distinct
-#' @importFrom dplyr .data
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
 #' @export
+
 build_net <- function(results_df,
                                        gmt_path,
                                        fdr_threshold = 0.25,
