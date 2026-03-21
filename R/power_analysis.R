@@ -45,7 +45,7 @@
 #' power_analysis(effect_size = 2, dispersion = 0.1, plot = FALSE)$min_sample_size
 #'
 #' # See plot
-#' power_analysis$plot
+#' #power_analysis$plot
 #'
 #' @export
 

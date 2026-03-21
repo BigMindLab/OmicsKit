@@ -4,5 +4,5 @@
 ^LICENSE\.md$
 ^\.github$
 ^data-raw$
-^vignettes$
 ^vignettes/prerender_figures\.R$
+
