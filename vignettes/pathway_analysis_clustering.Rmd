@@ -291,7 +291,7 @@ library(OmicsKit)
 gsl <- list_gmts("path/to/gmt_folder/")
 
 # 2. Jaccard similarity (filter by FDR < 0.05)
-jac <- calc_jaccard(gsl, camera_results, fdr_threshold = 0.05)
+jac <- calc_jaccard(gsl, camera_results, fdr_th = 0.05)
 
 # 3. Hierarchical clustering
 clust <- do_clust(jac)
