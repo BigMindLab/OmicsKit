@@ -39,7 +39,7 @@ Suggests:
     ComplexHeatmap,
     dbscan,
     knitr,
-    rmarkdown
+    rmarkdown,
     DESeq2,
     ggnewscale,
     ggraph,
