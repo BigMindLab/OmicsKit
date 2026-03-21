@@ -1,14 +1,14 @@
-#####################
-# Function nice_VSB #
-#####################
+##############################
+# Function nice_VSB_DEseq2.R #
+#############################
 
-#' Function to make Violin-Scatter-Box plots from data frames.
+#' Function to make Box-Scatter-Violin plots from DEseq2 output directly.
 #'
 #' This function will make a Boxplot, using a DEseq object.
 #' It will show the data points on top with a small deviation (jitter) for a better visualization.
 #'
-#' @param object A data frame object with normalized counts genes(in rows) across samples(in columns).
-#' @param annotations Data frame with annotations.
+#' @param object A DEseq object already transformed with the variance stabilizing or rlog transformations.
+
 #' @param variables To indicate the variables to be used as Shape and Fill of the markers.
 #' @param genename The gene name to be used for the plot.
 #' @param symbol The gene symbol to be used for the plot.
@@ -18,20 +18,26 @@
 #' @param shapes Vector of shapes to be used for the categories of the variable assigned as Marker Shape.
 #' @param markersize Size of the marker.
 #' @param alpha Transparency of the marker, which goes from 0 (transparent) to 1 (no transparent). Default: 0.8.
+#' @param width Width of the plot.
+#' @param height Height of the plot.
 #' @param jitter Random deviation added to the dots. Default: 0.2.
+#' @param dpi DPI of the plot. Default: 150.
+#' @param save To save the plot. Default: FALSE.
 #' @param title_size Font of the title and axis names. Default: c(axis = 20, fig = 24).
 #' @param label_size Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
 #' @import ggplot2
-#' @importFrom magrittr %>%
+
 #' @importFrom rlang .data
 #'
 #' @examples
-#' data(norm_counts)
+#' \dontrun{
+#' # requires a DESeq2 object
+#'
 #' data(sampledata)
 #'
-#' nice_VSB(
-#'   object      = norm_counts,
+#' nice_VSB_DEseq2(
+#'   object      = vst,
 #'   annotations = sampledata,
 #'   variables   = c(fill = "sample_type"),
 #'   genename    = rownames(norm_counts)[1],
@@ -41,22 +47,30 @@
 #'   shapes      = 21,
 #'   markersize  = 3
 #' )
-#'
+#' }
 #' @export
 
-nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill", shape = "VarShape"),
+nice_VSB_DEseq2 <- function (object = NULL, variables = c(fill = "VarFill", shape = "VarShape"),
                       genename = NULL, symbol = NULL, labels = c("N", "P", "R", "M"),
                       categories = c("normal", "primary", "recurrence", "metastasis"),
-                      colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8, jitter = 0.2,
+                      colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8,
+                      width = NULL, height = NULL, jitter = 0.2, dpi = 150, save = FALSE,
                       title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
-                      legend_size = c(title = 14, elements = 12))
-{
+                      legend_size = c(title = 14, elements = 12)) {
+
+  if (!requireNamespace("DESeq2", quietly = TRUE)) {
+    stop(
+      "Package \"DESeq2\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
   # Extracting the vector of counts for that gene
-  gene_counts <- object[genename, ]
+  gene_counts <- DESeq2::counts(object, normalized = TRUE)[genename, ]
   log2_gc <- log2(gene_counts)
 
   # Making a dataframe for the plot
-  df.box <- cbind(annotations, log2_gc)
+  df.box <- data.frame(object@colData[, c("id", "sample_type", variables)], log2_gc)
 
   # Re-ordering sample_type for the plot
   df.box[, "sample_type"] <- factor(df.box[, "sample_type"],
@@ -66,7 +80,7 @@ nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill"
   # Plot
   p.bs <- ggplot(df.box, aes(x = .data$sample_type, y = log2_gc)) + theme_bw() +
     geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
-		show.legend = FALSE, trim = TRUE) +
+                show.legend = FALSE, trim = TRUE) +
     geom_boxplot(width = 0.6, fill = "gray90") +
     labs(title = paste("Gene:", genename, symbol),
          x = expression("Sample Type"),
@@ -94,5 +108,8 @@ nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill"
   p.bs <- p.bs + scale_fill_manual(name = variables[1], values = colors,
                                    guide = guide_legend(override.aes = aes(shape = 21, size = 7)))
 
-  return(p.bs)
+  if (save == T) {
+    ggsave(paste0(symbol,".jpg"), plot = p.bs, width = width, height = height, dpi = dpi)
+
+  } else { return(p.bs) }
 }

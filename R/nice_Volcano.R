@@ -25,6 +25,32 @@
 #' @param genes Vector of genes to label in the plot. Default: NULL.
 #' @import ggplot2
 #' @importFrom rlang .data
+#'
+#' @examples
+#' data(deseq2_results)
+#'
+#' nice_Volcano(
+#'   results   = deseq2_results,
+#'   x_var     = "log2FoldChange",
+#'   y_var     = "padj",
+#'   label_var = "gene_id",
+#'   title     = "TCGA-LUAD: Tumor vs Normal",
+#'   cutoff_y  = 0.05,
+#'   cutoff_x  = 1,
+#'   x_range   = 8,
+#'   y_max     = 10
+#' )
+#'
+#' # Highlight specific genes
+#' nice_Volcano(
+#'   results   = deseq2_results,
+#'   x_var     = "log2FoldChange",
+#'   y_var     = "padj",
+#'   label_var = "gene_id",
+#'   title     = "TCGA-LUAD: Tumor vs Normal",
+#'   genes     = deseq2_results$gene_id[1:5]
+#' )
+#'
 #' @export
 
 nice_Volcano <- function(results, x_range = 9, y_max = 8, cutoff_y = 0.05, cutoff_x = 1,

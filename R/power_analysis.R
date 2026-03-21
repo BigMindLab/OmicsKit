@@ -14,6 +14,28 @@
 #' @param plot Logical. If TRUE, draws the power curve; if FALSE, skips plotting.
 #' @import ggplot2
 #' @importFrom rlang .data
+#'
+#' @examples
+#' # Basic power analysis with default parameters
+#' result <- power_analysis(
+#'   effect_size  = 1,
+#'   dispersion   = 0.1,
+#'   n_genes      = 20000,
+#'   prop_de      = 0.05,
+#'   alpha        = 0.05,
+#'   power_target = 0.8,
+#'   max_n        = 20
+#' )
+#'
+#' # Minimum sample size to reach 80% power
+#' result$min_sample_size
+#'
+#' # Full power table
+#' head(result$power_table)
+#'
+#' # Higher effect size requires fewer samples
+#' power_analysis(effect_size = 2, dispersion = 0.1, plot = FALSE)$min_sample_size
+#'
 #' @export
 
 power_analysis <- function(

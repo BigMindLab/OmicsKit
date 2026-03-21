@@ -9,6 +9,33 @@
 #' @param geneID Ensembl ID of the gene of interest.
 #' @param object DESeq2 results object of a comparison.
 #' @param thresholds Vector with 4 values of significance. Default c(0.001, 0.01, 0.1, 0.25).
+#'
+#' @examples
+#' data(deseq2_results)
+#'
+#' # get_stars expects a column named "ensembl"
+#' res <- deseq2_results
+#' colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
+#'
+#' # Get significance stars for the most significant gene
+#' get_stars(
+#'   geneID = res$ensembl[1],
+#'   object = res
+#' )
+#'
+#' # Custom thresholds
+#' get_stars(
+#'   geneID     = res$ensembl[1],
+#'   object     = res,
+#'   thresholds = c(0.001, 0.01, 0.05, 0.10)
+#' )
+#'
+#' # Non-significant gene
+#' get_stars(
+#'   geneID = res$ensembl[nrow(res)],
+#'   object = res
+#' )
+#'
 #' @export
 
 get_stars <- function(geneID, object, thresholds = c(0.001, 0.01, 0.1, 0.25))

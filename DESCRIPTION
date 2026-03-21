@@ -39,6 +39,8 @@ Suggests:
     ComplexHeatmap,
     dbscan,
     knitr,
+    rmarkdown,
+    DESeq2,
     ggnewscale,
     ggraph,
     ggrepel,
@@ -48,7 +50,6 @@ Suggests:
     openxlsx,
     pheatmap,
     readr,
-    rmarkdown,
     survival,
     survminer,
     tidygraph,
@@ -59,4 +60,6 @@ Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 3.5)
 LazyData: true
+LazyDataCompression: xz
 VignetteBuilder: knitr
+

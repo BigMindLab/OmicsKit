@@ -15,6 +15,24 @@
 #' @param l2fc The cut-off of Log2(Fold Change) for the over- and under-expressed tables. Default = 0.
 #' @param cutoff_alpha The cut-off of the False Discovery Rate (FDR o padj). Default = 0.25.
 #' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' data(deseq2_results)
+#'
+#' # Save full results + over/under-expressed tables as .xlsx files
+#' save_results(
+#'   df           = deseq2_results,
+#'   name         = "TCGA_LUAD_TumorVsNormal",
+#'   l2fc         = 1,
+#'   cutoff_alpha = 0.05
+#' )
+#' # Creates:
+#' #   TCGA_LUAD_TumorVsNormal_full.xlsx
+#' #   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
+#' #   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
+#' }
+#'
 #' @export
 
 save_results <- function(df, name, l2fc = 0, cutoff_alpha = 0.25){
@@ -33,16 +51,12 @@ save_results <- function(df, name, l2fc = 0, cutoff_alpha = 0.25){
                        file = paste0(name, "_full.xlsx"), overwrite = T)
 
   #Saving over-expressed genes:
-  #df.sig.fold_over <- subset(df, ((FDR < cutoff_alpha) & !is.na(FDR)) &
-  #                             log2FoldChange >= l2fc)
   df.sig.fold_over <- df[df$FDR < cutoff_alpha & !is.na(df$FDR) & df$log2FoldChange >= l2fc, ]
 
   openxlsx::write.xlsx(df.sig.fold_over, colNames = T, rowNames = F, append = F,
                        file = paste0(name, "_Overexp.xlsx"), overwrite = T)
 
   #Saving under-expressed genes:
-  #df.sig.fold_under <- subset(df, ((FDR < cutoff_alpha) & !is.na(FDR)) &
-  #                              log2FoldChange <= -l2fc)
   df.sig.fold_under <- df[df$FDR < cutoff_alpha & !is.na(df$FDR) & df$log2FoldChange <= -l2fc, ]
 
   openxlsx::write.xlsx(df.sig.fold_under, colNames = T, rowNames = F, append = F,

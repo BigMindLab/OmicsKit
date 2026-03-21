@@ -74,3 +74,27 @@ nice_tSNE(
 \description{
 Function to make tSNE plots.
 }
+\examples{
+\dontrun{
+data(vst_counts)
+data(sampledata)
+
+sampledata_t <- sampledata
+colnames(sampledata_t)[colnames(sampledata_t) == "patient_id"] <- "id"
+
+# perplexity must be < n_samples / 3; with 32 samples use perplexity = 5
+nice_tSNE(
+  object         = vst_counts,
+  annotations    = sampledata_t,
+  perplexity     = 5,
+  max_iterations = 1000,
+  variables      = c(fill = "sample_type"),
+  legend_names   = c(fill = "Sample Type"),
+  colors         = c("steelblue", "firebrick"),
+  shapes         = c(21, 21),
+  title          = "TCGA-LUAD tSNE",
+  seed           = 1905
+)
+}
+
+}
