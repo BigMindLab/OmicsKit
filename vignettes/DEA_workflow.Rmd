@@ -58,7 +58,7 @@ result <- power_analysis(
   alpha        = 0.05,   # desired FDR
   power_target = 0.8,    # desired power (80%)
   max_n        = 30,
-  plot         = FALSE
+  plot         = TRUE
 )
 
 # Minimum samples per group needed
@@ -66,6 +66,9 @@ result$min_sample_size
 
 # Full power curve
 head(result$power_table)
+
+# See plot
+result$plot
 ```
 
 ```{r power_plot, echo = FALSE, fig.cap = "Statistical power vs. sample size per group. The red dashed line marks 80% power; the blue dashed line marks the minimum required sample size.", fig.width = 7, fig.height = 5}

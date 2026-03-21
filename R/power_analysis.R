@@ -11,9 +11,17 @@
 #' @param alpha Numeric. Desired FDR (type I error rate).
 #' @param power_target Numeric. Desired statistical power (1 – β).
 #' @param max_n Integer. Maximum sample size per group to explore.
-#' @param plot Logical. If TRUE, draws the power curve; if FALSE, skips plotting.
+#' @param plot Logical.  If TRUE, draws the power curve; if FALSE, skips plotting.
 #' @import ggplot2
 #' @importFrom rlang .data
+#'
+#' @return A named list. If `plot = TRUE`, contains three elements:
+#'   * `$min_sample_size`: Integer. Minimum sample size per group to reach
+#'     `power_target`.
+#'   * `$power_table`: A data frame with columns `SampleSize` and `Power`.
+#'   * `$plot`: A ggplot2 object of the power curve.
+#'
+#'   If `plot = FALSE`, returns only `$min_sample_size` and `$power_table`.
 #'
 #' @examples
 #' # Basic power analysis with default parameters
@@ -35,6 +43,9 @@
 #'
 #' # Higher effect size requires fewer samples
 #' power_analysis(effect_size = 2, dispersion = 0.1, plot = FALSE)$min_sample_size
+#'
+#' # See plot
+#' power_analysis$plot
 #'
 #' @export
 
@@ -77,8 +88,7 @@ power_analysis <- function(
   min_n_required <- min(df$SampleSize[df$Power >= power_target], na.rm = TRUE)
 
   # Plot
-  if (plot) {
-
+  if (plot == TRUE) {
     p <- ggplot(df, aes(x = .data[["SampleSize"]], y = .data[["Power"]])) +
       geom_line(linewidth = 1.2, color = "#2c3e50") +
       geom_hline(yintercept = power_target, linetype = "dashed", color = "red") +
@@ -91,8 +101,12 @@ power_analysis <- function(
            x = "Sample Size per Group", y = "Statistical Power") +
       theme_bw(base_size = 14)
 
-    print(p)
-  }
+    return(list(min_sample_size = min_n_required,
+                power_table     = df,
+                plot            = p))
+  }else{
 
-  return(list(min_sample_size = min_n_required, power_table = df))
+    return(list(min_sample_size = min_n_required,
+                power_table     = df))
+  }
 }
