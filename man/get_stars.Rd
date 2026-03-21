@@ -16,3 +16,30 @@ get_stars(geneID, object, thresholds = c(0.001, 0.01, 0.1, 0.25))
 \description{
 This function will create asteriscs (*) from DESeq2 results objects to represent the significance of comparisons.
 }
+\examples{
+data(deseq2_results)
+
+# get_stars expects a column named "ensembl"
+res <- deseq2_results
+colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
+
+# Get significance stars for the most significant gene
+get_stars(
+  geneID = res$ensembl[1],
+  object = res
+)
+
+# Custom thresholds
+get_stars(
+  geneID     = res$ensembl[1],
+  object     = res,
+  thresholds = c(0.001, 0.01, 0.05, 0.10)
+)
+
+# Non-significant gene
+get_stars(
+  geneID = res$ensembl[nrow(res)],
+  object = res
+)
+
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/nice_VSB.R
 \name{nice_VSB}
 \alias{nice_VSB}
-\title{Function to make Violin-Scatter-Box plots.}
+\title{Function to make Violin-Scatter-Box plots from data frames.}
 \usage{
 nice_VSB(
   object = NULL,
@@ -23,7 +23,7 @@ nice_VSB(
 )
 }
 \arguments{
-\item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+\item{object}{A data frame object with normalized counts genes(in rows) across samples(in columns).}
 
 \item{annotations}{Data frame with annotations.}
 
@@ -56,4 +56,21 @@ nice_VSB(
 \description{
 This function will make a Boxplot, using a DEseq object.
 It will show the data points on top with a small deviation (jitter) for a better visualization.
+}
+\examples{
+data(norm_counts)
+data(sampledata)
+
+nice_VSB(
+  object      = norm_counts,
+  annotations = sampledata,
+  variables   = c(fill = "sample_type"),
+  genename    = rownames(norm_counts)[1],
+  categories  = c("normal", "tumor"),
+  labels      = c("Normal", "Tumor"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+
 }

@@ -77,3 +77,26 @@ nice_UMAP(
 \description{
 Function to make UMAP plots.
 }
+\examples{
+\dontrun{
+data(vst_counts)
+data(sampledata)
+
+sampledata_u <- sampledata
+colnames(sampledata_u)[colnames(sampledata_u) == "patient_id"] <- "id"
+
+nice_UMAP(
+  object       = vst_counts,
+  annotations  = sampledata_u,
+  variables    = c(fill = "sample_type"),
+  legend_names = c(fill = "Sample Type"),
+  colors       = c("steelblue", "firebrick"),
+  shapes       = c(21, 21),
+  title        = "TCGA-LUAD UMAP",
+  neighbors    = 5,
+  epochs       = 1000,
+  seed         = 1905
+)
+}
+
+}

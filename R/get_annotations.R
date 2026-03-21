@@ -18,6 +18,29 @@
 #' @param format The output is saved in .csv or .xlsx formats. Default = csv.
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#'
+#' @examples
+#' \dontrun{
+#' # Annotate genes from Normalized counts (requires internet connection)
+#' data(norm_counts)
+#'
+#' # Requires a reference table with a "geneID" column.
+#' # Use get_annotations() to generate it:
+#' annotations <- get_annotations(
+#'   ensembl_ids = rownames(norm_counts),
+#'   mode        = "genes"
+#' )
+#'
+#' head(annotations)
+#'
+#' # Use with add_annotations()
+#' norm_counts_annot <- add_annotations(
+#'   object    = norm_counts,
+#'   reference = annotations,
+#'   variables = c("symbol", "biotype")
+#' )
+#' }
+#'
 #' @export
 
 get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annotations", version = "Current", format = "csv") {

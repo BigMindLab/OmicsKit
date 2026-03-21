@@ -38,3 +38,43 @@ including the baseline, there are 10 mutually exclusive cases where genes can
 fall into. This function allows us to obtain these 10 cases and saves them
 into a list.
 }
+\examples{
+\dontrun{
+# split_cases requires three DESeq2 comparisons.
+# Simulate a 3-phenotype study: Normal (A), Primary (B), Metastasis (C)
+set.seed(174)
+n_genes <- 500
+
+make_res <- function(seed) {
+  set.seed(seed)
+  data.frame(
+    ensembl        = paste0("ENSG", sprintf("\%011d", seq_len(n_genes))),
+    log2FoldChange = rnorm(n_genes, 0, 1.5),
+    padj           = runif(n_genes, 0, 0.5),
+    stringsAsFactors = FALSE
+  )
+}
+
+df_BvsA <- make_res(1)
+df_CvsA <- make_res(2)
+df_BvsC <- make_res(3)
+
+cases <- split_cases(
+  df.BvsA              = df_BvsA,
+  df.CvsA              = df_CvsA,
+  df.BvsC              = df_BvsC,
+  unique_id            = "ensembl",
+  significance_var     = "padj",
+  significance_cutoff  = 0.25,
+  change_var           = "log2FoldChange",
+  change_cutoff        = 0
+)
+
+# Number of genes per case
+sapply(cases, nrow)
+
+# Inspect Case 1 (ladder genes: significant in all 3 comparisons)
+head(cases$Case1)
+}
+
+}

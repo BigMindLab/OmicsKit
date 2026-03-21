@@ -8,6 +8,35 @@
 #' @param reference A reference table with the annotations including a column named "geneID".
 #' @param variables Character vector of columns in `reference` to add. If NULL (default), all columns except geneID are used.
 #' @param data_frame Logical; if TRUE, coerce `object` to a data.frame first. Default: FALSE.
+#'
+#' @examples
+#' \dontrun{
+#' data(norm_counts)
+#'
+#' # Requires a reference table with a "geneID" column.
+#' # Use get_annotations() to generate it:
+#' annotations <- get_annotations(
+#'   ensembl_ids = rownames(norm_counts),
+#'   mode        = "genes"
+#' )
+#'
+#' # Add gene symbol and biotype columns to the counts matrix
+#' norm_counts_annot <- add_annotations(
+#'   object    = norm_counts,
+#'   reference = annotations,
+#'   variables = c("symbol", "biotype")
+#' )
+#'
+#' # Inspect result
+#' head(norm_counts_annot[, c("geneID", "symbol", "biotype")])
+#'
+#' # Add all annotation columns (variables = NULL uses everything)
+#' norm_counts_full <- add_annotations(
+#'   object    = norm_counts,
+#'   reference = annotations
+#' )
+#' }
+#'
 #' @export
 
 add_annotations <- function(object, reference, variables = NULL, data_frame = FALSE){

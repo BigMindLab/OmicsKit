@@ -24,3 +24,21 @@ And will save 3 tables:
 \item A table including only the under-expressed genes
 }
 }
+\examples{
+\dontrun{
+data(deseq2_results)
+
+# Save full results + over/under-expressed tables as .xlsx files
+save_results(
+  df           = deseq2_results,
+  name         = "TCGA_LUAD_TumorVsNormal",
+  l2fc         = 1,
+  cutoff_alpha = 0.05
+)
+# Creates:
+#   TCGA_LUAD_TumorVsNormal_full.xlsx
+#   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
+#   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
+}
+
+}

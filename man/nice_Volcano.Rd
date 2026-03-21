@@ -58,3 +58,29 @@ Volcano plot with configurable point shapes and threshold annotations:
 \item Vertical dashed lines at log-fold-change cutoffs, shown as custom x-axis ticks.
 }
 }
+\examples{
+data(deseq2_results)
+
+nice_Volcano(
+  results   = deseq2_results,
+  x_var     = "log2FoldChange",
+  y_var     = "padj",
+  label_var = "gene_id",
+  title     = "TCGA-LUAD: Tumor vs Normal",
+  cutoff_y  = 0.05,
+  cutoff_x  = 1,
+  x_range   = 8,
+  y_max     = 10
+)
+
+# Highlight specific genes
+nice_Volcano(
+  results   = deseq2_results,
+  x_var     = "log2FoldChange",
+  y_var     = "padj",
+  label_var = "gene_id",
+  title     = "TCGA-LUAD: Tumor vs Normal",
+  genes     = deseq2_results$gene_id[1:5]
+)
+
+}
