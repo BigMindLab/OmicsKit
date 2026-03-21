@@ -38,6 +38,8 @@ Suggests:
     cluster,
     ComplexHeatmap,
     dbscan,
+    knitr,
+    rmarkdown
     DESeq2,
     ggnewscale,
     ggraph,
