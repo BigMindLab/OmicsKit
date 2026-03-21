@@ -89,7 +89,7 @@ no overlap at all.
 jac <- calc_jaccard(
   geneset_list  = geneset_list,
   results       = camera_results,
-  fdr_threshold = 0.05
+  fdr_th        = 0.05
 )
 
 # The JaccardResult object contains three slots
