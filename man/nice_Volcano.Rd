@@ -40,7 +40,9 @@ nice_Volcano(
 
 \item{x_var}{Name of the column in \code{results} to plot on the x-axis (e.g. log₂FC).}
 
-\item{label_var}{to be defined.}
+\item{label_var}{Name of the column in \code{results} to use as point labels
+(e.g. gene IDs or HGNC symbols). To use gene symbols, first run
+\code{\link[=get_annotations]{get_annotations()}} and join the \code{symbol} column to your results table.}
 
 \item{legend}{Logical. Control legend display. Default: TRUE.}
 

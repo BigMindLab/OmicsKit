@@ -12,7 +12,9 @@
 #' @param results A data frame containing at least one column of effect sizes (e.g. log₂FC) and one column of significance (e.g. FDR).
 #' @param x_var Name of the column in `results` to plot on the x-axis (e.g. log₂FC).
 #' @param y_var Name of the column in `results` to plot on the y-axis (e.g. FDR).
-#' @param label_var to be defined.
+#' @param label_var Name of the column in `results` to use as point labels
+#'   (e.g. gene IDs or HGNC symbols). To use gene symbols, first run
+#'   [get_annotations()] and join the `symbol` column to your results table.
 #' @param legend Logical. Control legend display. Default: TRUE.
 #' @param title title.
 #' @param colors colors.

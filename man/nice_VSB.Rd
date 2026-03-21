@@ -31,7 +31,8 @@ nice_VSB(
 
 \item{genename}{The gene name to be used for the plot.}
 
-\item{symbol}{The gene symbol to be used for the plot.}
+\item{symbol}{The gene symbol to display in the plot title. To obtain
+gene symbols from Ensembl IDs, use \code{\link[=get_annotations]{get_annotations()}}.}
 
 \item{labels}{A vector containing the x-labels of the box-plot. Default: c("N", "P", "R", "M").}
 
