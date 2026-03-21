@@ -195,8 +195,8 @@ returns node attributes invisibly. It is faster and requires only `igraph`.
 result <- network_clust(
   x                 = jac,
   clust_result      = clust,
-  jaccard_threshold = 0.50,
-  min_degree        = 2,
+  jaccard_threshold = 0.10,
+  min_degree        = 1,
   superterms        = TRUE,
   superterm_data    = net$superterms,
   type              = "clean",
@@ -208,8 +208,8 @@ result <- network_clust(
 network_clust(
   x                 = jac,
   clust_result      = clust,
-  jaccard_threshold = 0.50,
-  min_degree        = 2,
+  jaccard_threshold = 0.10,
+  min_degree        = 1,
   superterms        = TRUE,
   superterm_data    = net$superterms,
   type              = "superterms",
@@ -227,8 +227,8 @@ Requires `ggraph` and `tidygraph`.
 plots <- network_clust_gg(
   x                 = jac,
   clust_result      = clust,
-  jaccard_threshold = 0.50,
-  min_degree        = 2,
+  jaccard_threshold = 0.10,
+  min_degree        = 1,
   superterms        = TRUE,
   superterm_data    = net$superterms,
   type              = "all",
