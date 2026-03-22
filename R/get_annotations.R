@@ -129,9 +129,10 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
         )
     }
 
-    openxlsx::write.xlsx(df, file = paste0(filename, ".xlsx"), colNames = T, rowNames = F, append = F)
+    openxlsx::write.xlsx(df, file = paste0(filename, ".xlsx"),
+                         colNames = TRUE, rowNames = FALSE, append = FALSE)
   } else {
-    utils::write.csv(df, rowNames = F, file = paste0(filename, ".csv"))
+    utils::write.csv(df, row.names = FALSE, file = paste0(filename, ".csv"))
   }
 
   return(df)
