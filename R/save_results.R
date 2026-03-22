@@ -18,9 +18,9 @@
 #'
 #' @return Invisibly returns `NULL`. Saves three `.xlsx` files to the working
 #'   directory:
-#'   * `<name>_full.xlsx`    : all genes.
-#'   * `<name>_Overexp.xlsx` : genes with FDR < `cutoff_alpha` and log2FC ≥ `l2fc`.
-#'   * `<name>_Underexp.xlsx`: genes with FDR < `cutoff_alpha` and log2FC ≤ `-l2fc`.
+#'   * `<name>_full.xlsx` : all genes.
+#'   * `<name>_up_log2FC><l2fc>_FDR<<cutoff_alpha>.xlsx`   : upregulated genes.
+#'   * `<name>_down_log2FC<<l2fc>_FDR<<cutoff_alpha>.xlsx` : downregulated genes.
 #'
 #' @examples
 #' \dontrun{
@@ -33,10 +33,11 @@
 #'   l2fc         = 1,
 #'   cutoff_alpha = 0.05
 #' )
+#'
 #' # Creates:
 #' #   TCGA_LUAD_TumorVsNormal_full.xlsx
-#' #   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
-#' #   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
+#' #   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#' #   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 #' }
 #'
 #' @seealso [detect_filter()] to further filter saved results;
@@ -50,7 +51,7 @@ save_results <- function(df, name, l2fc = 0, cutoff_alpha = 0.25){
     stop(
       "Package \"openxlsx\" must be installed to use this function.",
       call. = FALSE
-      )
+    )
   }
 
   names(df)[names(df) == "padj"] <- "FDR"
@@ -63,11 +64,11 @@ save_results <- function(df, name, l2fc = 0, cutoff_alpha = 0.25){
   df.sig.fold_over <- df[df$FDR < cutoff_alpha & !is.na(df$FDR) & df$log2FoldChange >= l2fc, ]
 
   openxlsx::write.xlsx(df.sig.fold_over, colNames = T, rowNames = F, append = F,
-                       file = paste0(name, "_Overexp.xlsx"), overwrite = T)
+                       file = paste0(name, "_up_log2FC>",l2fc,"_FDR<", cutoff_alpha, ".xlsx"), overwrite = T)
 
   #Saving under-expressed genes:
   df.sig.fold_under <- df[df$FDR < cutoff_alpha & !is.na(df$FDR) & df$log2FoldChange <= -l2fc, ]
 
   openxlsx::write.xlsx(df.sig.fold_under, colNames = T, rowNames = F, append = F,
-                       file = paste0(name, "_Underexp.xlsx"), overwrite = T)
+                       file = paste0(name, "_down_log2FC<",l2fc,"_FDR<", cutoff_alpha, ".xlsx"), overwrite = T)
 }

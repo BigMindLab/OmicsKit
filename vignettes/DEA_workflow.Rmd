@@ -255,8 +255,8 @@ save_results(
 )
 # Creates:
 #   TCGA_LUAD_TumorVsNormal_full.xlsx
-#   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
-#   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
+#   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 ```
 
 ---

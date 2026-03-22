@@ -19,9 +19,9 @@ save_results(df, name, l2fc = 0, cutoff_alpha = 0.25)
 Invisibly returns \code{NULL}. Saves three \code{.xlsx} files to the working
 directory:
 \itemize{
-\item \verb{<name>_full.xlsx}    : all genes.
-\item \verb{<name>_Overexp.xlsx} : genes with FDR < \code{cutoff_alpha} and log2FC ≥ \code{l2fc}.
-\item \verb{<name>_Underexp.xlsx}: genes with FDR < \code{cutoff_alpha} and log2FC ≤ \code{-l2fc}.
+\item \verb{<name>_full.xlsx} : all genes.
+\item \verb{<name>_up_log2FC><l2fc>_FDR<<cutoff_alpha>.xlsx}   : upregulated genes.
+\item \verb{<name>_down_log2FC<<l2fc>_FDR<<cutoff_alpha>.xlsx} : downregulated genes.
 }
 }
 \description{
@@ -44,10 +44,11 @@ save_results(
   l2fc         = 1,
   cutoff_alpha = 0.05
 )
+
 # Creates:
 #   TCGA_LUAD_TumorVsNormal_full.xlsx
-#   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
-#   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
+#   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 }
 
 }
