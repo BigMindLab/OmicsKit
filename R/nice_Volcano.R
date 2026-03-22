@@ -12,7 +12,9 @@
 #' @param results A data frame containing at least one column of effect sizes (e.g. log₂FC) and one column of significance (e.g. FDR).
 #' @param x_var Name of the column in `results` to plot on the x-axis (e.g. log₂FC).
 #' @param y_var Name of the column in `results` to plot on the y-axis (e.g. FDR).
-#' @param label_var to be defined.
+#' @param label_var Name of the column in `results` to use as point labels
+#'   (e.g. gene IDs or HGNC symbols). To use gene symbols, first run
+#'   [get_annotations()] and join the `symbol` column to your results table.
 #' @param legend Logical. Control legend display. Default: TRUE.
 #' @param title title.
 #' @param colors colors.
@@ -25,6 +27,8 @@
 #' @param genes Vector of genes to label in the plot. Default: NULL.
 #' @import ggplot2
 #' @importFrom rlang .data
+#'
+#' @return A ggplot2 object
 #'
 #' @examples
 #' data(deseq2_results)
@@ -50,6 +54,10 @@
 #'   title     = "TCGA-LUAD: Tumor vs Normal",
 #'   genes     = deseq2_results$gene_id[1:5]
 #' )
+#'
+#' @seealso [nice_VSB()] for gene-level expression visualization;
+#'   [detect_filter()] to filter detectable genes before plotting;
+#'   [deseq2_results] for an example input dataset.
 #'
 #' @export
 

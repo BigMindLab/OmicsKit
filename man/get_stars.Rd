@@ -13,6 +13,11 @@ get_stars(geneID, object, thresholds = c(0.001, 0.01, 0.1, 0.25))
 
 \item{thresholds}{Vector with 4 values of significance. Default c(0.001, 0.01, 0.1, 0.25).}
 }
+\value{
+A single character string: \code{"****"}, \code{"***"}, \code{"**"}, \code{"*"},
+\code{"ns"} (not significant), or \code{"Gene ID not found"} if the gene is absent
+from \code{object}.
+}
 \description{
 This function will create asteriscs (*) from DESeq2 results objects to represent the significance of comparisons.
 }
@@ -42,4 +47,9 @@ get_stars(
   object = res
 )
 
+}
+\seealso{
+\code{\link[=detect_filter]{detect_filter()}} to identify detectable genes before annotating;
+\code{\link[=nice_VSB]{nice_VSB()}} where significance stars can be added to plots;
+\link{deseq2_results} for an example input.
 }

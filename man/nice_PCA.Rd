@@ -74,6 +74,12 @@ nice_PCA(
 
 \item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 }
+\value{
+A ggplot2 object if \code{returnData = FALSE} (default). If
+\code{returnData = TRUE}, a numeric matrix of PCA coordinates with dimensions
+samples × \code{outPCs}, with a \code{percentVar} attribute containing the
+proportion of variance explained per component.
+}
 \description{
 This was inspired on the plotPCA function from DESeq2, made by Wolfgang Huber
 But including some improvements made by David Requena. Now it allows:
@@ -113,4 +119,8 @@ pca_data <- nice_PCA(
 )
 head(pca_data)
 
+}
+\seealso{
+\code{\link[=nice_UMAP]{nice_UMAP()}}, \code{\link[=nice_tSNE]{nice_tSNE()}} for other alternatives;
+\link{vst_counts} for the recommended input matrix.
 }

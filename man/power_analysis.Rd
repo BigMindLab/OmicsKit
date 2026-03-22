@@ -30,7 +30,18 @@ power_analysis(
 
 \item{max_n}{Integer. Maximum sample size per group to explore.}
 
-\item{plot}{Logical. If TRUE, draws the power curve; if FALSE, skips plotting.}
+\item{plot}{Logical.  If TRUE, draws the power curve; if FALSE, skips plotting.}
+}
+\value{
+A named list. If \code{plot = TRUE}, contains three elements:
+\itemize{
+\item \verb{$min_sample_size}: Integer. Minimum sample size per group to reach
+\code{power_target}.
+\item \verb{$power_table}: A data frame with columns \code{SampleSize} and \code{Power}.
+\item \verb{$plot}: A ggplot2 object of the power curve.
+}
+
+If \code{plot = FALSE}, returns only \verb{$min_sample_size} and \verb{$power_table}.
 }
 \description{
 Power analysis for RNA-seq differential expression with optional plotting
@@ -55,5 +66,8 @@ head(result$power_table)
 
 # Higher effect size requires fewer samples
 power_analysis(effect_size = 2, dispersion = 0.1, plot = FALSE)$min_sample_size
+
+# See plot
+#power_analysis$plot
 
 }

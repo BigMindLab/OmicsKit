@@ -18,6 +18,23 @@
 #' @param change_var Variable that indicates the direction of the change (i.e. log2FoldChange in DESeq2, NES in GSEA).
 #' @param change_cutoff The values of the change variable will be filtered by |change_var| > change_cutoff. Default: 0.
 #'
+#' @return A named list of 10 data frames (`$Case1` through `$Case10`), each
+#'   containing the genes belonging to that mutually exclusive expression
+#'   pattern. Cases 1–6 contain a `trend` column (`"up"` or `"dn"`). Case 10
+#'   contains genes not significant in any comparison.
+#'
+#' @details
+#'   The 10 cases are:
+#'   * **Case 1** : Ladder: significant in all 3, same direction.
+#'   * **Case 2** : Stronger in condition 1: significant in all 3, direction
+#'     reverses between conditions.
+#'   * **Case 3** : Stronger in condition 2.
+#'   * **Case 4** : Marker of condition 2: significant in CvsA and BvsC only.
+#'   * **Case 5** : Marker of condition 1: significant in BvsA and BvsC only.
+#'   * **Case 6** : Shared: significant in BvsA and CvsA only.
+#'   * **Cases 7-9** : Significant in only one comparison.
+#'   * **Case 10** : Not significant in any comparison.
+#'
 #' @examples
 #' \dontrun{
 #' # split_cases requires three DESeq2 comparisons.
@@ -56,6 +73,9 @@
 #' # Inspect Case 1 (ladder genes: significant in all 3 comparisons)
 #' head(cases$Case1)
 #' }
+#'
+#' @seealso [detect_filter()] to pre-filter genes before splitting;
+#'   [nice_Volcano()] to visualize individual comparison results.
 #'
 #' @export
 

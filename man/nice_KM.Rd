@@ -58,6 +58,13 @@ nice_KM(
 }
 \value{
 A \code{ggplot} object (or a list with \code{km_fit} and \code{plot} if \code{returnData = TRUE}).
+
+A ggplot2 object if \code{returnData = FALSE} (default). If
+\code{returnData = TRUE}, a named list with two elements:
+\itemize{
+\item \verb{$km_fit}: The \code{\link[survival:survfit]{survival::survfit()}} object.
+\item \verb{$plot}: The ggplot2 survival curve.
+}
 }
 \description{
 This function fits Kaplan Meier survival curves stratified by status (e.g., 'No' vs 'Yes') for a specified gene column in a data frame. It allows:
@@ -65,4 +72,10 @@ This function fits Kaplan Meier survival curves stratified by status (e.g., 'No'
 \item Automatic placement of the p-value at the midpoint of the time range (if coord = NULL).
 \item Automatic handling of cases where only one category ('No' or 'Yes') is present, returning an 'empty' placeholder plot with a warning message.
 }
+}
+\references{
+Kaplan, E. L., & Meier, P. (1958). Nonparametric estimation from
+incomplete observations. \emph{Journal of the American Statistical
+Association}, 53(282), 457–481.
+\doi{10.1080/01621459.1958.10501452}
 }

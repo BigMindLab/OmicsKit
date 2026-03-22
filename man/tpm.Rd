@@ -11,6 +11,10 @@ tpm(raw_counts, gene_lengths)
 
 \item{gene_lengths}{A column with the gene lengths.}
 }
+\value{
+A numeric matrix of the same dimensions as \code{raw_counts} with TPM
+values. Column sums equal 1,000,000 by definition.
+}
 \description{
 TPM: Transcript per million. See https://www.biostars.org/p/273537/
 The input table is numeric:
@@ -19,6 +23,14 @@ The input table is numeric:
 \item The column names represent the samples.
 The gene lengths are in a column of a dataframe with the same row order.
 }
+}
+\note{
+TPM normalizes for both sequencing depth and gene length, making
+values comparable between genes within a sample. It is not appropriate
+for differential expression analysis, use DESeq2 normalized counts
+(\link{norm_counts}) for that purpose. Gene lengths from \code{\link[=get_annotations]{get_annotations()}}
+are genomic lengths (including introns); for higher accuracy use
+transcript-level lengths.
 }
 \examples{
 \dontrun{
@@ -44,4 +56,8 @@ tpm_matrix <- tpm(raw_counts, gene_lengths)
 round(colSums(tpm_matrix)[1:3])
 }
 
+}
+\seealso{
+\code{\link[=get_annotations]{get_annotations()}} to obtain \code{gene_lengths};
+\link{norm_counts} for DESeq2 size-factor normalized counts.
 }

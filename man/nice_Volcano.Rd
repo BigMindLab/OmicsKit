@@ -40,7 +40,9 @@ nice_Volcano(
 
 \item{x_var}{Name of the column in \code{results} to plot on the x-axis (e.g. log₂FC).}
 
-\item{label_var}{to be defined.}
+\item{label_var}{Name of the column in \code{results} to use as point labels
+(e.g. gene IDs or HGNC symbols). To use gene symbols, first run
+\code{\link[=get_annotations]{get_annotations()}} and join the \code{symbol} column to your results table.}
 
 \item{legend}{Logical. Control legend display. Default: TRUE.}
 
@@ -49,6 +51,9 @@ nice_Volcano(
 \item{colors}{colors.}
 
 \item{genes}{Vector of genes to label in the plot. Default: NULL.}
+}
+\value{
+A ggplot2 object
 }
 \description{
 Volcano plot with configurable point shapes and threshold annotations:
@@ -83,4 +88,9 @@ nice_Volcano(
   genes     = deseq2_results$gene_id[1:5]
 )
 
+}
+\seealso{
+\code{\link[=nice_VSB]{nice_VSB()}} for gene-level expression visualization;
+\code{\link[=detect_filter]{detect_filter()}} to filter detectable genes before plotting;
+\link{deseq2_results} for an example input dataset.
 }

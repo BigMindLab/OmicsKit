@@ -29,6 +29,10 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a data frame with tSNE coordinates and sample
+#'   annotations.
+#'
 #' @examples
 #' \dontrun{
 #' data(vst_counts)
@@ -51,6 +55,13 @@
 #'   seed           = 1905
 #' )
 #' }
+#' @seealso [nice_PCA()], [nice_UMAP()] for alternative dimensionality
+#'   reduction methods; [vst_counts] for the recommended input matrix.
+#'
+#' @references
+#'   van der Maaten, L., & Hinton, G. (2008). Visualizing data using t-SNE.
+#'   *Journal of Machine Learning Research*, 9, 2579–2605.
+#'   \url{https://jmlr.org/papers/v9/vandermaaten08a.html}
 #'
 #' @export
 

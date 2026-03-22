@@ -71,6 +71,11 @@ nice_tSNE(
 
 \item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 }
+\value{
+A ggplot2 object if \code{returnData = FALSE} (default). If
+\code{returnData = TRUE}, a data frame with tSNE coordinates and sample
+annotations.
+}
 \description{
 Function to make tSNE plots.
 }
@@ -96,5 +101,13 @@ nice_tSNE(
   seed           = 1905
 )
 }
-
+}
+\references{
+van der Maaten, L., & Hinton, G. (2008). Visualizing data using t-SNE.
+\emph{Journal of Machine Learning Research}, 9, 2579–2605.
+\url{https://jmlr.org/papers/v9/vandermaaten08a.html}
+}
+\seealso{
+\code{\link[=nice_PCA]{nice_PCA()}}, \code{\link[=nice_UMAP]{nice_UMAP()}} for alternative dimensionality
+reduction methods; \link{vst_counts} for the recommended input matrix.
 }

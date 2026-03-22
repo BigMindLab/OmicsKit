@@ -35,6 +35,17 @@ detect_filter(
 
 \item{samples.condition3}{Vector of Sample IDs or indexes corresponding to the third condition (optional).}
 }
+\value{
+A named list. Always contains:
+\itemize{
+\item \verb{$Comparison1}: Data frame of detectable genes from \code{df.BvsA}.
+\item \verb{$DetectGenes}: Character vector of unique detectable gene IDs across
+all comparisons.
+}
+
+If \code{df.CvsA} is provided, also contains \verb{$Comparison2}. If \code{df.DvsA} is
+provided, also contains \verb{$Comparison3}.
+}
 \description{
 This function identifies genes with measurable expression levels across samples.
 Detectable genes must meet two conditions: the baseMean and their mean normalized counts in the phenotypes of interest must be greater than a set threshold.
@@ -70,4 +81,8 @@ length(detected$DetectGenes)
 head(detected$Comparison1)
 }
 
+}
+\seealso{
+\code{\link[=nice_VSB]{nice_VSB()}} to plot expression of detected genes;
+\link{norm_counts} for an example normalized counts matrix.
 }

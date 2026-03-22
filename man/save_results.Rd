@@ -15,6 +15,15 @@ save_results(df, name, l2fc = 0, cutoff_alpha = 0.25)
 
 \item{cutoff_alpha}{The cut-off of the False Discovery Rate (FDR o padj). Default = 0.25.}
 }
+\value{
+Invisibly returns \code{NULL}. Saves three \code{.xlsx} files to the working
+directory:
+\itemize{
+\item \verb{<name>_full.xlsx} : all genes.
+\item \verb{<name>_up_log2FC><l2fc>_FDR<<cutoff_alpha>.xlsx}   : upregulated genes.
+\item \verb{<name>_down_log2FC<<l2fc>_FDR<<cutoff_alpha>.xlsx} : downregulated genes.
+}
+}
 \description{
 This function takes as input the output of the function "results()" of DEseq2.
 And will save 3 tables:
@@ -35,10 +44,15 @@ save_results(
   l2fc         = 1,
   cutoff_alpha = 0.05
 )
+
 # Creates:
 #   TCGA_LUAD_TumorVsNormal_full.xlsx
-#   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
-#   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
+#   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 }
 
+}
+\seealso{
+\code{\link[=detect_filter]{detect_filter()}} to further filter saved results;
+\link{deseq2_results} for an example input.
 }

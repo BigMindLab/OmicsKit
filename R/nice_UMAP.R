@@ -30,6 +30,10 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a data frame with UMAP coordinates and sample
+#'   annotations.
+#'
 #' @examples
 #' \dontrun{
 #' data(vst_counts)
@@ -51,6 +55,15 @@
 #'   seed         = 1905
 #' )
 #' }
+#'
+#' @seealso [nice_PCA()], [nice_tSNE()] for alternative dimensionality
+#'   reduction methods; [vst_counts] for the recommended input matrix.
+#'
+#' @references
+#'   McInnes, L., Healy, J., & Melville, J. (2018). Umap: Uniform Manifold
+#'   Approximation and Projection for Dimension Reduction.
+#'   *arXiv preprint arXiv:1802.03426*.
+#'   \url{https://arxiv.org/abs/1802.03426}
 #'
 #' @export
 

@@ -37,6 +37,11 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a numeric matrix of PCA coordinates with dimensions
+#'   samples × `outPCs`, with a `percentVar` attribute containing the
+#'   proportion of variance explained per component.
+#'
 #' @examples
 #' data(vst_counts)
 #' data(sampledata)
@@ -66,6 +71,9 @@
 #'   returnData   = TRUE
 #' )
 #' head(pca_data)
+#'
+#' @seealso [nice_UMAP()], [nice_tSNE()] for other alternatives;
+#'   [vst_counts] for the recommended input matrix.
 #'
 #' @export
 

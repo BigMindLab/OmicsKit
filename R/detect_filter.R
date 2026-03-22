@@ -18,6 +18,14 @@
 #' @param samples.condition3 Vector of Sample IDs or indexes corresponding to the third condition (optional).
 #' @param cutoffs Vector containing threshold values for baseMean, mean normalized counts and Log2 Fold Change; respectively. Default: c(50, 50, 0).
 #'
+#' @return A named list. Always contains:
+#'   * `$Comparison1`: Data frame of detectable genes from `df.BvsA`.
+#'   * `$DetectGenes`: Character vector of unique detectable gene IDs across
+#'     all comparisons.
+#'
+#'   If `df.CvsA` is provided, also contains `$Comparison2`. If `df.DvsA` is
+#'   provided, also contains `$Comparison3`.
+#'
 #' @examples
 #' \dontrun{
 #' data(norm_counts)
@@ -47,6 +55,9 @@
 #' # Subset results
 #' head(detected$Comparison1)
 #' }
+#'
+#' @seealso [nice_VSB()] to plot expression of detected genes;
+#' [norm_counts] for an example normalized counts matrix.
 #'
 #' @export
 
