@@ -52,6 +52,9 @@ nice_Volcano(
 
 \item{genes}{Vector of genes to label in the plot. Default: NULL.}
 }
+\value{
+A ggplot2 object
+}
 \description{
 Volcano plot with configurable point shapes and threshold annotations:
 \itemize{
@@ -85,4 +88,9 @@ nice_Volcano(
   genes     = deseq2_results$gene_id[1:5]
 )
 
+}
+\seealso{
+\code{\link[=nice_VSB]{nice_VSB()}} for gene-level expression visualization;
+\code{\link[=detect_filter]{detect_filter()}} to filter detectable genes before plotting;
+\link{deseq2_results} for an example input dataset.
 }

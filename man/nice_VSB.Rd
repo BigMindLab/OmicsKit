@@ -54,6 +54,9 @@ gene symbols from Ensembl IDs, use \code{\link[=get_annotations]{get_annotations
 
 \item{legend_size}{Font of the title and elements of the legend. Default: c(title = 14, elements = 12).}
 }
+\value{
+A ggplot2 object.
+}
 \description{
 This function will make a Boxplot, using a DEseq object.
 It will show the data points on top with a small deviation (jitter) for a better visualization.
@@ -74,4 +77,9 @@ nice_VSB(
   markersize  = 3
 )
 
+}
+\seealso{
+\code{\link[=nice_Volcano]{nice_Volcano()}} for genome-wide visualization; \code{\link[=detect_filter]{detect_filter()}}
+to identify reliably expressed genes; \code{\link[=get_stars]{get_stars()}} to add significance
+annotations; \link{norm_counts} for an example input matrix.
 }

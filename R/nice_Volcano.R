@@ -28,6 +28,8 @@
 #' @import ggplot2
 #' @importFrom rlang .data
 #'
+#' @return A ggplot2 object
+#'
 #' @examples
 #' data(deseq2_results)
 #'
@@ -52,6 +54,10 @@
 #'   title     = "TCGA-LUAD: Tumor vs Normal",
 #'   genes     = deseq2_results$gene_id[1:5]
 #' )
+#'
+#' @seealso [nice_VSB()] for gene-level expression visualization;
+#'   [detect_filter()] to filter detectable genes before plotting;
+#'   [deseq2_results] for an example input dataset.
 #'
 #' @export
 

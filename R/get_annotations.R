@@ -19,6 +19,12 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
+#' @return A data frame with one row per input ID and the following columns:
+#'   `geneID`, `symbol`, `biotype`, `chromosome`, `gene_start`, `gene_end`,
+#'   `gene_length`, `description`. For `mode = "transcripts"`, an additional
+#'   `transcriptID` column is included. The data frame is also saved to disk
+#'   as a `.csv` or `.xlsx` file (see `filename` and `format`).
+#'
 #' @examples
 #' \dontrun{
 #' # Annotate genes from Normalized counts (requires internet connection)
@@ -40,6 +46,14 @@
 #'   variables = c("symbol", "biotype")
 #' )
 #' }
+#'
+#' @note Requires an active internet connection to query the Ensembl BioMart.
+#'   `gene_length` is computed as `gene_end - gene_start + 1` (genomic length).
+#'   For TPM calculation with [tpm()], this is an approximation,
+#'   use transcript-level lengths for higher accuracy.
+#'
+#' @seealso [add_annotations()] to join annotations to a counts matrix;
+#'   [tpm()] which requires gene lengths from this function.
 #'
 #' @export
 

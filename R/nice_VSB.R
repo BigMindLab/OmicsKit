@@ -27,6 +27,8 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
+#' @return A ggplot2 object.
+#'
 #' @examples
 #' data(norm_counts)
 #' data(sampledata)
@@ -42,6 +44,10 @@
 #'   shapes      = 21,
 #'   markersize  = 3
 #' )
+#'
+#' @seealso [nice_Volcano()] for genome-wide visualization; [detect_filter()]
+#'   to identify reliably expressed genes; [get_stars()] to add significance
+#'   annotations; [norm_counts] for an example input matrix.
 #'
 #' @export
 

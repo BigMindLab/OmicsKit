@@ -16,6 +16,12 @@
 #' @param cutoff_alpha The cut-off of the False Discovery Rate (FDR o padj). Default = 0.25.
 #' @importFrom rlang .data
 #'
+#' @return Invisibly returns `NULL`. Saves three `.xlsx` files to the working
+#'   directory:
+#'   * `<name>_full.xlsx`    : all genes.
+#'   * `<name>_Overexp.xlsx` : genes with FDR < `cutoff_alpha` and log2FC ≥ `l2fc`.
+#'   * `<name>_Underexp.xlsx`: genes with FDR < `cutoff_alpha` and log2FC ≤ `-l2fc`.
+#'
 #' @examples
 #' \dontrun{
 #' data(deseq2_results)
@@ -32,6 +38,9 @@
 #' #   TCGA_LUAD_TumorVsNormal_Overexp.xlsx
 #' #   TCGA_LUAD_TumorVsNormal_Underexp.xlsx
 #' }
+#'
+#' @seealso [detect_filter()] to further filter saved results;
+#'   [deseq2_results] for an example input.
 #'
 #' @export
 
