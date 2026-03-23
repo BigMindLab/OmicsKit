@@ -6,7 +6,9 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 ```{r setup, include = FALSE}
+
 knitr::opts_chunk$set(
   collapse  = TRUE,
   comment   = "#>",
@@ -15,11 +17,14 @@ knitr::opts_chunk$set(
   message   = FALSE
 )
 ```
+
 ## Overview
 This vignette demonstrates a complete gene set enrichment analysis (GSEA)
 downstream workflow using OmicsKit, from loading gene sets through
 publication-quality visualization.
+
 The workflow covers:
+
 1. **Loading gene sets** : reading GMT files with `list_gmts()`
 2. **Merging results** : combining multi-collection GSEA TSV files with
    `merge_PA()`
@@ -31,19 +36,25 @@ The workflow covers:
    multi-panel barplot for one comparison
 6. **Multi-comparison plot** : `multiplot_PA()` : faceted barplots comparing
    enrichment across conditions
+
 ## Required packages
 ```{r packages}
 library(OmicsKit)
+library(ggplot2)
 ```
+
 ---
+
 ## Section 1 : Load gene sets
+### `list_gmts()`
 Gene sets used for enrichment analysis are stored as `.gmt` files, the
-standard format used by MSigDB and other databases. `list_gmts()` reads all
-`.gmt` files from a directory and returns a single named list, ready for
-downstream use.
+standard format used by MSigDB. `list_gmts()` reads all `.gmt` files from a
+directory and returns a single named list, ready for downstream use.
+
 ```{r list_gmts, eval = FALSE}
 geneset_list <- list_gmts("path/to/your/gmt_folder/")
-# How many gene sets were loaded?
+
+# Number of gene sets loaded
 length(geneset_list)
 # Names of the first five gene sets
 names(geneset_list)[1:5]
@@ -51,7 +62,7 @@ names(geneset_list)[1:5]
 geneset_list[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]
 ```
 
-For this vignette we use the built-in example `geneset_list`, which contains
+In this vignetter, we use a built-in example `geneset_list`, which contains
 40 curated gene sets across four biological themes (apoptosis, cell cycle,
 immune response, and metabolism), and the built-in `gsea_results` dataset,
 which mimics the output of `merge_PA()` for three comparisons across HALLMARK,
@@ -71,8 +82,11 @@ dim(gsea_results)
 unique(gsea_results$COMPARISON)
 unique(gsea_results$COLLECTION)
 ```
+
 ---
+
 ## Section 2 : Merge GSEA results
+### `merge_PA()`
 In a real analysis, GSEA produces one results file per MSigDB collection
 (e.g., `H.tsv` for HALLMARK, `C2.tsv` for KEGG). `merge_PA()` reads all
 `.tsv` files from a directory, standardizes column names, parses the leading
@@ -86,21 +100,27 @@ gsea_data <- merge_PA(
 # Inspect result
 head(gsea_data[, c("NAME", "NES", "FDR", "COLLECTION", "COMPARISON", "tags")])
 ```
+
 > **Note:** Each `.tsv` file must contain a `Comparison` column identifying
-> the comparison name (e.g., `"TumorVsNormal"`). `merge_PA()` renames it to
-> `COMPARISON` in the output. If your files come from a single run without
-> that column, add it manually:
+> the comparison name (e.g., `"TumorVsNormal"`). Then `merge_PA()` renames it to
+> `COMPARISON`. If your files come from a single run without that column, 
+> add it manually:
 > ```r
 > your_data$Comparison <- "TumorVsNormal"
 > ```
+
 The built-in `gsea_results` already has this structure:
 ```{r inspect_data}
 # Key columns produced by merge_PA()
-head(gsea_results[, c("NAME", "NES", "FDR", "Log10FDR",
-                      "COLLECTION", "COMPARISON", "tags", "SIZE")])
+head(gsea_results[, c("NES", "FDR", "Log10FDR",
+                      "COLLECTION", "COMPARISON", "tags", "SIZE")], n = 2)
 ```
+
 ---
+
 ## Section 3 : Extract leading edge genes
+### `getgenesPA()`
+### `addgenesPA()`
 After obtaining pathway results, `getgenesPA()` retrieves the gene members
 relevant to each enrichment signal. Three extraction modes are available:
 - **`"le"`** (GSEA only): leading edge genes : the subset that drives the
@@ -124,45 +144,35 @@ gene_lists <- getgenesPA(
   genes        = c("all", "le", "top")
 )
 # Inspect results for one pathway
-gene_lists$le[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]   # leading edge
-gene_lists$top[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]  # top 30% by rank
-gene_lists$all[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]  # all members
+  ## leading edge
+  gene_lists$le[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]] 
+  ## top 30% by rank
+  gene_lists$top[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]  
+  ## all members
+  gene_lists$all[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]  
 # Append gene columns to the pathway table
-pa_annot <- addgenesPA(pa_single, gene_lists)
-head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
-```
-Let's run a minimal reproducible version with the built-in data:
-```{r getgenesPA_addgenesPA_run}
-pa_single     <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
-pa_single$top <- 0.30
-gene_lists <- getgenesPA(
-  pa_data      = pa_single,
-  geneset_list = geneset_list,
-  ranked_genes = ranked_genes,
-  genes        = c("all", "le", "top")
-)
 pa_annot <- addgenesPA(pa_single, gene_lists)
 # Number of gene sets annotated
 nrow(pa_annot)
-# Gene columns added
-grep("_genes$", colnames(pa_annot), value = TRUE)
-# Leading edge genes for one pathway
-gene_lists$le[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]
+
+head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
 ```
 
 > **Tip:** For CAMERA or other enrichment methods that do not produce leading
 > edge information, use `genes = c("all", "top")` and set `pa_data$top` to
 > your desired fraction (e.g., `0.25` for the top 25 % by rank). Do not
 > request `genes = "le"` without a `tags` column.
+
 ---
+
 ## Section 4 : Heatmaps
-### `heatmap_PA()` : R-object workflow
-`heatmap_PA()` generates one heatmap per gene set in `pa_data_annot`. Genes
-are ordered within each heatmap by their position in `ranked_genes`. Output
+### `heatmap_PA()`
+`heatmap_PA()` generates one heatmap per gene set based on `pa_data_annot`.
+Genes are ordered within each heatmap by their position in `ranked_genes`. Output
 files are organized into subdirectories by format (PDF / JPG) and gene
 selection mode (`all_genes`, `le_genes`, `top_genes`).
-```{r heatmap_PA, eval = FALSE}
 
+```{r heatmap_PA, eval = FALSE}
 heatmap_PA(
   expression_data = vst_counts,
   metadata        = sampledata,
@@ -180,20 +190,24 @@ heatmap_PA(
 #   heatmaps_PA/pdf/le_genes/HALLMARK_INTERFERON_GAMMA_RESPONSE_heatmap.pdf
 #   ... (one file per gene set per format per mode)
 ```
+
 The heatmap below shows the top-ranked genes for
 `HALLMARK_INTERFERON_GAMMA_RESPONSE` across tumor and normal TCGA-LUAD
 samples:
-```{r heatmap_plot, echo = FALSE, fig.cap = "Expression heatmap of top-ranked genes in HALLMARK_INTERFERON_GAMMA_RESPONSE across TCGA-LUAD tumor and normal samples. Genes are ordered by DESeq2 Wald statistic (most upregulated at top).", fig.width = 7, fig.height = 6}
+
+```{r heatmap_plot, echo = FALSE, fig.cap = "Expression heatmap of top-ranked genes in HALLMARK_INTERFERON_GAMMA_RESPONSE across TCGA-LUAD tumor and normal samples. Genes are ordered by DESeq2 Wald statistic.", fig.width = 7, fig.height = 6}
 
 knitr::include_graphics(
   "figures_PA/heatmaps/jpg/top_genes/HALLMARK_INTERFERON_GAMMA_RESPONSE_heatmap.jpg"
 )
 ```
+
 ### `heatmap_path_PA()` : file-path alternative
 `heatmap_path_PA()` is a convenience wrapper that reads all inputs from disk
 (expression TSV, metadata XLSX, GMT file, ranked-genes TSV, GSEA TSV) and
 calls the same heatmap engine internally. It is useful when running the
 analysis immediately after GSEA without loading data into R.
+
 ```{r heatmap_path_PA, eval = FALSE}
 
 heatmap_path_PA(
@@ -210,12 +224,15 @@ heatmap_path_PA(
 )
 # Produces the same output as heatmap_PA() for a single GSEA file
 ```
+
 > **Which function to use?** Prefer `heatmap_PA()` when your data are already
 > in R (e.g., after calling `merge_PA()`, `getgenesPA()`, and `addgenesPA()`).
 > Use `heatmap_path_PA()` when you want a quick one-call solution that reads
 > directly from files on disk. Both functions produce identical heatmaps.
+
 ---
-## Section 5 : Single-comparison plot
+
+## Section 5 : General plot | Single-comparison
 `splot_PA()` generates a publication-quality multi-panel enrichment plot for
 **one comparison**. Gene sets appear on the y-axis (grouped by MSigDB
 collection), NES on the x-axis, and −log10(FDR) as fill color. Six panels
@@ -230,19 +247,21 @@ splot_PA(
   nes_col        = "NES",
   fdr_col        = "FDR",
   order          = "desc",
-  fill_limits    = c(0, 5),         # cap at -log10(FDR) = 5
+  fill_limits    = c(0, 2),         # cap at -log10(FDR) = 5
   fill_palette   = c("white", "red")
 )
 ```
 
-```{r splot_plot, echo = FALSE, fig.cap = "Single-comparison pathway enrichment plot (TumorVsNormal). Gene sets are sorted by NES; fill color encodes -log10(FDR), capped at 5. Collections are annotated to the right.", fig.width = 9, fig.height = 7}
+```{r splot_plot, echo = FALSE, fig.cap = "Single-comparison pathway enrichment plot (TumorVsNormal). Gene sets are sorted by NES; fill color encodes -log10(FDR), capped at 2. Collections are annotated to the right.", fig.width = 6, fig.height = 5}
 knitr::include_graphics("figures_PA/splot_PA.jpg")
 ```
-> **Tip:** Use `fill_limits = c(0, 5)` to prevent a handful of extremely
+> **Tip:** Use `fill_limits = c(0, 3)` to prevent a handful of extremely
 > significant gene sets from washing out the color contrast for the rest. Any
-> pathway with FDR ≤ 0.00001 will be shown in the maximum color (red).
+> pathway with FDR ≤ 0.001 will be shown in the maximum color (red).
+
 ---
-## Section 6 : Multi-comparison plot
+
+## Section 6 : General plot | Multi-comparison
 `multiplot_PA()` generates a **faceted barplot** showing NES across multiple
 comparisons for a selected set of gene sets. Each facet represents one gene
 set; bars represent the NES per comparison, colored by −log10(FDR). This
@@ -281,35 +300,36 @@ multiplot_PA(
 )
 ```
 
-```{r multiplot_plot, echo = FALSE, fig.cap = "Multi-comparison pathway enrichment plot. Each facet shows NES for one HALLMARK gene set across three pairwise comparisons. Fill color encodes -log10(FDR), capped at 5.", fig.width = 10, fig.height = 8}
+```{r multiplot_plot, echo = FALSE, fig.cap = "Multi-comparison pathway enrichment plot. Each facet shows NES for one HALLMARK gene set across three pairwise comparisons. Fill color encodes -log10(FDR), capped at 5.", fig.width = 6, fig.height = 5}
 knitr::include_graphics("figures_PA/multiplot_PA.jpg")
 ```
+
 > **Tip:** Use `comparison_order` to control the left-to-right arrangement of
 > comparisons on the x-axis of each facet, and `custom_labels` to replace
 > long comparison names with shorter axis labels.
----
+
 ## Full workflow : summary
 ```{r full_workflow, eval = FALSE}
 library(OmicsKit)
 
-# ── 1. Load gene sets ────
+#  1. Load gene sets 
 gsl <- list_gmts("path/to/gmt_folder/")
 
-# ── 2. Merge GSEA output TSV files ───
+# 2. Merge GSEA output TSV files 
 gsea_data <- merge_PA(
   input_directory = "path/to/gsea_results/",
   fdr_replace     = 0.001
 )
-# ── 3. Build ranked gene list (from DESeq2 stat or log2FC) ─────
+# 3. Build ranked gene list (from DESeq2 stat or log2FC) 
 ranked <- deseq2_results$gene_id[
   order(deseq2_results$stat, decreasing = TRUE)
 ]
-# ── 4. Extract leading edge and top-ranked genes ───
+# 4. Extract leading edge and top-ranked genes 
 pa_single     <- gsea_data[gsea_data$COMPARISON == "TumorVsNormal", ]
 pa_single$top <- 0.30
 gene_lists <- getgenesPA(pa_single, gsl, ranked, genes = c("all", "le", "top"))
 pa_annot   <- addgenesPA(pa_single, gene_lists)
-# ── 5. Heatmaps ──────────
+# 5. Heatmaps 
 heatmap_PA(
   expression_data = vst_counts,
   metadata        = sampledata,
@@ -330,7 +350,7 @@ heatmap_path_PA(
   gsea_file         = "H.tsv",
   output_dir        = "leading_edge_heatmaps"
 )
-# ── 6. Single-comparison enrichment plot ───────────
+# 6. Single-comparison enrichment plot
 splot_PA(
   data           = pa_single,
   geneset_col    = "NAME",
@@ -339,7 +359,7 @@ splot_PA(
   fdr_col        = "FDR",
   fill_limits    = c(0, 5)
 )
-# ── 7. Multi-comparison enrichment plot ────────────
+# 7. Multi-comparison enrichment plot
 pathways_oi <- c(
   "HALLMARK_INTERFERON_GAMMA_RESPONSE",
   "HALLMARK_INFLAMMATORY_RESPONSE",
@@ -354,7 +374,7 @@ multiplot_PA(
   ncol_wrap        = 3
 )
 ```
----
+
 ## Session info
 ```{r session_info}
 sessionInfo()
