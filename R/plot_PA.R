@@ -706,7 +706,10 @@ heatmap_PA <- function(expression_data,
 
       gene_ranks    <- match(genes_in_mat, ranked_genes)
       genes_ordered <- genes_in_mat[order(gene_ranks, na.last = TRUE)]
-      heatmap_mat   <- expr_mat[genes_ordered, common_samps, drop = FALSE]
+      # Order samples by group so conditions are grouped in the heatmap
+      sample_groups  <- meta[common_samps, "Group"]
+      samps_ordered  <- common_samps[order(sample_groups)]
+      heatmap_mat    <- expr_mat[genes_ordered, samps_ordered, drop = FALSE]
 
       w <- 10
       h <- max(5, nrow(heatmap_mat) * 0.1 + 2)
