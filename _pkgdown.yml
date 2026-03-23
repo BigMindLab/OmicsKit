@@ -1,0 +1,144 @@
+package: OmicsKit
+title: "OmicsKit: A bioinformatics toolset for multiomics analysis"
+url: https://danielgarbozo.github.io/OmicsKit
+
+navbar:
+  structure:
+    left:  [reference, articles]
+    right: [github]
+  components:
+    github:
+      icon: fab fa-github
+      aria-label: GitHub
+      href: https://github.com/BigMindLab/OmicsKit
+
+home:
+  title: "OmicsKit"
+  description: >
+    Streamlined utilities for multi-omics analysis and publication-ready visuals.
+    Covers DEA, pathway analysis, dimensionality reduction, and more.
+  links:
+    - text: DEA Workflow
+      href: articles/DEA_workflow.html
+    - text: Pathway Analysis Workflow
+      href: articles/PA_workflow.html
+    - text: PA Clustering Workflow
+      href: articles/PA_clustering.html
+  sidebar:
+    structure: [links, license, authors, dev]
+
+authors:
+  David Requena:
+    href: https://orcid.org/0000-0002-5968-1133
+  Daniel Guevara:
+    href: https://orcid.org/0009-0001-2786-8729
+  Daniel Garbozo:
+    href: https://orcid.org/0009-0003-2495-6568
+  Angela Alarcon:
+    href: https://orcid.org/0000-0003-0293-5603
+
+
+footer:
+  structure:
+    left:  [developed_by]
+    right: [built_with]
+  components:
+    developed_by: |
+      Developed by the
+      <a href="https://github.com/BigMindLab">BigMind Lab</a>.
+      Contact: <a href="mailto:david.requena@nyulangone.org">david.requena@nyulangone.org</a>
+
+reference:
+  - title: "Differential Expression Analysis (DEA)"
+    desc: >
+      Functions for data quality control, normalization, dimensionality reduction,
+      annotation, and differential expression visualization.
+    contents:
+      - power_analysis
+      - tpm
+      - nice_PCA
+      - nice_UMAP
+      - nice_tSNE
+      - get_annotations
+      - add_annotations
+      - save_results
+      - split_cases
+      - nice_Volcano
+      - detect_filter
+      - get_stars
+      - nice_VSB
+      - nice_VSB_DEseq2
+
+  - title: "Genomics"
+    desc: "Survival analysis and genomics visualization utilities."
+    contents:
+      - nice_KM
+
+  - title: "Pathway Analysis (PA)"
+    desc: >
+      Tools for loading, merging, and visualizing GSEA / pathway analysis results,
+      including single- and multi-comparison plots and heatmaps.
+    contents:
+      - list_gmts
+      - merge_PA
+      - getgenesPA
+      - addgenesPA
+      - multiplot_PA
+      - splot_PA
+      - heatmap_PA
+      - heatmap_path_PA
+
+  - title: "PA Clustering"
+    desc: >
+      Pathway clustering via Jaccard similarity, hierarchical clustering,
+      and network-based community detection.
+    contents:
+      - geneset_similarity
+      - do_clust
+      - get_superterm
+      - get_network_communities
+      - network_clust
+      - network_clust_gg
+  - title: "Example datasets"
+    desc: "Built-in datasets for reproducible examples and vignettes."
+    contents:
+      - camera_results
+      - deseq2_results
+      - geneset_list
+      - gsea_results
+      - norm_counts
+      - raw_counts
+      - sampledata
+      - vst_counts
+
+articles:
+  - title: "Workflows"
+    desc: "End-to-end analysis examples with OmicsKit."
+    contents:
+      - DEA_workflow
+      - PA_workflow
+      - PA_clustering
+
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+  bslib:
+    primary:    "#6000C6"
+    secondary:  "#B3A3FF"
+    body-bg:    "#FFFFFF"
+    navbar-bg:  "#6000C6"
+    navbar-fg:  "#FFFFFF"
+    link-color: "#6000C6"
+    pre-bg:     "#F7F7FB"
+  includes:
+    in_header: |
+      <style>
+        a.navbar-brand { font-weight: 700; }
+        .pkgdown-footer { font-size: 0.85rem; }
+      </style>
+
+development:
+  mode: release
+
+toc:
+  depth: 2

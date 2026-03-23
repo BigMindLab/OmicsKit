@@ -62,4 +62,5 @@ Depends:
 LazyData: true
 LazyDataCompression: xz
 VignetteBuilder: knitr
+URL: https://bigmindlab.github.io/OmicsKit
 

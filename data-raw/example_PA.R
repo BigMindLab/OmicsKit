@@ -6,7 +6,7 @@
 # geneset_list
 # A named list of 40 curated gene sets with realistic KEGG / HALLMARK / GO
 # naming conventions and real human gene symbols, grouped into four biological
-# themes so that calc_jaccard() + do_clust() + get_network_communities()
+# themes so that geneset_similarity() + do_clust() + get_network_communities()
 # produce meaningful clustering results.
 #
 # Themes:

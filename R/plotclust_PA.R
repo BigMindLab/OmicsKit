@@ -22,7 +22,7 @@
 #' For a ggplot2-based version that returns plot objects instead of drawing
 #' them, see [network_clust_gg()].
 #'
-#' @param x A `JaccardResult` object (output of [calc_jaccard()]).
+#' @param x A `JaccardResult` object (output of [geneset_similarity()]).
 #' @param clust_result A list returned by [do_clust()], used to color nodes by
 #'   hierarchical cluster assignment.
 #' @param jaccard_threshold Numeric. Minimum Jaccard similarity required for an
@@ -61,7 +61,7 @@
 #' gsl <- list_gmts("path/to/gmt_folder/")
 #' res <- read.csv("path/to/results.csv")
 #'
-#' jac   <- calc_jaccard(gsl, res, fdr_th = 0.05)
+#' jac   <- geneset_similarity(gsl, res, fdr_th = 0.05)
 #' clust <- do_clust(jac)
 #' net   <- get_network_communities(jac, threshold = 0.3)
 #'
@@ -89,7 +89,7 @@
 #' dev.off()
 #' }
 #'
-#' @seealso [calc_jaccard()], [do_clust()], [get_network_communities()],
+#' @seealso [geneset_similarity()], [do_clust()], [get_network_communities()],
 #'   [get_superterm()], [network_clust_gg()]
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
@@ -110,7 +110,7 @@ network_clust <- function(x, clust_result,
   # --- Input validation ---------------------------------------------------
   if (!inherits(x, "JaccardResult")) {
     stop(
-      "`x` must be a `JaccardResult` object (output of `calc_jaccard()`).",
+      "`x` must be a `JaccardResult` object (output of `geneset_similarity()`).",
       call. = FALSE
     )
   }
@@ -317,7 +317,7 @@ network_clust <- function(x, clust_result,
 #' For a base R igraph version that draws directly to the active graphics
 #' device, see [network_clust()].
 #'
-#' @param x A `JaccardResult` object (output of [calc_jaccard()]).
+#' @param x A `JaccardResult` object (output of [geneset_similarity()]).
 #' @param clust_result A list returned by [do_clust()], used to color nodes by
 #'   hierarchical cluster assignment.
 #' @param jaccard_threshold Numeric. Minimum Jaccard similarity required for an
@@ -356,7 +356,7 @@ network_clust <- function(x, clust_result,
 #' gsl <- list_gmts("path/to/gmt_folder/")
 #' res <- read.csv("path/to/results.csv")
 #'
-#' jac   <- calc_jaccard(gsl, res, fdr_th = 0.05)
+#' jac   <- geneset_similarity(gsl, res, fdr_th = 0.05)
 #' clust <- do_clust(jac)
 #' net   <- get_network_communities(jac, threshold = 0.3)
 #'
@@ -389,7 +389,7 @@ network_clust <- function(x, clust_result,
 #' plots$clean + plots$superterms
 #' }
 #'
-#' @seealso [calc_jaccard()], [do_clust()], [get_network_communities()],
+#' @seealso [geneset_similarity()], [do_clust()], [get_network_communities()],
 #'   [get_superterm()], [network_clust()]
 #' @import ggplot2
 #' @importFrom magrittr %>%
@@ -417,7 +417,7 @@ network_clust_gg <- function(x, clust_result,
   # --- Input validation ---------------------------------------------------
   if (!inherits(x, "JaccardResult")) {
     stop(
-      "`x` must be a `JaccardResult` object (output of `calc_jaccard()`).",
+      "`x` must be a `JaccardResult` object (output of `geneset_similarity()`).",
       call. = FALSE
     )
   }

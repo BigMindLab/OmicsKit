@@ -21,7 +21,7 @@ A named list of 40 curated gene sets spanning four biological themes:
 apoptosis & cell death, cell cycle & DNA damage, immune response &
 inflammation, and metabolism. Gene set names follow standard database
 conventions (\code{KEGG_}, \code{HALLMARK_}, \code{GO_}) and gene symbols are real human
-genes. Designed to be used as input to \code{\link[=calc_jaccard]{calc_jaccard()}}.
+genes. Designed to be used as input to \code{\link[=geneset_similarity]{geneset_similarity()}}.
 }
 \examples{
 data(geneset_list)
@@ -32,12 +32,12 @@ length(geneset_list)
 # Inspect one gene set
 geneset_list[["KEGG_APOPTOSIS"]]
 
-# Use with calc_jaccard()
+# Use with geneset_similarity()
 data(camera_results)
-jac <- calc_jaccard(geneset_list, camera_results, fdr_th = 0.05)
+jac <- geneset_similarity(geneset_list, camera_results, fdr_th = 0.05)
 
 }
 \seealso{
-\code{\link[=calc_jaccard]{calc_jaccard()}}, \link{camera_results}
+\code{\link[=geneset_similarity]{geneset_similarity()}}, \link{camera_results}
 }
 \keyword{datasets}
