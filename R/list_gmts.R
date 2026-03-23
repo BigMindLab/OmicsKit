@@ -6,7 +6,7 @@
 #'
 #' Scans a directory for `.gmt` files, parses them, and returns a single named
 #' list where each element is a character vector of gene symbols for one gene
-#' set. The output is ready to be passed directly to [calc_jaccard()].
+#' set. The output is ready to be passed directly to [geneset_similarity()].
 #'
 #' **GMT format:** each row contains the gene set name in column 1, an optional
 #' description in column 2, and gene symbols from column 3 onward. Empty fields
@@ -31,11 +31,11 @@
 #' names(geneset_list)[1:5]          # first five gene set names
 #' geneset_list[["KEGG_APOPTOSIS"]]  # genes in a specific set
 #'
-#' # Pass directly to calc_jaccard
-#' jac <- calc_jaccard(geneset_list, results_df, fdr_th = 0.05)
+#' # Pass directly to geneset_similarity
+#' jac <- geneset_similarity(geneset_list, results_df, fdr_th = 0.05)
 #' }
 #'
-#' @seealso [calc_jaccard()]
+#' @seealso [geneset_similarity()]
 #' @export
 
 list_gmts <- function(dir) {

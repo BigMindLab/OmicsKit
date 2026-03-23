@@ -2,9 +2,9 @@
 
 export(add_annotations)
 export(addgenesPA)
-export(calc_jaccard)
 export(detect_filter)
 export(do_clust)
+export(geneset_similarity)
 export(get_annotations)
 export(get_network_communities)
 export(get_stars)

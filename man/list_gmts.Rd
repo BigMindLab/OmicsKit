@@ -19,7 +19,7 @@ last occurrence overwrites the earlier one.
 \description{
 Scans a directory for \code{.gmt} files, parses them, and returns a single named
 list where each element is a character vector of gene symbols for one gene
-set. The output is ready to be passed directly to \code{\link[=calc_jaccard]{calc_jaccard()}}.
+set. The output is ready to be passed directly to \code{\link[=geneset_similarity]{geneset_similarity()}}.
 }
 \details{
 \strong{GMT format:} each row contains the gene set name in column 1, an optional
@@ -37,11 +37,11 @@ length(geneset_list)              # number of gene sets
 names(geneset_list)[1:5]          # first five gene set names
 geneset_list[["KEGG_APOPTOSIS"]]  # genes in a specific set
 
-# Pass directly to calc_jaccard
-jac <- calc_jaccard(geneset_list, results_df, fdr_th = 0.05)
+# Pass directly to geneset_similarity
+jac <- geneset_similarity(geneset_list, results_df, fdr_th = 0.05)
 }
 
 }
 \seealso{
-\code{\link[=calc_jaccard]{calc_jaccard()}}
+\code{\link[=geneset_similarity]{geneset_similarity()}}
 }

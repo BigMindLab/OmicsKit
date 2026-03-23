@@ -7,7 +7,7 @@
 do_clust(x, method = "ward.D2", max_k = NULL)
 }
 \arguments{
-\item{x}{A \code{JaccardResult} object (output of \code{\link[=calc_jaccard]{calc_jaccard()}}) or an
+\item{x}{A \code{JaccardResult} object (output of \code{\link[=geneset_similarity]{geneset_similarity()}}) or an
 object of class \code{dist}.}
 
 \item{method}{Agglomeration method passed to \code{\link[stats:hclust]{stats::hclust()}}.
@@ -50,7 +50,7 @@ results <- data.frame(
   FDR     = c(0.01, 0.02, 0.03, 0.04, 0.01)
 )
 
-jac   <- calc_jaccard(geneset_list, results)
+jac   <- geneset_similarity(geneset_list, results)
 clust <- do_clust(jac)
 
 clust$silhouette_plot               # ggplot2 silhouette curve
@@ -61,6 +61,6 @@ clust$cluster_assignments           # tibble: NAME | cluster
 
 }
 \seealso{
-\code{\link[=calc_jaccard]{calc_jaccard()}}, \code{\link[=get_network_communities]{get_network_communities()}},
+\code{\link[=geneset_similarity]{geneset_similarity()}}, \code{\link[=get_network_communities]{get_network_communities()}},
 \code{\link[=network_clust]{network_clust()}}, \code{\link[=network_clust_gg]{network_clust_gg()}}
 }

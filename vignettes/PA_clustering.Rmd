@@ -27,7 +27,7 @@ vignette demonstrates how to use OmicsKit's pathway clustering functions to:
 
 1. **Load gene sets** from GMT files with `list_gmts()`
 2. **Quantify redundancy** between gene sets using Jaccard similarity with
-   `calc_jaccard()`
+   `geneset_similarity()`
 3. **Cluster** redundant gene sets hierarchically with `do_clust()`
 4. **Detect communities** in the gene set network and generate interpretable
    labels with `get_network_communities()`
@@ -77,7 +77,7 @@ sum(camera_results$FDR < 0.05)
 
 ## Step 2 — Jaccard similarity matrix
 
-`calc_jaccard()` filters the gene sets by FDR threshold and computes all
+`geneset_similarity()` filters the gene sets by FDR threshold and computes all
 pairwise Jaccard similarity coefficients:
 
 $$J(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
@@ -85,8 +85,8 @@ $$J(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
 A value of 1 means the two gene sets share identical gene membership; 0 means
 no overlap at all.
 
-```{r calc_jaccard}
-jac <- calc_jaccard(
+```{r geneset_similarity}
+jac <- geneset_similarity(
   geneset_list  = geneset_list,
   results       = camera_results,
   fdr_th        = 0.05
@@ -291,7 +291,7 @@ library(OmicsKit)
 gsl <- list_gmts("path/to/gmt_folder/")
 
 # 2. Jaccard similarity (filter by FDR < 0.05)
-jac <- calc_jaccard(gsl, camera_results, fdr_th = 0.05)
+jac <- geneset_similarity(gsl, camera_results, fdr_th = 0.05)
 
 # 3. Hierarchical clustering
 clust <- do_clust(jac)

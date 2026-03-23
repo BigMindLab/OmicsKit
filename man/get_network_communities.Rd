@@ -15,7 +15,7 @@ get_network_communities(
 )
 }
 \arguments{
-\item{x}{A \code{JaccardResult} object (output of \code{\link[=calc_jaccard]{calc_jaccard()}}).}
+\item{x}{A \code{JaccardResult} object (output of \code{\link[=geneset_similarity]{geneset_similarity()}}).}
 
 \item{threshold}{Numeric between 0 and 1. Gene set pairs with a Jaccard
 similarity above this value are connected in the network. Default: \code{0.3}.}
@@ -56,7 +56,7 @@ A named list with four elements:
 Convenience wrapper that builds a binary adjacency network from a Jaccard
 similarity matrix, runs a community-detection algorithm, and optionally
 generates super-term labels for each community via \code{\link[=get_superterm]{get_superterm()}}.
-Designed to be the single step between \code{\link[=calc_jaccard]{calc_jaccard()}} and the network
+Designed to be the single step between \code{\link[=geneset_similarity]{geneset_similarity()}} and the network
 plotting functions \code{\link[=network_clust]{network_clust()}} / \code{\link[=network_clust_gg]{network_clust_gg()}}.
 }
 \examples{
@@ -65,7 +65,7 @@ gsl <- list_gmts("path/to/gmt_folder/")
 res <- read.csv("path/to/results.csv")
 
 # Full workflow
-jac   <- calc_jaccard(gsl, res, fdr_th = 0.05)
+jac   <- geneset_similarity(gsl, res, fdr_th = 0.05)
 clust <- do_clust(jac)
 net   <- get_network_communities(jac, threshold = 0.3, method = "louvain")
 
@@ -85,6 +85,6 @@ plots$combined
 
 }
 \seealso{
-\code{\link[=calc_jaccard]{calc_jaccard()}}, \code{\link[=do_clust]{do_clust()}}, \code{\link[=get_superterm]{get_superterm()}},
+\code{\link[=geneset_similarity]{geneset_similarity()}}, \code{\link[=do_clust]{do_clust()}}, \code{\link[=get_superterm]{get_superterm()}},
 \code{\link[=network_clust]{network_clust()}}, \code{\link[=network_clust_gg]{network_clust_gg()}}
 }

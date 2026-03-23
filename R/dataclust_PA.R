@@ -8,7 +8,7 @@
 #' apoptosis & cell death, cell cycle & DNA damage, immune response &
 #' inflammation, and metabolism. Gene set names follow standard database
 #' conventions (`KEGG_`, `HALLMARK_`, `GO_`) and gene symbols are real human
-#' genes. Designed to be used as input to [calc_jaccard()].
+#' genes. Designed to be used as input to [geneset_similarity()].
 #'
 #' @format A named list of 40 elements. Each element is a character vector of
 #'   human gene symbols (HGNC) belonging to that gene set. Gene set sizes range
@@ -26,11 +26,11 @@
 #' # Inspect one gene set
 #' geneset_list[["KEGG_APOPTOSIS"]]
 #'
-#' # Use with calc_jaccard()
+#' # Use with geneset_similarity()
 #' data(camera_results)
-#' jac <- calc_jaccard(geneset_list, camera_results, fdr_th = 0.05)
+#' jac <- geneset_similarity(geneset_list, camera_results, fdr_th = 0.05)
 #'
-#' @seealso [calc_jaccard()], [camera_results]
+#' @seealso [geneset_similarity()], [camera_results]
 "geneset_list"
 
 
@@ -40,7 +40,7 @@
 #' analysis, containing significance values for the 40 gene sets in
 #' [geneset_list]. Approximately 60% of gene sets have FDR < 0.05, providing
 #' enough significant sets for meaningful clustering. Designed to be used
-#' alongside [geneset_list] as input to [calc_jaccard()].
+#' alongside [geneset_list] as input to [geneset_similarity()].
 #'
 #' @format A data frame with 40 rows and 4 columns:
 #'   \describe{
@@ -63,9 +63,9 @@
 #' # How many gene sets are significant?
 #' sum(camera_results$FDR < 0.05)
 #'
-#' # Use with calc_jaccard()
+#' # Use with geneset_similarity()
 #' data(geneset_list)
-#' jac <- calc_jaccard(geneset_list, camera_results, fdr_th = 0.05)
+#' jac <- geneset_similarity(geneset_list, camera_results, fdr_th = 0.05)
 #'
-#' @seealso [calc_jaccard()], [geneset_list]
+#' @seealso [geneset_similarity()], [geneset_list]
 "camera_results"

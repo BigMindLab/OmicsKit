@@ -26,7 +26,7 @@ A data frame simulating the output of a CAMERA differential expression
 analysis, containing significance values for the 40 gene sets in
 \link{geneset_list}. Approximately 60\% of gene sets have FDR < 0.05, providing
 enough significant sets for meaningful clustering. Designed to be used
-alongside \link{geneset_list} as input to \code{\link[=calc_jaccard]{calc_jaccard()}}.
+alongside \link{geneset_list} as input to \code{\link[=geneset_similarity]{geneset_similarity()}}.
 }
 \examples{
 data(camera_results)
@@ -37,12 +37,12 @@ head(camera_results)
 # How many gene sets are significant?
 sum(camera_results$FDR < 0.05)
 
-# Use with calc_jaccard()
+# Use with geneset_similarity()
 data(geneset_list)
-jac <- calc_jaccard(geneset_list, camera_results, fdr_th = 0.05)
+jac <- geneset_similarity(geneset_list, camera_results, fdr_th = 0.05)
 
 }
 \seealso{
-\code{\link[=calc_jaccard]{calc_jaccard()}}, \link{geneset_list}
+\code{\link[=geneset_similarity]{geneset_similarity()}}, \link{geneset_list}
 }
 \keyword{datasets}

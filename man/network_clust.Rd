@@ -16,7 +16,7 @@ network_clust(
 )
 }
 \arguments{
-\item{x}{A \code{JaccardResult} object (output of \code{\link[=calc_jaccard]{calc_jaccard()}}).}
+\item{x}{A \code{JaccardResult} object (output of \code{\link[=geneset_similarity]{geneset_similarity()}}).}
 
 \item{clust_result}{A list returned by \code{\link[=do_clust]{do_clust()}}, used to color nodes by
 hierarchical cluster assignment.}
@@ -78,7 +78,7 @@ them, see \code{\link[=network_clust_gg]{network_clust_gg()}}.
 gsl <- list_gmts("path/to/gmt_folder/")
 res <- read.csv("path/to/results.csv")
 
-jac   <- calc_jaccard(gsl, res, fdr_th = 0.05)
+jac   <- geneset_similarity(gsl, res, fdr_th = 0.05)
 clust <- do_clust(jac)
 net   <- get_network_communities(jac, threshold = 0.3)
 
@@ -108,6 +108,6 @@ dev.off()
 
 }
 \seealso{
-\code{\link[=calc_jaccard]{calc_jaccard()}}, \code{\link[=do_clust]{do_clust()}}, \code{\link[=get_network_communities]{get_network_communities()}},
+\code{\link[=geneset_similarity]{geneset_similarity()}}, \code{\link[=do_clust]{do_clust()}}, \code{\link[=get_network_communities]{get_network_communities()}},
 \code{\link[=get_superterm]{get_superterm()}}, \code{\link[=network_clust_gg]{network_clust_gg()}}
 }

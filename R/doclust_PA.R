@@ -4,14 +4,14 @@
 # community detection, and super-term generation.
 #
 # Functions:
-#   calc_jaccard            — Compute Jaccard similarity & distance matrices
+#   geneset_similarity            — Compute Jaccard similarity & distance matrices
 #   do_clust                — Hierarchical clustering with silhouette selection
 #   get_superterm           — TF-IDF super-term labels for gene set communities
 #   get_network_communities — Community detection + super-terms in one call
 # =============================================================================
 
 ########################
-# Function calc_jaccard #
+# Function geneset_similarity #
 ########################
 
 #' Compute Jaccard similarity and distance matrices for gene sets
@@ -51,7 +51,7 @@
 #' )
 #'
 #' # Only the first three gene sets pass the FDR threshold
-#' jac <- calc_jaccard(geneset_list, results, fdr_th = 0.05)
+#' jac <- geneset_similarity(geneset_list, results, fdr_th = 0.05)
 #'
 #' jac$jaccard_sim   # similarity matrix
 #' jac$dist_mat      # distance object (usable in UMAP, clustering, etc.)
@@ -63,7 +63,7 @@
 #' @importFrom rlang .data
 #' @export
 
-calc_jaccard <- function(geneset_list, results, fdr_th = 0.05) {
+geneset_similarity <- function(geneset_list, results, fdr_th = 0.05) {
 
   if (!is.list(geneset_list) || is.null(names(geneset_list))) {
     stop("`geneset_list` must be a named list of character vectors.", call. = FALSE)
@@ -136,7 +136,7 @@ calc_jaccard <- function(geneset_list, results, fdr_th = 0.05) {
 #' returns cluster assignments, a silhouette ggplot2 object, and a
 #' ComplexHeatmap with dendrogram.
 #'
-#' @param x A `JaccardResult` object (output of [calc_jaccard()]) or an
+#' @param x A `JaccardResult` object (output of [geneset_similarity()]) or an
 #'   object of class `dist`.
 #' @param method Agglomeration method passed to [stats::hclust()].
 #'   Default: `"ward.D2"`.
@@ -168,7 +168,7 @@ calc_jaccard <- function(geneset_list, results, fdr_th = 0.05) {
 #'   FDR     = c(0.01, 0.02, 0.03, 0.04, 0.01)
 #' )
 #'
-#' jac   <- calc_jaccard(geneset_list, results)
+#' jac   <- geneset_similarity(geneset_list, results)
 #' clust <- do_clust(jac)
 #'
 #' clust$silhouette_plot               # ggplot2 silhouette curve
@@ -177,7 +177,7 @@ calc_jaccard <- function(geneset_list, results, fdr_th = 0.05) {
 #' clust$cluster_assignments           # tibble: NAME | cluster
 #' }
 #'
-#' @seealso [calc_jaccard()], [get_network_communities()],
+#' @seealso [geneset_similarity()], [get_network_communities()],
 #'   [network_clust()], [network_clust_gg()]
 #' @import ggplot2
 #' @importFrom rlang .data
@@ -204,7 +204,7 @@ do_clust <- function(x, method = "ward.D2", max_k = NULL) {
     jaccard_sim <- 1 - as.matrix(x)
   } else {
     stop(
-      "`x` must be a `JaccardResult` object (output of `calc_jaccard()`) ",
+      "`x` must be a `JaccardResult` object (output of `geneset_similarity()`) ",
       "or an object of class `dist`.",
       call. = FALSE
     )
@@ -471,10 +471,10 @@ get_superterm <- function(geneset_names, community_membership,
 #' Convenience wrapper that builds a binary adjacency network from a Jaccard
 #' similarity matrix, runs a community-detection algorithm, and optionally
 #' generates super-term labels for each community via [get_superterm()].
-#' Designed to be the single step between [calc_jaccard()] and the network
+#' Designed to be the single step between [geneset_similarity()] and the network
 #' plotting functions [network_clust()] / [network_clust_gg()].
 #'
-#' @param x A `JaccardResult` object (output of [calc_jaccard()]).
+#' @param x A `JaccardResult` object (output of [geneset_similarity()]).
 #' @param threshold Numeric between 0 and 1. Gene set pairs with a Jaccard
 #'   similarity above this value are connected in the network. Default: `0.3`.
 #' @param method Character. Community detection algorithm to use. One of:
@@ -506,7 +506,7 @@ get_superterm <- function(geneset_names, community_membership,
 #' res <- read.csv("path/to/results.csv")
 #'
 #' # Full workflow
-#' jac   <- calc_jaccard(gsl, res, fdr_th = 0.05)
+#' jac   <- geneset_similarity(gsl, res, fdr_th = 0.05)
 #' clust <- do_clust(jac)
 #' net   <- get_network_communities(jac, threshold = 0.3, method = "louvain")
 #'
@@ -524,7 +524,7 @@ get_superterm <- function(geneset_names, community_membership,
 #' plots$combined
 #' }
 #'
-#' @seealso [calc_jaccard()], [do_clust()], [get_superterm()],
+#' @seealso [geneset_similarity()], [do_clust()], [get_superterm()],
 #'   [network_clust()], [network_clust_gg()]
 #' @importFrom magrittr %>%
 #' @export
@@ -542,7 +542,7 @@ get_network_communities <- function(x,
   }
   if (!inherits(x, "JaccardResult")) {
     stop(
-      "`x` must be a `JaccardResult` object (output of `calc_jaccard()`).",
+      "`x` must be a `JaccardResult` object (output of `geneset_similarity()`).",
       call. = FALSE
     )
   }
