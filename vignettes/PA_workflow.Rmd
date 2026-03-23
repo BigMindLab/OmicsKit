@@ -62,7 +62,7 @@ names(geneset_list)[1:5]
 geneset_list[["HALLMARK_INTERFERON_GAMMA_RESPONSE"]]
 ```
 
-In this vignetter, we use a built-in example `geneset_list`, which contains
+In this vignette, we use a built-in example `geneset_list`, which contains
 40 curated gene sets across four biological themes (apoptosis, cell cycle,
 immune response, and metabolism), and the built-in `gsea_results` dataset,
 which mimics the output of `merge_PA()` for three comparisons across HALLMARK,
@@ -255,9 +255,9 @@ splot_PA(
 ```{r splot_plot, echo = FALSE, fig.cap = "Single-comparison pathway enrichment plot (TumorVsNormal). Gene sets are sorted by NES; fill color encodes -log10(FDR), capped at 2. Collections are annotated to the right.", fig.width = 6, fig.height = 5}
 knitr::include_graphics("figures_PA/splot_PA.jpg")
 ```
-> **Tip:** Use `fill_limits = c(0, 3)` to prevent a handful of extremely
+> **Tip:** Use `fill_limits = c(0, 2)` to prevent a handful of extremely
 > significant gene sets from washing out the color contrast for the rest. Any
-> pathway with FDR ≤ 0.001 will be shown in the maximum color (red).
+> pathway with FDR ≤ 0.01 will be shown in the maximum color (red).
 
 ---
 
