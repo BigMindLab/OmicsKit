@@ -9,7 +9,8 @@ navbar:
   components:
     github:
       icon: fab fa-github
-      href: https://github.com/DanielGarbozo/OmicsKit
+      aria-label: GitHub
+      href: https://github.com/BigMindLab/OmicsKit
 
 home:
   title: "OmicsKit"
@@ -98,6 +99,17 @@ reference:
       - get_network_communities
       - network_clust
       - network_clust_gg
+  - title: "Example datasets"
+    desc: "Built-in datasets for reproducible examples and vignettes."
+    contents:
+      - camera_results
+      - deseq2_results
+      - geneset_list
+      - gsea_results
+      - norm_counts
+      - raw_counts
+      - sampledata
+      - vst_counts
 
 articles:
   - title: "Workflows"
