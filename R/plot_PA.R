@@ -69,10 +69,10 @@ utils::globalVariables(c(
 #'
 #' @examples
 #' \dontrun{
-#' gsea_data <- merge_PA("path/to/gsea_results/")
+#' gsea_results <- merge_PA("path/to/gsea_results/")
 #'
 #' # Filter to one comparison
-#' single <- gsea_data[gsea_data$COMPARISON == "TumorVsNormal", ]
+#' single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 #'
 #' splot_PA(
 #'   data           = single,
@@ -302,11 +302,11 @@ splot_PA <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' gsea_data <- merge_PA("path/to/gsea_results/")
+#' gsea_results <- merge_PA("path/to/gsea_results/")
 #'
 #' # Basic multi-comparison plot
 #' multiplot_PA(
-#'   data           = gsea_data,
+#'   data           = gsea_results,
 #'   comparison_col = "COMPARISON",
 #'   facet_col      = "NAME",
 #'   fdr_col        = "FDR",
@@ -315,7 +315,7 @@ splot_PA <- function(data,
 #'
 #' # Control left-to-right order of comparisons on the x-axis
 #' multiplot_PA(
-#'   data             = gsea_data,
+#'   data             = gsea_results,
 #'   comparison_col   = "COMPARISON",
 #'   facet_col        = "NAME",
 #'   fdr_col          = "FDR",
@@ -323,10 +323,10 @@ splot_PA <- function(data,
 #' )
 #'
 #' # Use cleaner facet labels and shorten x-axis tick names
-#' gsea_data$clean_name <- gsub("_", " ", gsea_data$NAME)
+#' gsea_results$clean_name <- gsub("_", " ", gsea_results$NAME)
 #'
 #' multiplot_PA(
-#'   data             = gsea_data,
+#'   data             = gsea_results,
 #'   comparison_col   = "COMPARISON",
 #'   facet_col        = "clean_name",
 #'   fdr_col          = "FDR",
@@ -454,14 +454,14 @@ multiplot_PA <- function(data,
 #' Plot leading edge heatmaps from pathway analysis results
 #'
 #' Generates heatmaps of gene expression for each gene set in `pa_data_annot`,
-#' using the `all_genes` and/or `le_genes` (GSEA output only) columns produced
-#' by [addgenesPA()]. Genes within each heatmap are ordered by their position
-#' in `ranked_genes`.
+#' using the `all_genes`, `le_genes` (GSEA output only), and/or `top_genes`
+#' columns produced by [addgenesPA()]. Genes within each heatmap are ordered
+#' by their position in `ranked_genes`.
 #'
 #' The recommended workflow before calling this function is:
 #' ```r
 #' gsl          <- list_gmts("path/to/gmt/")
-#' pa_data      <- merge_PA("path/to/gsea_results/")
+#' pa_data      <- merge_PA("path/to/pa_data/")
 #' ranked       <- deseq2_results$gene_id[order(deseq2_results$stat,
 #'                                              decreasing = TRUE)]
 #' gene_lists   <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
@@ -471,27 +471,29 @@ multiplot_PA <- function(data,
 #'   expression_data = vst_counts,
 #'   metadata        = sampledata,
 #'   pa_data_annot   = pa_annot,
-#'   ranked_genes    = ranked
+#'   ranked_genes    = ranked,
+#'   plot_genes      = c("all_genes", "le_genes")
 #' )
 #' ```
 #'
 #' @param expression_data A numeric matrix or data frame of expression values
 #'   with gene symbols or Ensembl IDs as row names and sample IDs as column
-#'   names. Recommended input: VST-transformed counts from [vst_counts].
+#'   names. Recommended input: VST-transformed counts from [vst_counts] or
+#'   normalized coutns [norm_counts].
 #' @param metadata A data frame of sample annotations. Must contain a column
 #'   matching `sample_col` (sample IDs) and a column matching `group_col`
 #'   (condition labels, e.g., `"Control"`, `"Treatment"`).
-#' @param pa_data_annot A data frame of pathway analysis results enriched with
+#' @param pa_data_annot  A data frame of pathway analysis results enriched with
 #'   gene columns. Must contain the column `NAME` and at least one of
-#'   `all_genes` or `le_genes` (comma-separated gene symbols per gene set).
-#'   Typically the output of [addgenesPA()].
+#'   `all_genes`, `le_genes`, or `top_genes` (comma-separated gene symbols per
+#'   gene set). Typically the output of [addgenesPA()].
 #' @param ranked_genes A character vector of gene symbols ordered by their
-#'   ranking metric (e.g., log2FC or signal-to-noise ratio), used to sort
+#'   ranking metric (e.g., stat, log2FC or signal-to-noise ratio), used to sort
 #'   genes within each heatmap row.
 #' @param plot_genes Character vector specifying which gene columns to plot.
-#'   One or both of `"all_genes"` and `"le_genes"`. Each selection produces
-#'   its own set of output files in a dedicated subfolder. Default:
-#'   `c("all_genes", "le_genes")`.
+#'   One or both of `"all_genes"` and `"le_genes"`, and `"top_genes"`. Each
+#'   selection produces its own set of output files in a dedicated subfolder.
+#'   Default: `c("all_genes", "le_genes")`.
 #' @param sample_col Name of the sample ID column in `metadata`.
 #'   Default: `"Sample"`.
 #' @param group_col Name of the condition/group column in `metadata`
@@ -501,8 +503,10 @@ multiplot_PA <- function(data,
 #'   created automatically based on `pdf`, `jpg`, and `plot_genes`:
 #'   * `<out_dir>/pdf/all_genes/`
 #'   * `<out_dir>/pdf/le_genes/`
+#'   * `<out_dir>/pdf/top_genes/`
 #'   * `<out_dir>/jpg/all_genes/`
 #'   * `<out_dir>/jpg/le_genes/`
+#'   * `<out_dir>/jpg/top_genes/`
 #'   Default: `"heatmaps_PA"`.
 #' @param pdf Logical. If `TRUE`, saves PDF heatmaps. Default: `TRUE`.
 #' @param jpg Logical. If `TRUE`, saves JPG heatmaps. Default: `TRUE`.
@@ -514,15 +518,19 @@ multiplot_PA <- function(data,
 #' \dontrun{
 #' data(vst_counts)
 #' data(sampledata)
+#' data(deseq2_results)
+#' data(gsea_results)
+#' data(geneset_list)
 #'
-#' gsl        <- list_gmts("path/to/gmt_folder/")
-#' pa_data    <- merge_PA("path/to/gsea_results/")
-#' ranked     <- deseq2_results$gene_id[order(deseq2_results$stat,
-#'                                            decreasing = TRUE)]
-#' gene_lists <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
-#' pa_annot   <- addgenesPA(pa_data, gene_lists)
+#' ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+#'                                           decreasing = TRUE)]
 #'
-#' # Plot both all genes and leading edge genes
+#' # ── Example 1: GSEA results (all_genes + le_genes) ────
+#' pa_single  <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
+#' gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+#'                          genes = c("all", "le"))
+#' pa_annot   <- addgenesPA(pa_single, gene_lists)
+#'
 #' heatmap_PA(
 #'   expression_data = vst_counts,
 #'   metadata        = sampledata,
@@ -531,23 +539,40 @@ multiplot_PA <- function(data,
 #'   plot_genes      = c("all_genes", "le_genes"),
 #'   sample_col      = "patient_id",
 #'   group_col       = "sample_type",
-#'   out_dir         = "heatmaps_output",
+#'   out_dir         = "heatmaps_gsea",
 #'   pdf             = TRUE,
 #'   jpg             = TRUE
 #' )
 #' # Creates:
-#' #   heatmaps_output/pdf/all_genes/<geneset>_heatmap.pdf
-#' #   heatmaps_output/pdf/le_genes/<geneset>_heatmap.pdf
-#' #   heatmaps_output/jpg/all_genes/<geneset>_heatmap.jpg
-#' #   heatmaps_output/jpg/le_genes/<geneset>_heatmap.jpg
+#' #   heatmaps_gsea/pdf/all_genes/<geneset>_heatmap.pdf
+#' #   heatmaps_gsea/pdf/le_genes/<geneset>_heatmap.pdf
+#' #   heatmaps_gsea/jpg/all_genes/<geneset>_heatmap.jpg
+#' #   heatmaps_gsea/jpg/le_genes/<geneset>_heatmap.jpg
 #'
-#' # Plot only leading edge genes
+#' # ── Example 2: CAMERA results (all_genes + top_genes)
+#' # camera_results does not contain leading edge information.
+#' # Use genes = "top" with a manually set top fraction instead.
+#' # Note: top_genes are rank-based and do NOT represent true leading edge genes.
+#' data(camera_results)
+#' camera_pa      <- camera_results
+#' colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
+#' camera_pa$SIZE <- sapply(camera_pa$NAME,
+#'                          function(x) length(geneset_list[[x]]))
+#' camera_pa$top  <- 0.25
+#'
+#' gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+#'                              genes = c("all", "top"))
+#' pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
+#'
 #' heatmap_PA(
 #'   expression_data = vst_counts,
 #'   metadata        = sampledata,
-#'   pa_data_annot   = pa_annot,
+#'   pa_data_annot   = pa_annot_cam,
 #'   ranked_genes    = ranked,
-#'   plot_genes      = "le_genes"
+#'   plot_genes      = c("all_genes", "top_genes"),
+#'   sample_col      = "patient_id",
+#'   group_col       = "sample_type",
+#'   out_dir         = "heatmaps_camera"
 #' )
 #' }
 #'
@@ -577,7 +602,7 @@ heatmap_PA <- function(expression_data,
     stop("Package \"grDevices\" must be installed to use this function.", call. = FALSE)
   }
 
-  # --- Input validation ------------------------------------------------------
+  # --- Input validation ----
   if (!is.matrix(expression_data) && !is.data.frame(expression_data)) {
     stop("`expression_data` must be a matrix or data frame.", call. = FALSE)
   }
@@ -597,10 +622,10 @@ heatmap_PA <- function(expression_data,
     stop("`pa_data_annot` must contain a column named 'NAME'.", call. = FALSE)
   }
 
-  plot_genes <- match.arg(plot_genes, choices = c("all_genes", "le_genes"),
-                          several.ok = TRUE)
+  plot_genes <- match.arg(plot_genes,
+                          choices      = c("all_genes", "le_genes", "top_genes"),
+                          several.ok   = TRUE)
 
-  # Check requested columns exist
   missing_cols <- setdiff(plot_genes, colnames(pa_data_annot))
   if (length(missing_cols) > 0) {
     stop(
@@ -615,7 +640,7 @@ heatmap_PA <- function(expression_data,
     stop("`ranked_genes` must be a non-empty character vector.", call. = FALSE)
   }
 
-  # --- Prepare metadata -------------------------------------------------------
+  # --- Prepare metadata ----
   meta <- metadata[, c(sample_col, group_col), drop = FALSE]
   colnames(meta) <- c("Sample", "Group")
   rownames(meta) <- meta$Sample
@@ -631,13 +656,10 @@ heatmap_PA <- function(expression_data,
     )
   }
 
-  # --- Internal heatmap drawer -----------------------------------------------
+  # --- Internal heatmap drawer --
   .draw_heatmap <- function(mat, title) {
-    annot_col   <- data.frame(Group = meta[colnames(mat), "Group"])
+    annot_col        <- data.frame(Group = meta[colnames(mat), "Group"])
     rownames(annot_col) <- colnames(mat)
-    w <- 10
-    h <- max(5, nrow(mat) * 0.1 + 2)
-
     pheatmap::pheatmap(
       mat,
       main                     = title,
@@ -654,16 +676,13 @@ heatmap_PA <- function(expression_data,
       cellheight               = 5,
       cellwidth                = 8
     )
-
-    invisible(list(w = w, h = h))
   }
 
-  # --- Loop over requested gene column types ---------------------------------
+  # --- Loop over requested gene column types ---
   n_plotted <- 0L
 
   for (gene_col in plot_genes) {
 
-    # Create output subdirectories
     if (pdf) {
       pdf_sub <- file.path(out_dir, "pdf", gene_col)
       if (!dir.exists(pdf_sub)) dir.create(pdf_sub, recursive = TRUE)
@@ -680,16 +699,14 @@ heatmap_PA <- function(expression_data,
 
       if (is.na(genes_str) || nchar(genes_str) == 0) next
 
-      genes_vec    <- strsplit(genes_str, ",")[[1]]
-      genes_in_mat <- genes_vec[genes_vec %in% rownames(expr_mat)]
+      genes_vec     <- strsplit(genes_str, ",")[[1]]
+      genes_in_mat  <- genes_vec[genes_vec %in% rownames(expr_mat)]
 
       if (length(genes_in_mat) == 0) next
 
-      # Order genes by rank
-      gene_ranks   <- match(genes_in_mat, ranked_genes)
+      gene_ranks    <- match(genes_in_mat, ranked_genes)
       genes_ordered <- genes_in_mat[order(gene_ranks, na.last = TRUE)]
-
-      heatmap_mat <- expr_mat[genes_ordered, common_samps, drop = FALSE]
+      heatmap_mat   <- expr_mat[genes_ordered, common_samps, drop = FALSE]
 
       w <- 10
       h <- max(5, nrow(heatmap_mat) * 0.1 + 2)
@@ -725,7 +742,7 @@ utils::globalVariables(c(
   "NAME", "GENES", "SIZE", "tags", "L.EDGE_size"
 ))
 
-#' Plot leading edge heatmaps from pathway analysis results using file paths
+#' Plot leading edge heatmaps from GSEA analysis results using file paths
 #'
 #' Generates one heatmap per gene set from GSEA/CAMERA/PADOG output by reading
 #' all required inputs from file paths. For each gene set, the leading edge

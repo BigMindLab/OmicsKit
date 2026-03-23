@@ -99,11 +99,11 @@ For visualizing a single comparison with full collection grouping, use
 }
 \examples{
 \dontrun{
-gsea_data <- merge_PA("path/to/gsea_results/")
+gsea_results <- merge_PA("path/to/gsea_results/")
 
 # Basic multi-comparison plot
 multiplot_PA(
-  data           = gsea_data,
+  data           = gsea_results,
   comparison_col = "COMPARISON",
   facet_col      = "NAME",
   fdr_col        = "FDR",
@@ -112,7 +112,7 @@ multiplot_PA(
 
 # Control left-to-right order of comparisons on the x-axis
 multiplot_PA(
-  data             = gsea_data,
+  data             = gsea_results,
   comparison_col   = "COMPARISON",
   facet_col        = "NAME",
   fdr_col          = "FDR",
@@ -120,10 +120,10 @@ multiplot_PA(
 )
 
 # Use cleaner facet labels and shorten x-axis tick names
-gsea_data$clean_name <- gsub("_", " ", gsea_data$NAME)
+gsea_results$clean_name <- gsub("_", " ", gsea_results$NAME)
 
 multiplot_PA(
-  data             = gsea_data,
+  data             = gsea_results,
   comparison_col   = "COMPARISON",
   facet_col        = "clean_name",
   fdr_col          = "FDR",

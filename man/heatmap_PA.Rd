@@ -20,7 +20,8 @@ heatmap_PA(
 \arguments{
 \item{expression_data}{A numeric matrix or data frame of expression values
 with gene symbols or Ensembl IDs as row names and sample IDs as column
-names. Recommended input: VST-transformed counts from \link{vst_counts}.}
+names. Recommended input: VST-transformed counts from \link{vst_counts} or
+normalized coutns \link{norm_counts}.}
 
 \item{metadata}{A data frame of sample annotations. Must contain a column
 matching \code{sample_col} (sample IDs) and a column matching \code{group_col}
@@ -28,17 +29,17 @@ matching \code{sample_col} (sample IDs) and a column matching \code{group_col}
 
 \item{pa_data_annot}{A data frame of pathway analysis results enriched with
 gene columns. Must contain the column \code{NAME} and at least one of
-\code{all_genes} or \code{le_genes} (comma-separated gene symbols per gene set).
-Typically the output of \code{\link[=addgenesPA]{addgenesPA()}}.}
+\code{all_genes}, \code{le_genes}, or \code{top_genes} (comma-separated gene symbols per
+gene set). Typically the output of \code{\link[=addgenesPA]{addgenesPA()}}.}
 
 \item{ranked_genes}{A character vector of gene symbols ordered by their
-ranking metric (e.g., log2FC or signal-to-noise ratio), used to sort
+ranking metric (e.g., stat, log2FC or signal-to-noise ratio), used to sort
 genes within each heatmap row.}
 
 \item{plot_genes}{Character vector specifying which gene columns to plot.
-One or both of \code{"all_genes"} and \code{"le_genes"}. Each selection produces
-its own set of output files in a dedicated subfolder. Default:
-\code{c("all_genes", "le_genes")}.}
+One or both of \code{"all_genes"} and \code{"le_genes"}, and \code{"top_genes"}. Each
+selection produces its own set of output files in a dedicated subfolder.
+Default: \code{c("all_genes", "le_genes")}.}
 
 \item{sample_col}{Name of the sample ID column in \code{metadata}.
 Default: \code{"Sample"}.}
@@ -52,8 +53,10 @@ created automatically based on \code{pdf}, \code{jpg}, and \code{plot_genes}:
 \itemize{
 \item \verb{<out_dir>/pdf/all_genes/}
 \item \verb{<out_dir>/pdf/le_genes/}
+\item \verb{<out_dir>/pdf/top_genes/}
 \item \verb{<out_dir>/jpg/all_genes/}
 \item \verb{<out_dir>/jpg/le_genes/}
+\item \verb{<out_dir>/jpg/top_genes/}
 Default: \code{"heatmaps_PA"}.
 }}
 
@@ -67,15 +70,15 @@ the corresponding subdirectories under \code{out_dir}.
 }
 \description{
 Generates heatmaps of gene expression for each gene set in \code{pa_data_annot},
-using the \code{all_genes} and/or \code{le_genes} (GSEA output only) columns produced
-by \code{\link[=addgenesPA]{addgenesPA()}}. Genes within each heatmap are ordered by their position
-in \code{ranked_genes}.
+using the \code{all_genes}, \code{le_genes} (GSEA output only), and/or \code{top_genes}
+columns produced by \code{\link[=addgenesPA]{addgenesPA()}}. Genes within each heatmap are ordered
+by their position in \code{ranked_genes}.
 }
 \details{
 The recommended workflow before calling this function is:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{gsl          <- list_gmts("path/to/gmt/")
-pa_data      <- merge_PA("path/to/gsea_results/")
+pa_data      <- merge_PA("path/to/pa_data/")
 ranked       <- deseq2_results$gene_id[order(deseq2_results$stat,
                                              decreasing = TRUE)]
 gene_lists   <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
@@ -85,7 +88,8 @@ heatmap_PA(
   expression_data = vst_counts,
   metadata        = sampledata,
   pa_data_annot   = pa_annot,
-  ranked_genes    = ranked
+  ranked_genes    = ranked,
+  plot_genes      = c("all_genes", "le_genes")
 )
 }\if{html}{\out{</div>}}
 }
@@ -93,15 +97,19 @@ heatmap_PA(
 \dontrun{
 data(vst_counts)
 data(sampledata)
+data(deseq2_results)
+data(gsea_results)
+data(geneset_list)
 
-gsl        <- list_gmts("path/to/gmt_folder/")
-pa_data    <- merge_PA("path/to/gsea_results/")
-ranked     <- deseq2_results$gene_id[order(deseq2_results$stat,
-                                           decreasing = TRUE)]
-gene_lists <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
-pa_annot   <- addgenesPA(pa_data, gene_lists)
+ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+                                          decreasing = TRUE)]
 
-# Plot both all genes and leading edge genes
+# ── Example 1: GSEA results (all_genes + le_genes) ────
+pa_single  <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
+gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+                         genes = c("all", "le"))
+pa_annot   <- addgenesPA(pa_single, gene_lists)
+
 heatmap_PA(
   expression_data = vst_counts,
   metadata        = sampledata,
@@ -110,23 +118,40 @@ heatmap_PA(
   plot_genes      = c("all_genes", "le_genes"),
   sample_col      = "patient_id",
   group_col       = "sample_type",
-  out_dir         = "heatmaps_output",
+  out_dir         = "heatmaps_gsea",
   pdf             = TRUE,
   jpg             = TRUE
 )
 # Creates:
-#   heatmaps_output/pdf/all_genes/<geneset>_heatmap.pdf
-#   heatmaps_output/pdf/le_genes/<geneset>_heatmap.pdf
-#   heatmaps_output/jpg/all_genes/<geneset>_heatmap.jpg
-#   heatmaps_output/jpg/le_genes/<geneset>_heatmap.jpg
+#   heatmaps_gsea/pdf/all_genes/<geneset>_heatmap.pdf
+#   heatmaps_gsea/pdf/le_genes/<geneset>_heatmap.pdf
+#   heatmaps_gsea/jpg/all_genes/<geneset>_heatmap.jpg
+#   heatmaps_gsea/jpg/le_genes/<geneset>_heatmap.jpg
 
-# Plot only leading edge genes
+# ── Example 2: CAMERA results (all_genes + top_genes)
+# camera_results does not contain leading edge information.
+# Use genes = "top" with a manually set top fraction instead.
+# Note: top_genes are rank-based and do NOT represent true leading edge genes.
+data(camera_results)
+camera_pa      <- camera_results
+colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
+camera_pa$SIZE <- sapply(camera_pa$NAME,
+                         function(x) length(geneset_list[[x]]))
+camera_pa$top  <- 0.25
+
+gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+                             genes = c("all", "top"))
+pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
+
 heatmap_PA(
   expression_data = vst_counts,
   metadata        = sampledata,
-  pa_data_annot   = pa_annot,
+  pa_data_annot   = pa_annot_cam,
   ranked_genes    = ranked,
-  plot_genes      = "le_genes"
+  plot_genes      = c("all_genes", "top_genes"),
+  sample_col      = "patient_id",
+  group_col       = "sample_type",
+  out_dir         = "heatmaps_camera"
 )
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_PA.R
 \name{heatmap_path_PA}
 \alias{heatmap_path_PA}
-\title{Plot leading edge heatmaps from pathway analysis results using file paths}
+\title{Plot leading edge heatmaps from GSEA analysis results using file paths}
 \usage{
 heatmap_path_PA(
   main_dir = NULL,

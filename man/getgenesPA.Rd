@@ -7,73 +7,125 @@
 getgenesPA(pa_data, geneset_list, ranked_genes, genes = c("all", "le"))
 }
 \arguments{
-\item{pa_data}{A data frame of pathway analysis results. Must contain:
+\item{pa_data}{A data frame of pathway analysis results. Must always
+contain:
 \itemize{
 \item \code{NAME}: gene set name.
-\item \code{SIZE}: number of genes in the gene set (GSEA output only).
-\item \verb{LEADING EDGE}: GSEA leading edge string
-(e.g., \code{"tags=20\%, list=30\%, signal=15\%"}) (GSEA output only).
-Typically the output of \code{\link[=merge_PA]{merge_PA()}}.
-}}
+}
+
+Additionally required depending on \code{genes}:
+\itemize{
+\item \code{SIZE}: number of genes in the gene set. Required for \code{"le"} and
+\code{"top"}.
+\item \code{tags}: numeric fraction (0-1) of genes contributing to the
+enrichment score (GSEA leading edge). Produced automatically by
+\code{\link[=merge_PA]{merge_PA()}}. Required for \code{genes = "le"}.
+\item \code{top}: numeric fraction (0-1) defining the proportion of top-ranked
+genes to extract. Set manually by the user (e.g.,
+\code{pa_data$top <- 0.25} for the top 25\%). Required for \code{genes = "top"}.
+}
+
+Typically the output of \code{\link[=merge_PA]{merge_PA()}}.}
 
 \item{geneset_list}{A named list of gene sets, where each element is a
-character vector of gene symbols. Typically the output of \code{\link[=list_gmts]{list_gmts()}}.}
+character vector of gene symbols. Typically the output of \code{\link[=list_gmts]{list_gmts()}},
+or use the built-in \link{geneset_list} for quick testing.}
 
 \item{ranked_genes}{A character vector of gene symbols ordered by their
-ranking metric (e.g., stat, log2FC or signal-to-noise ratio), from most
-positive to most negative, not-significant in the middle of the list.
-Used to order leading edge genes by rank.}
+ranking metric (e.g., DESeq2 \code{stat}, log2FC, or signal-to-noise ratio),
+from most positive to most negative. Non-significant genes fall in the
+middle of the list. Used to order genes within each extracted set.}
 
-\item{genes}{Character vector specifying which gene sets to return. One or
-both of \code{"le"} (leading edge genes only) and \code{"all"} (all genes in the
-gene set). Default: \code{c("all", "le")}.}
+\item{genes}{Character vector specifying which extraction mode(s) to use.
+Any combination of \code{"all"}, \code{"le"}, and \code{"top"}. Default:
+\code{c("all", "le")}.}
 }
 \value{
 Depends on \code{genes}:
 \itemize{
-\item \code{genes = "le"} : A named list where each element is a character vector
-of leading edge gene symbols ordered by rank. The list has an attribute
-\code{type = "le"} used by \code{\link[=addgenesPA]{addgenesPA()}}.
-\item \code{genes = "all"} : A named list where each element is a character vector
-of all gene symbols in that gene set. The list has an attribute
-\code{type = "all"} used by \code{\link[=addgenesPA]{addgenesPA()}}.
-\item \code{genes = c("all", "le")} : A named list with two elements:
+\item Single mode (e.g., \code{genes = "le"}): a named list where each element
+is a character vector of gene symbols. The list has an attribute
+\code{genes_type} used by \code{\link[=addgenesPA]{addgenesPA()}} to name the output column.
+\item Multiple modes (e.g., \code{genes = c("all", "le", "top")}): a named list
+with one element per requested mode:
 \itemize{
 \item \verb{$all}: named list of all gene set members.
-\item \verb{$le}: named list of leading edge genes ordered by rank.
+\item \verb{$le}: named list of leading edge genes (GSEA only).
+\item \verb{$top}: named list of top-ranked genes.
 }
 }
 }
 \description{
-For each gene set in a pathway analysis results table, retrieves either the
-leading edge genes (the subset that drives enrichment, in GSEA output only),
-all genes in the gene set, or both. Leading edge genes are ordered by their
-rank in the provided ranked gene list.
+For each gene set in a pathway analysis results table, retrieves leading
+edge genes, a user-defined top fraction of genes, all genes in the gene
+set, or any combination. All gene lists are ordered by their rank in the
+provided ranked gene list.
 }
 \details{
-This function is the recommended first step before \code{\link[=heatmap_PA]{heatmap_PA()}},
-\code{\link[=addgenesPA]{addgenesPA()}}, and gene-level visualization with \code{\link[=nice_VSB]{nice_VSB()}}.
+\strong{Three extraction modes:}
+\itemize{
+\item \code{"le"}: \strong{GSEA output only.} Leading edge genes: the subset of genes
+that drives the enrichment signal. Size is computed as
+\code{round(SIZE * tags)}, where \code{tags} is the fraction of gene hits before
+(positive ES) or after (negative ES) the peak in the running enrichment
+score. Definition from the GSEA User Guide: \emph{"The percentage of gene hits
+before (for positive ES) or after (for negative ES) the peak in the
+running enrichment score. This gives an indication of the percentage of
+genes contributing to the enrichment score."}
+(\url{https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/}).
+Requires columns \code{SIZE} and \code{tags} in \code{pa_data}, produced automatically
+by \code{\link[=merge_PA]{merge_PA()}}.
+\item \code{"top"}: \strong{Any enrichment result (GSEA, CAMERA, PADOG, etc.).}
+A user-defined top fraction of genes ordered by rank. Size is computed as
+\code{round(SIZE * top)}, where \code{top} is a numeric value between 0 and 1
+provided in a \code{top} column of \code{pa_data}. This does \strong{not} represent true
+leading edge genes: it is a flexible, rank-based selection suitable for
+exploratory visualization with any pathway analysis method.
+Requires columns \code{SIZE} and \code{top} in \code{pa_data}.
+\item \code{"all"}: All genes in the gene set, ordered by rank.
+}
 }
 \examples{
 \dontrun{
-gsl     <- list_gmts("path/to/gmt_folder/")
-pa_data <- read.delim("gsea_results_merged.tsv")
-ranked  <- deseq2_results$gene_id[order(deseq2_results$stat,
-                                        decreasing = TRUE)]
+data(gsea_results)
+data(geneset_list)
+data(deseq2_results)
 
-# Get both leading edge and all genes
-gene_lists <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
-pa_annot   <- addgenesPA(pa_data, gene_lists)
-head(pa_annot[, c("NAME", "all_genes", "le_genes")])
+#or
+gsl <- list_gmts("path/to/gmt_folder/")
 
-# Get only leading edge genes
-le_only  <- getgenesPA(pa_data, gsl, ranked, genes = "le")
-pa_annot <- addgenesPA(pa_data, le_only)
-head(pa_annot[, c("NAME", "le_genes")])
+ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+                                          decreasing = TRUE)]
+pa_single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 
-# Access genes for a specific gene set
-gene_lists$le[["KEGG_APOPTOSIS"]]
-gene_lists$all[["KEGG_APOPTOSIS"]]
+# ── GSEA results: all three modes available
+gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+                         genes = c("all", "le", "top"))
+
+# But first add the top column (e.g. top 30\% of genes by rank)
+pa_single$top <- 0.30
+gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+                         genes = c("all", "le", "top"))
+
+gene_lists$le[["KEGG_APOPTOSIS"]]    # leading edge genes
+gene_lists$top[["KEGG_APOPTOSIS"]]   # top 30\% by rank
+gene_lists$all[["KEGG_APOPTOSIS"]]   # all genes
+
+pa_annot <- addgenesPA(pa_single, gene_lists)
+head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
+
+# ── CAMERA results: use "top" (no leading edge available) ───
+data(camera_results)
+camera_pa      <- camera_results
+colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
+camera_pa$SIZE <- sapply(camera_pa$NAME,
+                         function(x) length(geneset_list[[x]]))
+camera_pa$top  <- 0.25   # top 25\% by rank
+
+gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+                             genes = c("all", "top"))
+pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
+head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])
 }
 
 }
@@ -81,5 +133,5 @@ gene_lists$all[["KEGG_APOPTOSIS"]]
 \code{\link[=addgenesPA]{addgenesPA()}} to append gene columns to pa_data;
 \code{\link[=heatmap_PA]{heatmap_PA()}} for heatmap visualization;
 \code{\link[=list_gmts]{list_gmts()}} to generate \code{geneset_list};
-\code{\link[=merge_PA]{merge_PA()}} to generate \code{pa_data}.
+\code{\link[=merge_PA]{merge_PA()}} to generate \code{pa_data} with the required \code{tags} column.
 }

@@ -86,10 +86,10 @@ Default: \code{c(4, 25, 15, 3, 10, 3)}.}
 }
 \examples{
 \dontrun{
-gsea_data <- merge_PA("path/to/gsea_results/")
+gsea_results <- merge_PA("path/to/gsea_results/")
 
 # Filter to one comparison
-single <- gsea_data[gsea_data$COMPARISON == "TumorVsNormal", ]
+single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 
 splot_PA(
   data           = single,

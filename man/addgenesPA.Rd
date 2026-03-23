@@ -12,47 +12,66 @@ column. Typically the output of \code{\link[=merge_PA]{merge_PA()}}.}
 
 \item{gene_lists}{Output of \code{\link[=getgenesPA]{getgenesPA()}}. Can be:
 \itemize{
-\item A list with \verb{$all} and/or \verb{$le} slots : when
-\code{getgenesPA(..., genes = c("all", "le"))}. Adds both \code{all_genes} and
-\code{le_genes} columns.
-\item A flat named list with attribute \code{genes_type = "le"} : when
-\code{getgenesPA(..., genes = "le")}. Adds \code{le_genes} column only.
-\item A flat named list with attribute \code{genes_type = "all"} : when
-\code{getgenesPA(..., genes = "all")}. Adds \code{all_genes} column only.
+\item A list with \verb{$all}, \verb{$le}, and/or \verb{$top} slots: when multiple modes
+are requested (e.g., \code{getgenesPA(..., genes = c("all", "le", "top"))}).
+Adds the corresponding columns.
+\item A flat named list with attribute \code{genes_type}: when a single mode is
+requested. Adds the corresponding column (\code{all_genes}, \code{le_genes}, or
+\code{top_genes}).
 }}
 }
 \value{
-The input \code{pa_data} data frame with one or two additional columns:
+The input \code{pa_data} data frame with one or more additional columns:
 \itemize{
-\item \code{all_genes}: comma-separated string of all gene set members.
-\item \code{le_genes}: comma-separated string of leading edge genes ordered by
-rank (GSEA output only).
+\item \code{all_genes}: comma-separated string of all gene set members ordered by
+rank.
+\item \code{le_genes}: comma-separated string of leading edge genes (GSEA only),
+ordered by rank.
+\item \code{top_genes}: comma-separated string of top-ranked genes based on the
+user-defined \code{top} fraction.
 }
 
 Gene sets not found in \code{gene_lists} receive \code{NA}.
 }
 \description{
-Appends \code{all_genes} and/or \code{le_genes} (GSEA output only) columns to a pathway
+Appends \code{all_genes}, \code{le_genes}, and/or \code{top_genes} columns to a pathway
 analysis results data frame based on the output of \code{\link[=getgenesPA]{getgenesPA()}}.
 Gene symbols within each cell are comma-separated. Automatically detects
 which column(s) to add based on the structure of the input.
 }
 \examples{
 \dontrun{
-gsl     <- list_gmts("path/to/gmt_folder/")
-pa_data <- read.delim("gsea_results_merged.tsv")
-ranked  <- deseq2_results$gene_id[order(deseq2_results$stat,
-                                        decreasing = TRUE)]
+data(gsea_results)
+data(geneset_list)
+data(deseq2_results)
 
-# Add both columns at once
-gene_lists <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
-pa_annot   <- addgenesPA(pa_data, gene_lists)
-head(pa_annot[, c("NAME", "all_genes", "le_genes")])
+ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+                                          decreasing = TRUE)]
+pa_single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
+pa_single$top <- 0.30
+
+# Add all three columns
+gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+                         genes = c("all", "le", "top"))
+pa_annot   <- addgenesPA(pa_single, gene_lists)
+head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
 
 # Add only leading edge genes
-le_only  <- getgenesPA(pa_data, gsl, ranked, genes = "le")
-pa_annot <- addgenesPA(pa_data, le_only)
+le_only  <- getgenesPA(pa_single, geneset_list, ranked, genes = "le")
+pa_annot <- addgenesPA(pa_single, le_only)
 head(pa_annot[, c("NAME", "le_genes")])
+
+# CAMERA: add only top and all (no leading edge)
+data(camera_results)
+camera_pa      <- camera_results
+colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
+camera_pa$SIZE <- sapply(camera_pa$NAME,
+                         function(x) length(geneset_list[[x]]))
+camera_pa$top  <- 0.25
+gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+                             genes = c("all", "top"))
+pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
+head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])
 }
 
 }
