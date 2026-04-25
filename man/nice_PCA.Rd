@@ -74,6 +74,12 @@ nice_PCA(
 
 \item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 }
+\value{
+A ggplot2 object if \code{returnData = FALSE} (default). If
+\code{returnData = TRUE}, a numeric matrix of PCA coordinates with dimensions
+samples × \code{outPCs}, with a \code{percentVar} attribute containing the
+proportion of variance explained per component.
+}
 \description{
 This was inspired on the plotPCA function from DESeq2, made by Wolfgang Huber
 But including some improvements made by David Requena. Now it allows:
@@ -82,4 +88,39 @@ But including some improvements made by David Requena. Now it allows:
 \item To use one or two features to represent as the fill or shape of the markers.
 \item To provide the colors, shapes and fonts.
 }
+}
+\examples{
+data(vst_counts)
+data(sampledata)
+
+# nice_PCA joins by a column named "id" in annotations
+sampledata_pca <- sampledata
+colnames(sampledata_pca)[colnames(sampledata_pca) == "patient_id"] <- "id"
+
+nice_PCA(
+  object       = vst_counts,
+  annotations  = sampledata_pca,
+  variables    = c(fill = "sample_type"),
+  legend_names = c(fill = "Sample Type"),
+  colors       = c("steelblue", "firebrick"),
+  shapes       = c(21, 21),
+  title        = "TCGA-LUAD PCA"
+)
+
+# Return PCA coordinates instead of plot
+pca_data <- nice_PCA(
+  object       = vst_counts,
+  annotations  = sampledata_pca,
+  variables    = c(fill = "sample_type"),
+  legend_names = c(fill = "Sample Type"),
+  colors       = c("steelblue", "firebrick"),
+  shapes       = c(21, 21),
+  returnData   = TRUE
+)
+head(pca_data)
+
+}
+\seealso{
+\code{\link[=nice_UMAP]{nice_UMAP()}}, \code{\link[=nice_tSNE]{nice_tSNE()}} for other alternatives;
+\link{vst_counts} for the recommended input matrix.
 }

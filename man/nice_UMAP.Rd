@@ -74,6 +74,44 @@ nice_UMAP(
 
 \item{returnData}{Indicates if the function should return the data (TRUE) or the plot (FALSE). Default: FALSE.}
 }
+\value{
+A ggplot2 object if \code{returnData = FALSE} (default). If
+\code{returnData = TRUE}, a data frame with UMAP coordinates and sample
+annotations.
+}
 \description{
 Function to make UMAP plots.
+}
+\examples{
+\dontrun{
+data(vst_counts)
+data(sampledata)
+
+sampledata_u <- sampledata
+colnames(sampledata_u)[colnames(sampledata_u) == "patient_id"] <- "id"
+
+nice_UMAP(
+  object       = vst_counts,
+  annotations  = sampledata_u,
+  variables    = c(fill = "sample_type"),
+  legend_names = c(fill = "Sample Type"),
+  colors       = c("steelblue", "firebrick"),
+  shapes       = c(21, 21),
+  title        = "TCGA-LUAD UMAP",
+  neighbors    = 5,
+  epochs       = 1000,
+  seed         = 1905
+)
+}
+
+}
+\references{
+McInnes, L., Healy, J., & Melville, J. (2018). Umap: Uniform Manifold
+Approximation and Projection for Dimension Reduction.
+\emph{arXiv preprint arXiv:1802.03426}.
+\url{https://arxiv.org/abs/1802.03426}
+}
+\seealso{
+\code{\link[=nice_PCA]{nice_PCA()}}, \code{\link[=nice_tSNE]{nice_tSNE()}} for alternative dimensionality
+reduction methods; \link{vst_counts} for the recommended input matrix.
 }

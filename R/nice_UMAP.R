@@ -29,6 +29,42 @@
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a data frame with UMAP coordinates and sample
+#'   annotations.
+#'
+#' @examples
+#' \dontrun{
+#' data(vst_counts)
+#' data(sampledata)
+#'
+#' sampledata_u <- sampledata
+#' colnames(sampledata_u)[colnames(sampledata_u) == "patient_id"] <- "id"
+#'
+#' nice_UMAP(
+#'   object       = vst_counts,
+#'   annotations  = sampledata_u,
+#'   variables    = c(fill = "sample_type"),
+#'   legend_names = c(fill = "Sample Type"),
+#'   colors       = c("steelblue", "firebrick"),
+#'   shapes       = c(21, 21),
+#'   title        = "TCGA-LUAD UMAP",
+#'   neighbors    = 5,
+#'   epochs       = 1000,
+#'   seed         = 1905
+#' )
+#' }
+#'
+#' @seealso [nice_PCA()], [nice_tSNE()] for alternative dimensionality
+#'   reduction methods; [vst_counts] for the recommended input matrix.
+#'
+#' @references
+#'   McInnes, L., Healy, J., & Melville, J. (2018). Umap: Uniform Manifold
+#'   Approximation and Projection for Dimension Reduction.
+#'   *arXiv preprint arXiv:1802.03426*.
+#'   \url{https://arxiv.org/abs/1802.03426}
+#'
 #' @export
 
 nice_UMAP <- function(object, annotations = NULL, neighbors = 5, components = 2, epochs = 10000, seed = 0,

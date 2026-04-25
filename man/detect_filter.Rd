@@ -35,8 +35,54 @@ detect_filter(
 
 \item{samples.condition3}{Vector of Sample IDs or indexes corresponding to the third condition (optional).}
 }
+\value{
+A named list. Always contains:
+\itemize{
+\item \verb{$Comparison1}: Data frame of detectable genes from \code{df.BvsA}.
+\item \verb{$DetectGenes}: Character vector of unique detectable gene IDs across
+all comparisons.
+}
+
+If \code{df.CvsA} is provided, also contains \verb{$Comparison2}. If \code{df.DvsA} is
+provided, also contains \verb{$Comparison3}.
+}
 \description{
 This function identifies genes with measurable expression levels across samples.
 Detectable genes must meet two conditions: the baseMean and their mean normalized counts in the phenotypes of interest must be greater than a set threshold.
 It returns a list of detectable genes and the comparisons in which they can be found.
+}
+\examples{
+\dontrun{
+data(norm_counts)
+data(deseq2_results)
+data(sampledata)
+
+# detect_filter requires an "ensembl" column in the results data frame
+res <- deseq2_results
+colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
+rownames(res) <- res$ensembl
+
+# Get sample IDs per group
+samples_normal <- sampledata$patient_id[sampledata$sample_type == "normal"]
+samples_tumor  <- sampledata$patient_id[sampledata$sample_type == "tumor"]
+
+detected <- detect_filter(
+  norm.counts        = as.data.frame(norm_counts),
+  df.BvsA            = res,
+  samples.baseline   = samples_normal,
+  samples.condition1 = samples_tumor,
+  cutoffs            = c(50, 50, 0)
+)
+
+# Number of detectable genes
+length(detected$DetectGenes)
+
+# Subset results
+head(detected$Comparison1)
+}
+
+}
+\seealso{
+\code{\link[=nice_VSB]{nice_VSB()}} to plot expression of detected genes;
+\link{norm_counts} for an example normalized counts matrix.
 }

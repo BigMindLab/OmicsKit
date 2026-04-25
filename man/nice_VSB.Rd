@@ -2,7 +2,7 @@
 % Please edit documentation in R/nice_VSB.R
 \name{nice_VSB}
 \alias{nice_VSB}
-\title{Function to make Violin-Scatter-Box plots.}
+\title{Function to make Violin-Scatter-Box plots from data frames.}
 \usage{
 nice_VSB(
   object = NULL,
@@ -23,7 +23,7 @@ nice_VSB(
 )
 }
 \arguments{
-\item{object}{A DEseq object already transformed with the variance stabilizing or rlog transformations.}
+\item{object}{A data frame object with normalized counts genes(in rows) across samples(in columns).}
 
 \item{annotations}{Data frame with annotations.}
 
@@ -31,7 +31,8 @@ nice_VSB(
 
 \item{genename}{The gene name to be used for the plot.}
 
-\item{symbol}{The gene symbol to be used for the plot.}
+\item{symbol}{The gene symbol to display in the plot title. To obtain
+gene symbols from Ensembl IDs, use \code{\link[=get_annotations]{get_annotations()}}.}
 
 \item{labels}{A vector containing the x-labels of the box-plot. Default: c("N", "P", "R", "M").}
 
@@ -53,7 +54,32 @@ nice_VSB(
 
 \item{legend_size}{Font of the title and elements of the legend. Default: c(title = 14, elements = 12).}
 }
+\value{
+A ggplot2 object.
+}
 \description{
 This function will make a Boxplot, using a DEseq object.
 It will show the data points on top with a small deviation (jitter) for a better visualization.
+}
+\examples{
+data(norm_counts)
+data(sampledata)
+
+nice_VSB(
+  object      = norm_counts,
+  annotations = sampledata,
+  variables   = c(fill = "sample_type"),
+  genename    = rownames(norm_counts)[1],
+  categories  = c("normal", "tumor"),
+  labels      = c("Normal", "Tumor"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+
+}
+\seealso{
+\code{\link[=nice_Volcano]{nice_Volcano()}} for genome-wide visualization; \code{\link[=detect_filter]{detect_filter()}}
+to identify reliably expressed genes; \code{\link[=get_stars]{get_stars()}} to add significance
+annotations; \link{norm_counts} for an example input matrix.
 }

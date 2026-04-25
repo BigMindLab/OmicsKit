@@ -26,6 +26,18 @@
 #' @param returnData Logical. If `TRUE`, returns a list with `km_fit` and `plot`; if `FALSE`, returns only the `ggplot` object. Default `FALSE`.
 #' @return A `ggplot` object (or a list with `km_fit` and `plot` if `returnData = TRUE`).
 #' @import ggplot2
+#'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a named list with two elements:
+#'   * `$km_fit`: The [survival::survfit()] object.
+#'   * `$plot`: The ggplot2 survival curve.
+#'
+#' @references
+#'   Kaplan, E. L., & Meier, P. (1958). Nonparametric estimation from
+#'   incomplete observations. *Journal of the American Statistical
+#'   Association*, 53(282), 457–481.
+#'   \doi{10.1080/01621459.1958.10501452}
+#'
 #' @export
 
 nice_KM <- function(data, gene, time_var, event_var, coord = NULL, title_prefix = "Mut ", colors = c("#1F8FFF", "#ED4D4D"),

@@ -1,0 +1,327 @@
+---
+title: "Pathway Analysis Clustering with OmicsKit"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pathway Analysis Clustering with OmicsKit}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  warning   = FALSE,
+  message   = FALSE
+)
+```
+
+## Overview
+
+After a gene set enrichment analysis (e.g., CAMERA, GSEA, fgsea), a common
+challenge is that hundreds of significant gene sets are returned — many of which
+are redundant because they share large overlapping gene memberships. This
+vignette demonstrates how to use OmicsKit's pathway clustering functions to:
+
+1. **Load gene sets** from GMT files with `list_gmts()`
+2. **Quantify redundancy** between gene sets using Jaccard similarity with
+   `geneset_similarity()`
+3. **Cluster** redundant gene sets hierarchically with `do_clust()`
+4. **Detect communities** in the gene set network and generate interpretable
+   labels with `get_network_communities()`
+5. **Visualize** the network with `network_clust()` (base R) or
+   `network_clust_gg()` (ggplot2)
+
+## Required packages
+
+```{r packages}
+library(OmicsKit)
+
+# Suggested packages used in this vignette
+library(igraph)
+library(ComplexHeatmap)
+```
+
+---
+
+## Step 1 — Load gene sets
+
+In a real analysis, gene sets are stored as `.gmt` files. `list_gmts()` reads
+all `.gmt` files in a directory and returns a single named list.
+
+```{r list_gmts, eval = FALSE}
+geneset_list <- list_gmts("path/to/your/gmt_folder/")
+```
+
+For this vignette we use the built-in example data, which contains 40 curated
+gene sets spanning four biological themes: apoptosis, cell cycle, immune
+response, and metabolism.
+
+```{r load_data}
+data(geneset_list)
+data(camera_results)
+
+# How many gene sets?
+length(geneset_list)
+
+# What does the enrichment results table look like?
+head(camera_results)
+
+# How many are significant at FDR < 0.05?
+sum(camera_results$FDR < 0.05)
+```
+
+---
+
+## Step 2 — Jaccard similarity matrix
+
+`geneset_similarity()` filters the gene sets by FDR threshold and computes all
+pairwise Jaccard similarity coefficients:
+
+$$J(A, B) = \frac{|A \cap B|}{|A \cup B|}$$
+
+A value of 1 means the two gene sets share identical gene membership; 0 means
+no overlap at all.
+
+```{r geneset_similarity}
+jac <- geneset_similarity(
+  geneset_list  = geneset_list,
+  results       = camera_results,
+  fdr_th        = 0.05
+)
+
+# The JaccardResult object contains three slots
+names(jac)
+
+# Dimensions of the similarity matrix
+dim(jac$jaccard_sim)
+```
+
+The `$dist_mat` slot (1 − Jaccard similarity) can be reused independently —
+for example as input to `nice_UMAP()` or any other distance-based method.
+
+```{r jaccard_preview}
+# Preview the top-left corner of the similarity matrix
+jac$jaccard_sim[1:5, 1:5]
+```
+
+---
+
+## Step 3 — Hierarchical clustering
+
+`do_clust()` performs Ward-D2 hierarchical clustering on the distance matrix
+and automatically selects the optimal number of clusters *k* by maximizing the
+average silhouette width.
+
+```{r do_clust}
+clust <- do_clust(jac)
+
+# Optimal k selected automatically
+clust$optimal_k
+
+# Cluster assignments (one row per gene set)
+head(clust$cluster_assignments)
+```
+
+### Silhouette curve
+
+The red dot marks the selected *k*:
+
+```{r silhouette_plot, fig.cap = "Average silhouette width vs. number of clusters. The optimal k is highlighted in red."}
+clust$silhouette_plot
+```
+
+### Jaccard heatmap with dendrogram
+
+Gene sets in the same hierarchical cluster appear as blocks of high similarity
+(darker blue) along the diagonal:
+
+```{r heatmap, fig.width = 6, fig.height = 6, fig.cap = "Jaccard similarity heatmap with Ward-D2 dendrogram."}
+ComplexHeatmap::draw(clust$heatmap)
+```
+
+---
+
+## Step 4 — Community detection and super-terms
+
+Hierarchical clustering groups gene sets by overall similarity, but the network
+community detection captures a different structure: densely connected
+sub-networks within the Jaccard graph.
+
+`get_network_communities()` does three things in a single call:
+
+- Builds a binary adjacency matrix (edges where Jaccard > `threshold`)
+- Runs the Louvain algorithm to detect communities
+- Calls `get_superterm()` internally to generate TF-IDF labels for each
+  community
+
+```{r get_network_communities}
+net <- get_network_communities(
+  x             = jac,
+  threshold     = 0.3,
+  method        = "louvain",
+  superterms    = TRUE,
+  n_terms       = 3,
+  remove_prefix = TRUE,
+  seed          = 1905
+)
+
+# How many communities were detected?
+length(unique(net$membership))
+
+# Community summary: label + size
+net$superterms$summary
+```
+
+The `$superterms$mapping` tibble links every gene set to its community and
+its super-term label:
+
+```{r superterm_mapping}
+head(net$superterms$mapping)
+```
+
+---
+
+## Step 5 — Network visualization
+
+### Option A: base R igraph (`network_clust`)
+
+`network_clust()` draws plots directly to the active graphics device and
+returns node attributes invisibly. It is faster and requires only `igraph`.
+
+```{r network_clust_clean, fig.width = 7, fig.height = 7, fig.cap = "Gene set network — clean view. Node color reflects hierarchical cluster."}
+result <- network_clust(
+  x                 = jac,
+  clust_result      = clust,
+  jaccard_threshold = 0.10,
+  min_degree        = 1,
+  superterms        = TRUE,
+  superterm_data    = net$superterms,
+  type              = "clean",
+  seed              = 1905
+)
+```
+
+```{r network_clust_superterms, fig.width = 7, fig.height = 7, fig.cap = "Gene set network with community super-term labels."}
+network_clust(
+  x                 = jac,
+  clust_result      = clust,
+  jaccard_threshold = 0.10,
+  min_degree        = 1,
+  superterms        = TRUE,
+  superterm_data    = net$superterms,
+  type              = "superterms",
+  seed              = 1905
+)
+```
+
+### Option B: ggraph / ggplot2 (`network_clust_gg`)
+
+`network_clust_gg()` returns a named list of ggplot2 objects that can be
+further customized, saved with `ggsave()`, or composed with `patchwork`.
+Requires `ggraph` and `tidygraph`.
+
+```{r network_clust_gg, fig.width = 7, fig.height = 7, fig.cap = "Gene set network (ggraph) with super-term labels."}
+plots <- network_clust_gg(
+  x                 = jac,
+  clust_result      = clust,
+  jaccard_threshold = 0.10,
+  min_degree        = 1,
+  superterms        = TRUE,
+  superterm_data    = net$superterms,
+  type              = "all",
+  seed              = 1905
+)
+
+# Display the combined view (super-terms + individual node labels)
+plots$superterms
+```
+
+```{r patchwork, fig.width = 12, fig.height = 6, fig.cap = "Side-by-side comparison: clean view (left) vs. super-term labels (right)."}
+library(patchwork)
+plots$clean + plots$superterms
+```
+
+### Saving plots
+
+```{r save, eval = FALSE}
+# Save with ggsave
+ggplot2::ggsave(
+  filename = "network_combined.pdf",
+  plot     = plots$combined,
+  width    = 14,
+  height   = 14
+)
+
+# Save base R igraph plot to PDF
+pdf("network_superterms_igraph.pdf", width = 14, height = 14)
+network_clust(jac, clust,
+              superterms     = TRUE,
+              superterm_data = net$superterms,
+              type           = "superterms")
+dev.off()
+```
+
+---
+
+## Step 6 — Downstream tables
+
+Both network functions return node-level attributes for downstream analysis:
+
+```{r node_attributes}
+# From the igraph version (invisible return)
+head(result$node_attributes)
+```
+
+```{r superterm_report}
+# Superterm report: community membership breakdown
+result$superterm_report
+```
+
+---
+
+## Full workflow — summary
+
+```{r full_workflow, eval = FALSE}
+library(OmicsKit)
+
+# 1. Load gene sets
+gsl <- list_gmts("path/to/gmt_folder/")
+
+# 2. Jaccard similarity (filter by FDR < 0.05)
+jac <- geneset_similarity(gsl, camera_results, fdr_th = 0.05)
+
+# 3. Hierarchical clustering
+clust <- do_clust(jac)
+clust$silhouette_plot
+ComplexHeatmap::draw(clust$heatmap)
+
+# 4. Community detection + super-terms
+net <- get_network_communities(jac, threshold = 0.3)
+net$superterms$summary
+
+# 5a. Network plot — base R (draws to device)
+network_clust(jac, clust,
+              superterms     = TRUE,
+              superterm_data = net$superterms)
+
+# 5b. Network plot — ggplot2 (returns objects)
+plots <- network_clust_gg(jac, clust,
+                          superterms     = TRUE,
+                          superterm_data = net$superterms)
+plots$combined
+ggplot2::ggsave("network.pdf", plots$combined, width = 14, height = 14)
+
+# 6. Reuse the distance matrix for UMAP
+nice_UMAP(as.matrix(jac$dist_mat))
+```
+
+---
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```

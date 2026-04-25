@@ -16,11 +16,13 @@ Authors@R: c(
 Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
 License: CC BY-NC-SA 4.0
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
     dplyr,
     ggplot2,
     tsne,
+    cowplot,
+    graphics,
     magrittr,
     rlang,
     stats,
@@ -32,10 +34,17 @@ Imports:
     patchwork
 Suggests: 
     biomaRt,
-    cowplot,
+    circlize,
+    cluster,
+    ComplexHeatmap,
     dbscan,
+    knitr,
+    rmarkdown,
+    DESeq2,
     ggnewscale,
+    ggraph,
     ggrepel,
+    igraph,
     grDevices,
     matrixStats,
     openxlsx,
@@ -43,9 +52,15 @@ Suggests:
     readr,
     survival,
     survminer,
+    tidygraph,
     tidyr,
-    tidyselect
+    tidyselect,
+    tm
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 3.5)
 LazyData: true
+LazyDataCompression: xz
+VignetteBuilder: knitr
+URL: https://bigmindlab.github.io/OmicsKit
+

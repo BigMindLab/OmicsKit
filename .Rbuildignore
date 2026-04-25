@@ -4,3 +4,7 @@
 ^LICENSE\.md$
 ^\.github$
 ^data-raw$
+^vignettes/prerender_figures\.R$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

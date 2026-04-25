@@ -1,0 +1,478 @@
+---
+title: "Differential Expression Analysis Workflow with OmicsKit"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Differential Expression Analysis Workflow with OmicsKit}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.align = "center",
+  warning   = FALSE,
+  message   = FALSE
+)
+```
+
+## Overview
+
+This vignette demonstrates a complete RNA-seq differential expression analysis
+(DEA) workflow using OmicsKit, from study design through visualization, using
+real TCGA-LUAD data (16 tumor vs. 16 normal lung samples).
+
+The workflow covers:
+
+1. **Study design** : statistical power estimation
+2. **Quality control** : unsupervised dimensionality reduction
+3. **DEA results** : annotation, normalization, and export
+4. **Visualization** : volcano plots and gene-level expression plots
+5. **Multi-comparison** : splitting genes into exclusive expression cases
+
+## Required packages
+
+```{r packages}
+library(OmicsKit)
+library(ggplot2)
+```
+
+---
+
+## Section 1 : Study design: power analysis
+
+Before collecting data or running any analysis, it is good practice to estimate
+the minimum sample size needed to reliably detect differentially expressed genes
+at a given effect size and false discovery rate.
+
+`power_analysis()` computes statistical power across a range of sample sizes
+using an analytical approximation that accounts for multiple testing:
+
+```{r power_analysis}
+result <- power_analysis(
+  effect_size  = 1,      # minimum log2 fold-change to detect
+  dispersion   = 0.1,    # biological coefficient of variation squared
+  n_genes      = 20000,  # total genes tested
+  prop_de      = 0.05,   # expected proportion of DE genes
+  alpha        = 0.05,   # desired FDR
+  power_target = 0.8,    # desired power (80%)
+  max_n        = 30,
+  plot         = TRUE
+)
+
+# Minimum samples per group needed
+result$min_sample_size
+
+# Full power curve
+head(result$power_table)
+
+# See plot
+result$plot
+```
+
+```{r power_plot, echo = FALSE, fig.cap = "Statistical power vs. sample size per group. The red dashed line marks 80% power; the blue dashed line marks the minimum required sample size.", fig.width = 7, fig.height = 5}
+knitr::include_graphics("figures/power_analysis.png")
+```
+
+The TCGA-LUAD dataset used in this vignette has 16 samples per group, well
+above the minimum required for detecting log2FC ≥ 1 at 80% power.
+
+---
+
+## Section 2 : Quality control: unsupervised clustering
+
+Before running DEA, it is essential to verify that samples cluster by their
+biological group and to detect potential batch effects or outliers. OmicsKit
+provides three complementary dimensionality reduction methods that all accept
+the same VST-transformed count matrix.
+
+**Why VST?** Variance Stabilizing Transformation removes the mean-variance
+dependence of RNA-seq counts, placing all genes on a comparable log2-like
+scale. This prevents highly expressed genes from dominating the sample-level
+distances.
+
+```{r load_data}
+data(vst_counts)
+data(sampledata)
+
+# nice_PCA, nice_UMAP, and nice_tSNE require a column named "id"
+sampledata_dim <- sampledata
+colnames(sampledata_dim)[colnames(sampledata_dim) == "patient_id"] <- "id"
+
+dim(vst_counts)
+table(sampledata$sample_type)
+```
+
+### PCA
+
+PCA is the fastest method and should always be the first step. The first two
+principal components often capture the main sources of variation.
+
+```{r nice_PCA, eval = FALSE}
+nice_PCA(
+  object       = vst_counts,
+  annotations  = sampledata_dim,
+  variables    = c(fill = "sample_type"),
+  legend_names = c(fill = "Sample Type"),
+  colors       = c("steelblue", "firebrick"),
+  shapes       = c(21, 21),
+  title        = "TCGA-LUAD PCA: Tumor vs Normal"
+)
+```
+
+```{r pca_plot, echo = FALSE, fig.cap = "PCA of VST-transformed TCGA-LUAD counts. Tumor (red) and normal (blue) samples separate cleanly along PC1.", fig.width = 7, fig.height = 6}
+knitr::include_graphics("figures/nice_PCA.png")
+```
+
+### UMAP
+
+UMAP captures non-linear structure and is particularly useful for larger
+datasets or when PCA does not show clear separation.
+
+```{r nice_UMAP, eval = FALSE}
+nice_UMAP(
+  object       = vst_counts,
+  annotations  = sampledata_dim,
+  variables    = c(fill = "sample_type"),
+  legend_names = c(fill = "Sample Type"),
+  colors       = c("steelblue", "firebrick"),
+  shapes       = c(21, 21),
+  title        = "TCGA-LUAD UMAP: Tumor vs Normal",
+  neighbors    = 5,
+  epochs       = 1000,
+  seed         = 174
+)
+```
+
+```{r umap_plot, echo = FALSE, fig.cap = "UMAP of VST-transformed TCGA-LUAD counts.", fig.width = 7, fig.height = 6}
+knitr::include_graphics("figures/nice_UMAP.png")
+```
+
+### tSNE
+
+tSNE is useful for visualizing tight local clusters. Note that `perplexity`
+must be less than one-third of the number of samples.
+
+```{r nice_tSNE, eval = FALSE}
+# With 32 samples, perplexity must be < 10
+nice_tSNE(
+  object         = vst_counts,
+  annotations    = sampledata_dim,
+  perplexity     = 5,
+  max_iterations = 1000,
+  variables      = c(fill = "sample_type"),
+  legend_names   = c(fill = "Sample Type"),
+  colors         = c("steelblue", "firebrick"),
+  shapes         = c(21, 21),
+  title          = "TCGA-LUAD tSNE: Tumor vs Normal",
+  seed           = 174
+)
+```
+
+```{r tsne_plot, echo = FALSE, fig.cap = "tSNE of VST-transformed TCGA-LUAD counts.", fig.width = 7, fig.height = 6}
+knitr::include_graphics("figures/nice_tSNE.png")
+```
+
+---
+
+## Section 3 : DEA results: annotation, normalization, and export
+
+Once QC confirms clean group separation, we work with the DESeq2 results. The
+`deseq2_results` object is already provided as an example dataset.
+
+```{r load_results}
+data(deseq2_results)
+data(norm_counts)
+
+# Overview
+dim(deseq2_results)
+sum(deseq2_results$padj < 0.05, na.rm = TRUE)
+```
+
+### Gene annotations
+
+`get_annotations()` queries Ensembl via biomaRt to retrieve gene symbols,
+biotype, chromosomal location, and length. Requires an internet connection.
+
+```{r get_annotations, eval = FALSE}
+annotations <- get_annotations(
+  ensembl_ids = deseq2_results$gene_id,
+  mode        = "genes",
+  version     = "Current",
+  filename    = "luad_gene_annotations",
+  format      = "csv"
+)
+
+head(annotations)
+```
+
+### Adding annotations to results and counts
+
+`add_annotations()` joins annotation columns to any matrix or data frame using
+Ensembl IDs as the key:
+
+```{r add_annotations, eval = FALSE}
+# Add gene symbol and biotype to normalized counts
+norm_counts_annot <- add_annotations(
+  object    = norm_counts,
+  reference = annotations,
+  variables = c("symbol", "biotype")
+)
+
+head(norm_counts_annot[, c("geneID", "symbol", "biotype")])
+```
+
+### TPM normalization
+
+While DESeq2 normalized counts are appropriate for DEA, TPM is useful for
+comparing expression levels between genes within a sample. Note that TPM
+requires accurate gene lengths, `get_annotations()` provides these via
+`$gene_length` (computed as `end - start + 1`).
+
+```{r tpm, eval = FALSE}
+gene_lengths <- annotations$gene_length[
+  match(rownames(raw_counts), annotations$geneID)
+]
+
+tpm_matrix <- tpm(raw_counts, gene_lengths)
+
+# Column sums should all equal 1,000,000
+round(colSums(tpm_matrix)[1:3])
+```
+
+### Saving results
+
+`save_results()` exports three Excel files: all genes, over-expressed only,
+and under-expressed only:
+
+```{r save_results, eval = FALSE}
+save_results(
+  df           = deseq2_results,
+  name         = "TCGA_LUAD_TumorVsNormal",
+  l2fc         = 1,
+  cutoff_alpha = 0.05
+)
+# Creates:
+#   TCGA_LUAD_TumorVsNormal_full.xlsx
+#   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
+```
+
+---
+
+## Section 4 : Visualization
+
+### Volcano plot
+
+The volcano plot is the standard way to visualize DEA results, showing the
+relationship between effect size (log2FC) and significance (FDR).
+
+> **Tip:** To display gene symbols instead of Ensembl IDs, run
+> `get_annotations()` and join the `symbol` column to `deseq2_results` 
+> with `add_annotations()` before calling `nice_Volcano()`.
+
+```{r nice_Volcano, eval = FALSE}
+nice_Volcano(
+  results   = deseq2_results,
+  x_var     = "log2FoldChange",
+  y_var     = "padj",
+  label_var = "gene_id",
+  title     = "TCGA-LUAD: Tumor vs Normal",
+  cutoff_y  = 0.05,
+  cutoff_x  = 1,
+  x_range   = 8,
+  y_max     = 10
+)
+```
+
+```{r volcano_plot, echo = FALSE, fig.cap = "Volcano plot of TCGA-LUAD DEA results. Red: upregulated in tumor; blue: downregulated; grey: not significant.", fig.width = 8, fig.height = 7}
+knitr::include_graphics("figures/nice_Volcano.png")
+```
+
+### Detectable genes
+
+`detect_filter()` identifies genes with reliable expression levels by applying
+thresholds on baseMean and mean normalized counts per group.
+
+```{r detect_filter, eval = FALSE}
+# detect_filter requires a column named "ensembl"
+res <- deseq2_results
+colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
+rownames(res) <- res$ensembl
+
+samples_normal <- sampledata$patient_id[sampledata$sample_type == "normal"]
+samples_tumor  <- sampledata$patient_id[sampledata$sample_type == "tumor"]
+
+detected <- detect_filter(
+  norm.counts        = as.data.frame(norm_counts),
+  df.BvsA            = res,
+  samples.baseline   = samples_normal,
+  samples.condition1 = samples_tumor,
+  cutoffs            = c(50, 50, 0)
+)
+
+length(detected$DetectGenes)
+```
+
+### Significance stars
+
+`get_stars()` converts FDR values to asterisk notation for annotation in plots:
+
+```{r get_stars}
+data(deseq2_results)
+
+res_stars <- deseq2_results
+colnames(res_stars)[colnames(res_stars) == "gene_id"] <- "ensembl"
+
+# Most significant gene
+get_stars(
+  geneID = res_stars$ensembl[1],
+  object = res_stars
+)
+
+# Least significant gene
+get_stars(
+  geneID = res_stars$ensembl[nrow(res_stars)],
+  object = res_stars
+)
+```
+
+### Gene-level expression: Violin-Scatter-Box plot
+
+`nice_VSB()` shows the distribution of normalized expression for a single gene
+across sample groups. The input is the normalized counts matrix.
+
+```{r nice_VSB, eval = FALSE}
+top_gene <- deseq2_results$gene_id[1]
+
+# Get symbol
+#symbol <- deseq2_results$symbol[1]
+
+nice_VSB(
+  object      = norm_counts,
+  annotations = sampledata,
+  variables   = c(fill = "sample_type"),
+  genename    = top_gene,
+  categories  = c("normal", "tumor"),
+  labels      = c("Normal", "Tumor"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+```
+
+> **Note: alternative using a DESeq2 object directly:** If you still have
+> your `DESeqDataSet` object in your session, you can use `nice_VSB_DESeq2()`
+> instead. It extracts the normalized counts internally via
+> `DESeq2::counts(dds, normalized = TRUE)`, so you do not need to provide
+> a separate `norm_counts` matrix:
+>
+> ```r
+> nice_VSB_DESeq2(
+>   object     = dds,
+>   variables  = c(fill = "sample_type"),
+>   genename   = top_gene,
+>   symbol     = "TP53",                 # optional: displayed in plot title
+>   categories = c("normal", "tumor"),
+>   labels     = c("Normal", "Tumor"),
+>   colors     = c("steelblue", "firebrick"),
+>   shapes     = 21,
+>   markersize = 3
+> )
+> ```
+>
+> Use `nice_VSB()` when working from a pre-computed normalized counts matrix,
+> and `nice_VSB_DESeq2()` when the DESeq2 object is still available in your
+> environment.
+
+
+```{r vsb_plot, echo = FALSE, fig.cap = "Violin-Scatter-Box plot of the most significant DEG across tumor and normal samples.", fig.width = 6, fig.height = 6}
+knitr::include_graphics("figures/nice_VSB.png")
+```
+
+
+
+---
+
+## Section 5 : Multi-comparison analysis (optional)
+
+When a study includes three phenotypes (e.g., normal, primary tumor,
+metastasis), `split_cases()` classifies genes into 10 mutually exclusive
+expression patterns based on significance and direction across all three
+pairwise comparisons.
+
+```{r split_cases, eval = FALSE}
+# Requires three DESeq2 result data frames:
+# df.BvsA : condition 1 vs baseline
+# df.CvsA : condition 2 vs baseline
+# df.BvsC : condition 1 vs condition 2
+
+cases <- split_cases(
+  df.BvsA             = df_tumor_vs_normal,
+  df.CvsA             = df_meta_vs_normal,
+  df.BvsC             = df_tumor_vs_meta,
+  unique_id           = "ensembl",
+  significance_var    = "padj",
+  significance_cutoff = 0.05,
+  change_var          = "log2FoldChange",
+  change_cutoff       = 1
+)
+
+# Number of genes per case
+sapply(cases, nrow)
+
+# Case 1: ladder genes : progressive up or down across all comparisons
+head(cases$Case1)
+```
+
+---
+
+## Full workflow - summary
+
+```{r full_workflow, eval = FALSE}
+library(OmicsKit)
+
+# 1. Study design
+power_analysis(effect_size = 1, dispersion = 0.1, n_genes = 20000)
+
+# 2. QC: dimensionality reduction (use VST counts)
+data(vst_counts); data(sampledata)
+sampledata$id <- sampledata$patient_id
+
+nice_PCA(vst_counts, sampledata, variables = c(fill = "sample_type"),
+         legend_names = c(fill = "Sample Type"),
+         colors = c("steelblue", "firebrick"), shapes = c(21, 21))
+
+# 3. Annotate and export results
+annotations <- get_annotations(deseq2_results$gene_id)
+norm_counts_annot <- add_annotations(norm_counts, annotations)
+save_results(deseq2_results, name = "TumorVsNormal", l2fc = 1)
+
+# 4. Visualize and filter non-detectable genes
+nice_Volcano(deseq2_results, x_var = "log2FoldChange",
+             y_var = "padj", label_var = "gene_id",
+             title = "Tumor vs Normal")
+
+detected <- detect_filter(as.data.frame(norm_counts), deseq2_results,
+                          samples.baseline = samples_normal,
+                          samples.condition1 = samples_tumor)
+
+nice_VSB(norm_counts, sampledata,
+         variables = c(fill = "sample_type"),
+         genename = detected$DetectGenes[1],
+         categories = c("normal", "tumor"),
+         labels = c("Normal", "Tumor"),
+         colors = c("steelblue", "firebrick"))
+
+# 5. Multi-comparison (if 3 phenotypes)
+cases <- split_cases(df.BvsA, df.CvsA, df.BvsC)
+```
+
+---
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```

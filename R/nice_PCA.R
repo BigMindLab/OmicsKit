@@ -36,6 +36,45 @@
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a numeric matrix of PCA coordinates with dimensions
+#'   samples × `outPCs`, with a `percentVar` attribute containing the
+#'   proportion of variance explained per component.
+#'
+#' @examples
+#' data(vst_counts)
+#' data(sampledata)
+#'
+#' # nice_PCA joins by a column named "id" in annotations
+#' sampledata_pca <- sampledata
+#' colnames(sampledata_pca)[colnames(sampledata_pca) == "patient_id"] <- "id"
+#'
+#' nice_PCA(
+#'   object       = vst_counts,
+#'   annotations  = sampledata_pca,
+#'   variables    = c(fill = "sample_type"),
+#'   legend_names = c(fill = "Sample Type"),
+#'   colors       = c("steelblue", "firebrick"),
+#'   shapes       = c(21, 21),
+#'   title        = "TCGA-LUAD PCA"
+#' )
+#'
+#' # Return PCA coordinates instead of plot
+#' pca_data <- nice_PCA(
+#'   object       = vst_counts,
+#'   annotations  = sampledata_pca,
+#'   variables    = c(fill = "sample_type"),
+#'   legend_names = c(fill = "Sample Type"),
+#'   colors       = c("steelblue", "firebrick"),
+#'   shapes       = c(21, 21),
+#'   returnData   = TRUE
+#' )
+#' head(pca_data)
+#'
+#' @seealso [nice_UMAP()], [nice_tSNE()] for other alternatives;
+#'   [vst_counts] for the recommended input matrix.
+#'
 #' @export
 
 nice_PCA <- function(object, annotations = NULL, PCs = c(1,2), ntop = NULL,
@@ -51,7 +90,7 @@ nice_PCA <- function(object, annotations = NULL, PCs = c(1,2), ntop = NULL,
   object <- as.matrix(object)
 
   expr <- if (transform) log2(object + 0.001) else object
-  
+
   if (scale) {
     expr <- expr[matrixStats::rowVars(expr) > 0, , drop = FALSE]
   }

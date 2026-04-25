@@ -2,16 +2,17 @@
 # Function nice_VSB #
 #####################
 
-#' Function to make Violin-Scatter-Box plots.
+#' Function to make Violin-Scatter-Box plots from data frames.
 #'
 #' This function will make a Boxplot, using a DEseq object.
 #' It will show the data points on top with a small deviation (jitter) for a better visualization.
 #'
-#' @param object A DEseq object already transformed with the variance stabilizing or rlog transformations.
+#' @param object A data frame object with normalized counts genes(in rows) across samples(in columns).
 #' @param annotations Data frame with annotations.
 #' @param variables To indicate the variables to be used as Shape and Fill of the markers.
 #' @param genename The gene name to be used for the plot.
-#' @param symbol The gene symbol to be used for the plot.
+#' @param symbol The gene symbol to display in the plot title. To obtain
+#'  gene symbols from Ensembl IDs, use [get_annotations()].
 #' @param labels A vector containing the x-labels of the box-plot. Default: c("N", "P", "R", "M").
 #' @param categories A vector containing the labels for the legend. Default: c("normal", "primary", "recurrence", "metastasis").
 #' @param colors Vector of colors to be used for the categories of the variable assigned as Marker Fill.
@@ -25,6 +26,29 @@
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#'
+#' @return A ggplot2 object.
+#'
+#' @examples
+#' data(norm_counts)
+#' data(sampledata)
+#'
+#' nice_VSB(
+#'   object      = norm_counts,
+#'   annotations = sampledata,
+#'   variables   = c(fill = "sample_type"),
+#'   genename    = rownames(norm_counts)[1],
+#'   categories  = c("normal", "tumor"),
+#'   labels      = c("Normal", "Tumor"),
+#'   colors      = c("steelblue", "firebrick"),
+#'   shapes      = 21,
+#'   markersize  = 3
+#' )
+#'
+#' @seealso [nice_Volcano()] for genome-wide visualization; [detect_filter()]
+#'   to identify reliably expressed genes; [get_stars()] to add significance
+#'   annotations; [norm_counts] for an example input matrix.
+#'
 #' @export
 
 nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill", shape = "VarShape"),

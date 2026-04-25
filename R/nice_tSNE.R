@@ -28,6 +28,41 @@
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#'
+#' @return A ggplot2 object if `returnData = FALSE` (default). If
+#'   `returnData = TRUE`, a data frame with tSNE coordinates and sample
+#'   annotations.
+#'
+#' @examples
+#' \dontrun{
+#' data(vst_counts)
+#' data(sampledata)
+#'
+#' sampledata_t <- sampledata
+#' colnames(sampledata_t)[colnames(sampledata_t) == "patient_id"] <- "id"
+#'
+#' # perplexity must be < n_samples / 3; with 32 samples use perplexity = 5
+#' nice_tSNE(
+#'   object         = vst_counts,
+#'   annotations    = sampledata_t,
+#'   perplexity     = 5,
+#'   max_iterations = 1000,
+#'   variables      = c(fill = "sample_type"),
+#'   legend_names   = c(fill = "Sample Type"),
+#'   colors         = c("steelblue", "firebrick"),
+#'   shapes         = c(21, 21),
+#'   title          = "TCGA-LUAD tSNE",
+#'   seed           = 1905
+#' )
+#' }
+#' @seealso [nice_PCA()], [nice_UMAP()] for alternative dimensionality
+#'   reduction methods; [vst_counts] for the recommended input matrix.
+#'
+#' @references
+#'   van der Maaten, L., & Hinton, G. (2008). Visualizing data using t-SNE.
+#'   *Journal of Machine Learning Research*, 9, 2579–2605.
+#'   \url{https://jmlr.org/papers/v9/vandermaaten08a.html}
+#'
 #' @export
 
 nice_tSNE <- function(object, annotations = NULL, perplexity = 3, max_iterations = 10000, seed = 0,

@@ -23,6 +23,13 @@ get_annotations(
 
 \item{format}{The output is saved in .csv or .xlsx formats. Default = csv.}
 }
+\value{
+A data frame with one row per input ID and the following columns:
+\code{geneID}, \code{symbol}, \code{biotype}, \code{chromosome}, \code{gene_start}, \code{gene_end},
+\code{gene_length}, \code{description}. For \code{mode = "transcripts"}, an additional
+\code{transcriptID} column is included. The data frame is also saved to disk
+as a \code{.csv} or \code{.xlsx} file (see \code{filename} and \code{format}).
+}
 \description{
 This function annotates a column of transcripts or gene IDs (ENSEMBL) with information of the Biomart.
 If transcript IDs are provided, they are also annotated with information of the genes to which they belong.
@@ -33,4 +40,37 @@ The Gene information added include:
 \item Gene ENSEMBL ID, HGNC Symbol, Description, Biotype and Chromosome.
 \item Gene start, end and length
 }
+}
+\note{
+Requires an active internet connection to query the Ensembl BioMart.
+\code{gene_length} is computed as \code{gene_end - gene_start + 1} (genomic length).
+For TPM calculation with \code{\link[=tpm]{tpm()}}, this is an approximation,
+use transcript-level lengths for higher accuracy.
+}
+\examples{
+\dontrun{
+# Annotate genes from Normalized counts (requires internet connection)
+data(norm_counts)
+
+# Requires a reference table with a "geneID" column.
+# Use get_annotations() to generate it:
+annotations <- get_annotations(
+  ensembl_ids = rownames(norm_counts),
+  mode        = "genes"
+)
+
+head(annotations)
+
+# Use with add_annotations()
+norm_counts_annot <- add_annotations(
+  object    = norm_counts,
+  reference = annotations,
+  variables = c("symbol", "biotype")
+)
+}
+
+}
+\seealso{
+\code{\link[=add_annotations]{add_annotations()}} to join annotations to a counts matrix;
+\code{\link[=tpm]{tpm()}} which requires gene lengths from this function.
 }

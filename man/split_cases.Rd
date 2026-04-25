@@ -32,9 +32,73 @@ split_cases(
 
 \item{change_cutoff}{The values of the change variable will be filtered by |change_var| > change_cutoff. Default: 0.}
 }
+\value{
+A named list of 10 data frames (\verb{$Case1} through \verb{$Case10}), each
+containing the genes belonging to that mutually exclusive expression
+pattern. Cases 1–6 contain a \code{trend} column (\code{"up"} or \code{"dn"}). Case 10
+contains genes not significant in any comparison.
+}
 \description{
 When performing differential expression analysis of a study with 3 phenotypes,
 including the baseline, there are 10 mutually exclusive cases where genes can
 fall into. This function allows us to obtain these 10 cases and saves them
 into a list.
+}
+\details{
+The 10 cases are:
+\itemize{
+\item \strong{Case 1} : Ladder: significant in all 3, same direction.
+\item \strong{Case 2} : Stronger in condition 1: significant in all 3, direction
+reverses between conditions.
+\item \strong{Case 3} : Stronger in condition 2.
+\item \strong{Case 4} : Marker of condition 2: significant in CvsA and BvsC only.
+\item \strong{Case 5} : Marker of condition 1: significant in BvsA and BvsC only.
+\item \strong{Case 6} : Shared: significant in BvsA and CvsA only.
+\item \strong{Cases 7-9} : Significant in only one comparison.
+\item \strong{Case 10} : Not significant in any comparison.
+}
+}
+\examples{
+\dontrun{
+# split_cases requires three DESeq2 comparisons.
+# Simulate a 3-phenotype study: Normal (A), Primary (B), Metastasis (C)
+set.seed(174)
+n_genes <- 500
+
+make_res <- function(seed) {
+  set.seed(seed)
+  data.frame(
+    ensembl        = paste0("ENSG", sprintf("\%011d", seq_len(n_genes))),
+    log2FoldChange = rnorm(n_genes, 0, 1.5),
+    padj           = runif(n_genes, 0, 0.5),
+    stringsAsFactors = FALSE
+  )
+}
+
+df_BvsA <- make_res(1)
+df_CvsA <- make_res(2)
+df_BvsC <- make_res(3)
+
+cases <- split_cases(
+  df.BvsA              = df_BvsA,
+  df.CvsA              = df_CvsA,
+  df.BvsC              = df_BvsC,
+  unique_id            = "ensembl",
+  significance_var     = "padj",
+  significance_cutoff  = 0.25,
+  change_var           = "log2FoldChange",
+  change_cutoff        = 0
+)
+
+# Number of genes per case
+sapply(cases, nrow)
+
+# Inspect Case 1 (ladder genes: significant in all 3 comparisons)
+head(cases$Case1)
+}
+
+}
+\seealso{
+\code{\link[=detect_filter]{detect_filter()}} to pre-filter genes before splitting;
+\code{\link[=nice_Volcano]{nice_Volcano()}} to visualize individual comparison results.
 }

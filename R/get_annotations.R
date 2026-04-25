@@ -18,6 +18,43 @@
 #' @param format The output is saved in .csv or .xlsx formats. Default = csv.
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#'
+#' @return A data frame with one row per input ID and the following columns:
+#'   `geneID`, `symbol`, `biotype`, `chromosome`, `gene_start`, `gene_end`,
+#'   `gene_length`, `description`. For `mode = "transcripts"`, an additional
+#'   `transcriptID` column is included. The data frame is also saved to disk
+#'   as a `.csv` or `.xlsx` file (see `filename` and `format`).
+#'
+#' @examples
+#' \dontrun{
+#' # Annotate genes from Normalized counts (requires internet connection)
+#' data(norm_counts)
+#'
+#' # Requires a reference table with a "geneID" column.
+#' # Use get_annotations() to generate it:
+#' annotations <- get_annotations(
+#'   ensembl_ids = rownames(norm_counts),
+#'   mode        = "genes"
+#' )
+#'
+#' head(annotations)
+#'
+#' # Use with add_annotations()
+#' norm_counts_annot <- add_annotations(
+#'   object    = norm_counts,
+#'   reference = annotations,
+#'   variables = c("symbol", "biotype")
+#' )
+#' }
+#'
+#' @note Requires an active internet connection to query the Ensembl BioMart.
+#'   `gene_length` is computed as `gene_end - gene_start + 1` (genomic length).
+#'   For TPM calculation with [tpm()], this is an approximation,
+#'   use transcript-level lengths for higher accuracy.
+#'
+#' @seealso [add_annotations()] to join annotations to a counts matrix;
+#'   [tpm()] which requires gene lengths from this function.
+#'
 #' @export
 
 get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annotations", version = "Current", format = "csv") {
@@ -92,9 +129,10 @@ get_annotations <- function(ensembl_ids, mode = "genes", filename = "gene_annota
         )
     }
 
-    openxlsx::write.xlsx(df, file = paste0(filename, ".xlsx"), colNames = T, rowNames = F, append = F)
+    openxlsx::write.xlsx(df, file = paste0(filename, ".xlsx"),
+                         colNames = TRUE, rowNames = FALSE, append = FALSE)
   } else {
-    utils::write.csv(df, rowNames = F, file = paste0(filename, ".csv"))
+    utils::write.csv(df, row.names = FALSE, file = paste0(filename, ".csv"))
   }
 
   return(df)

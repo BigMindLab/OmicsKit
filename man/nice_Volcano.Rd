@@ -40,7 +40,9 @@ nice_Volcano(
 
 \item{x_var}{Name of the column in \code{results} to plot on the x-axis (e.g. log₂FC).}
 
-\item{label_var}{to be defined.}
+\item{label_var}{Name of the column in \code{results} to use as point labels
+(e.g. gene IDs or HGNC symbols). To use gene symbols, first run
+\code{\link[=get_annotations]{get_annotations()}} and join the \code{symbol} column to your results table.}
 
 \item{legend}{Logical. Control legend display. Default: TRUE.}
 
@@ -50,6 +52,9 @@ nice_Volcano(
 
 \item{genes}{Vector of genes to label in the plot. Default: NULL.}
 }
+\value{
+A ggplot2 object
+}
 \description{
 Volcano plot with configurable point shapes and threshold annotations:
 \itemize{
@@ -57,4 +62,35 @@ Volcano plot with configurable point shapes and threshold annotations:
 \item Horizontal dashed line at one or more significance thresholds, annotated with its value.
 \item Vertical dashed lines at log-fold-change cutoffs, shown as custom x-axis ticks.
 }
+}
+\examples{
+data(deseq2_results)
+
+nice_Volcano(
+  results   = deseq2_results,
+  x_var     = "log2FoldChange",
+  y_var     = "padj",
+  label_var = "gene_id",
+  title     = "TCGA-LUAD: Tumor vs Normal",
+  cutoff_y  = 0.05,
+  cutoff_x  = 1,
+  x_range   = 8,
+  y_max     = 10
+)
+
+# Highlight specific genes
+nice_Volcano(
+  results   = deseq2_results,
+  x_var     = "log2FoldChange",
+  y_var     = "padj",
+  label_var = "gene_id",
+  title     = "TCGA-LUAD: Tumor vs Normal",
+  genes     = deseq2_results$gene_id[1:5]
+)
+
+}
+\seealso{
+\code{\link[=nice_VSB]{nice_VSB()}} for gene-level expression visualization;
+\code{\link[=detect_filter]{detect_filter()}} to filter detectable genes before plotting;
+\link{deseq2_results} for an example input dataset.
 }

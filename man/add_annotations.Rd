@@ -15,6 +15,44 @@ add_annotations(object, reference, variables = NULL, data_frame = FALSE)
 
 \item{data_frame}{Logical; if TRUE, coerce \code{object} to a data.frame first. Default: FALSE.}
 }
+\value{
+The input \code{object} as a data frame with additional columns from
+\code{reference} joined by Ensembl gene ID. A \code{geneID} column is added
+containing the row names of the original object.
+}
 \description{
 A function to add annotations to a table of gene counts.
+}
+\examples{
+\dontrun{
+data(norm_counts)
+
+# Requires a reference table with a "geneID" column.
+# Use get_annotations() to generate it:
+annotations <- get_annotations(
+  ensembl_ids = rownames(norm_counts),
+  mode        = "genes"
+)
+
+# Add gene symbol and biotype columns to the counts matrix
+norm_counts_annot <- add_annotations(
+  object    = norm_counts,
+  reference = annotations,
+  variables = c("symbol", "biotype")
+)
+
+# Inspect result
+head(norm_counts_annot[, c("geneID", "symbol", "biotype")])
+
+# Add all annotation columns (variables = NULL uses everything)
+norm_counts_full <- add_annotations(
+  object    = norm_counts,
+  reference = annotations
+)
+}
+
+}
+\seealso{
+\code{\link[=get_annotations]{get_annotations()}} to generate the \code{reference} table;
+\link{norm_counts} for an example input matrix.
 }
