@@ -17,7 +17,7 @@ network).}
 
 \item{community_membership}{A named numeric or integer vector mapping each
 gene set to its community ID. Typically the output of
-\code{\link[igraph:communities]{igraph::membership()}} applied to a community detection result (e.g.,
+\code{\link[igraph:membership]{igraph::membership()}} applied to a community detection result (e.g.,
 \code{\link[igraph:cluster_louvain]{igraph::cluster_louvain()}}). Must have the same length as
 \code{geneset_names}. See \code{\link[=get_network_communities]{get_network_communities()}} for a simpler workflow.}
 

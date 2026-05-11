@@ -67,12 +67,30 @@ In this vignette, we use a built-in example `geneset_list`, which contains
 immune response, and metabolism), and the built-in `gsea_results` dataset,
 which mimics the output of `merge_PA()` for three comparisons across HALLMARK,
 KEGG, and GO collections.
-```{r load_data}
+```{r load_data, eval = FALSE}
 data(geneset_list)
 data(gsea_results)
 data(deseq2_results)
 data(vst_counts)
 data(sampledata)
+
+# Retrieve HGNC symbols
+annotations <- get_annotations(
+  ensembl_ids = deseq2_results$gene_id,
+  species     = "hsapiens_gene_ensembl",
+  mode        = "genes",
+  version     = "112",
+  filename    = "luad_gene_annotations",
+  format      = "csv"
+)
+
+# Set format to add_annotations
+rownames(deseq2_results) <- deseq2_results$gene_id
+deseq2_results_annot <- add_annotations(object    = deseq2_results,
+  reference = annotations,
+  variables = c("symbol", "biotype"), 
+  data_frame = TRUE
+)
 # Ranked gene list: DESeq2 Wald stat from most positive to most negative
 ranked_genes <- deseq2_results$gene_id[
   order(deseq2_results$stat, decreasing = TRUE)
@@ -173,12 +191,27 @@ files are organized into subdirectories by format (PDF / JPG) and gene
 selection mode (`all_genes`, `le_genes`, `top_genes`).
 
 ```{r heatmap_PA, eval = FALSE}
+# Change rownames from vst to hgnc symbols and clean format
+idx_vst      <- match(rownames(vst_counts), annotations$geneID)
+new_rownames <- rownames(vst_counts)
+
+valid_vst <- !is.na(idx_vst) &
+             !is.na(annotations$symbol[idx_vst]) &
+             annotations$symbol[idx_vst] != ""
+
+new_rownames[valid_vst] <- annotations$symbol[idx_vst[valid_vst]]
+
+vst_sym               <- vst_counts
+rownames(vst_sym)     <- new_rownames
+vst_sym               <- vst_sym[!duplicated(rownames(vst_sym)), ]
+
+# Plot
 heatmap_PA(
-  expression_data = vst_counts,
+  expression_data = vst_sym,
   metadata        = sampledata,
   pa_data_annot   = pa_annot,
   ranked_genes    = ranked_genes,
-  plot_genes      = c("all_genes", "le_genes", "top_genes"),
+  plot_genes      = c("all_genes"),
   sample_col      = "patient_id",
   group_col       = "sample_type",
   out_dir         = "heatmaps_PA",

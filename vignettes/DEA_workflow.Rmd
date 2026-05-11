@@ -36,6 +36,7 @@ The workflow covers:
 ```{r packages}
 library(OmicsKit)
 library(ggplot2)
+library(biomaRt) # for get_annotations
 ```
 
 ---
@@ -195,15 +196,21 @@ sum(deseq2_results$padj < 0.05, na.rm = TRUE)
 `get_annotations()` queries Ensembl via biomaRt to retrieve gene symbols,
 biotype, chromosomal location, and length. Requires an internet connection.
 
+Use `list_ensembl_species()` to find the correct dataset name for your organism,
+and `list_ensembl_versions()` to see available releases.
+
 ```{r get_annotations, eval = FALSE}
+# Example: list datasets (optional)
+# list_ensembl_species(version = "current", filter = "human")
+
 annotations <- get_annotations(
   ensembl_ids = deseq2_results$gene_id,
+  species     = "hsapiens_gene_ensembl",
   mode        = "genes",
-  version     = "Current",
+  version     = "current",
   filename    = "luad_gene_annotations",
   format      = "csv"
 )
-
 head(annotations)
 ```
 
@@ -217,7 +224,8 @@ Ensembl IDs as the key:
 norm_counts_annot <- add_annotations(
   object    = norm_counts,
   reference = annotations,
-  variables = c("symbol", "biotype")
+  variables = c("symbol", "biotype"),
+  data_frame = TRUE
 )
 
 head(norm_counts_annot[, c("geneID", "symbol", "biotype")])

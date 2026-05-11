@@ -2,75 +2,118 @@
 % Please edit documentation in R/get_annotations.R
 \name{get_annotations}
 \alias{get_annotations}
-\title{Get annotations from Ensembl.}
+\title{Get gene or transcript annotations from Ensembl BioMart.}
 \usage{
 get_annotations(
   ensembl_ids,
+  species = "hsapiens_gene_ensembl",
   mode = "genes",
+  version = "current",
   filename = "gene_annotations",
-  version = "Current",
   format = "csv"
 )
 }
 \arguments{
-\item{ensembl_ids}{The column of transcripts to be used as input.}
+\item{ensembl_ids}{A character vector of Ensembl gene or transcript IDs as inputs.}
 
-\item{mode}{To specify the IDs provided, between "transcripts" or "genes". Default = genes.}
+\item{species}{The BioMart dataset identifier. Default =
+\code{"hsapiens_gene_ensembl"} (human). Use \code{\link[=list_ensembl_species]{list_ensembl_species()}} to find
+the identifier for other organisms.}
 
-\item{filename}{The name of the output file, which is table. Default = gene_annotations.}
+\item{mode}{Either \code{"genes"} or \code{"transcripts"}. Default = \code{"genes"}.}
 
-\item{version}{This function can use the versions 102, 103, and 112 of Ensembl. Default = "Current".}
+\item{version}{Ensembl release version as a string (e.g. \code{"112"}, \code{"114"}),
+or \code{"current"}. Use \code{\link[=list_ensembl_versions]{list_ensembl_versions()}} to see available versions,
+and \code{\link[=list_ensembl_species]{list_ensembl_species()}} to confirm your species exists in that
+version. Default = \code{"current"}.}
 
-\item{format}{The output is saved in .csv or .xlsx formats. Default = csv.}
+\item{filename}{Name of the output file without extension. If \code{NULL}, the
+result is returned but \strong{not} saved to disk. Default =
+\code{"gene_annotations"}.}
+
+\item{format}{Output format: \code{"csv"} or \code{"xlsx"}. Ignored when
+\code{filename = NULL}. Default = \code{"csv"}.}
 }
 \value{
-A data frame with one row per input ID and the following columns:
-\code{geneID}, \code{symbol}, \code{biotype}, \code{chromosome}, \code{gene_start}, \code{gene_end},
-\code{gene_length}, \code{description}. For \code{mode = "transcripts"}, an additional
-\code{transcriptID} column is included. The data frame is also saved to disk
-as a \code{.csv} or \code{.xlsx} file (see \code{filename} and \code{format}).
+A data frame with one row per input ID and columns: \code{geneID},
+\code{symbol}, \code{biotype}, \code{chromosome}, \code{gene_start}, \code{gene_end},
+\code{gene_length}, \code{description}. For \code{mode = "transcripts"}, a \code{transcriptID}
+column is prepended. If \code{filename} is not \code{NULL}, the data frame is also
+written to disk.
 }
 \description{
 This function annotates a column of transcripts or gene IDs (ENSEMBL) with information of the Biomart.
-If transcript IDs are provided, they are also annotated with information of the genes to which they belong.
 }
 \details{
 The Gene information added include:
 \itemize{
-\item Gene ENSEMBL ID, HGNC Symbol, Description, Biotype and Chromosome.
+\item Gene ENSEMBL ID, gene Symbol, Description, Biotype and Chromosome.
 \item Gene start, end and length
+}
+
+Annotates a vector of Ensembl gene or transcript IDs using BioMart. If
+transcript IDs are provided, they are also annotated with information
+of the genes to which they belong. Works for any species available in
+Ensembl — use \code{\link[=list_ensembl_species]{list_ensembl_species()}} to find the correct \code{species} value
+for your organism, and \code{\link[=list_ensembl_versions]{list_ensembl_versions()}} to verify version availability.
+
+\strong{Workflow:}
+\enumerate{
+\item \code{list_ensembl_species()} → find dataset name.
+\item \code{list_ensembl_versions()} → confirm version exists.
+\item \code{get_annotations(ensembl_ids, species = "drerio_gene_ensembl")}.
+}
+
+\strong{Symbol resolution by species:}
+\itemize{
+\item Human (\code{hsapiens}): uses \code{hgnc_symbol}, falling back to
+\code{external_gene_name} when HGNC symbol is absent.
+\item Mouse (\code{mmusculus}): uses \code{mgi_symbol}.
+\item Rat (\code{rnorvegicus}): uses \code{rgd_symbol}.
+\item Zebrafish (\code{drerio}): uses \code{zfin_id_symbol}.
+\item Drosophila (\code{dmelanogaster}): uses \code{flybasename_gene}.
+\item All other species: uses \code{external_gene_name} (universal fallback).
 }
 }
 \note{
 Requires an active internet connection to query the Ensembl BioMart.
-\code{gene_length} is computed as \code{gene_end - gene_start + 1} (genomic length).
-For TPM calculation with \code{\link[=tpm]{tpm()}}, this is an approximation,
-use transcript-level lengths for higher accuracy.
+\code{gene_length} is computed as \code{gene_end - gene_start + 1} (genomic span).
+For TPM calculation with \code{\link[=tpm]{tpm()}}, transcript-level lengths are more
+accurate.
 }
 \examples{
 \dontrun{
-# Annotate genes from Normalized counts (requires internet connection)
-data(norm_counts)
+# Step 1 — find your species dataset
+list_ensembl_species(version = "112", filter = "zebrafish")
+# -> "drerio_gene_ensembl"
 
-# Requires a reference table with a "geneID" column.
-# Use get_annotations() to generate it:
+# Step 2 — annotate (human, default)
 annotations <- get_annotations(
-  ensembl_ids = rownames(norm_counts),
-  mode        = "genes"
+  ensembl_ids = c("ENSG00000141510", "ENSG00000012048"),
+  species     = "hsapiens_gene_ensembl",
+  version     = "112",
+  filename    = NULL
 )
 
-head(annotations)
+# Mouse
+annotations_mouse <- get_annotations(
+  ensembl_ids = c("ENSMUSG00000059552", "ENSMUSG00000024610"),
+  species     = "mmusculus_gene_ensembl",
+  version     = "112",
+  filename    = NULL
+)
 
-# Use with add_annotations()
-norm_counts_annot <- add_annotations(
-  object    = norm_counts,
-  reference = annotations,
-  variables = c("symbol", "biotype")
+# Zebrafish
+annotations_zf <- get_annotations(
+  ensembl_ids = c("ENSDARG00000002333"),
+  species     = "drerio_gene_ensembl",
+  version     = "112",
+  filename    = NULL
 )
 }
 
 }
 \seealso{
-\code{\link[=add_annotations]{add_annotations()}} to join annotations to a counts matrix;
-\code{\link[=tpm]{tpm()}} which requires gene lengths from this function.
+\code{\link[=list_ensembl_versions]{list_ensembl_versions()}}, \code{\link[=list_ensembl_species]{list_ensembl_species()}} to find
+the identifier for other organisms, \code{\link[=add_annotations]{add_annotations()}}, \code{\link[=tpm]{tpm()}}
 }
