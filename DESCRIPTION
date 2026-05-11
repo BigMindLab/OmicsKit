@@ -16,7 +16,6 @@ Authors@R: c(
 Description: This package contains functions that help in manipulating tables and generating plots for multi-omics analysis including genomics, transcriptomics, proteomics, methylomics and immunoinformatics.
 License: CC BY-NC-SA 4.0
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Imports:
     dplyr,
     ggplot2,
@@ -25,13 +24,18 @@ Imports:
     graphics,
     magrittr,
     rlang,
-    stats,
     umap,
     tibble,
     scales,
     grid,
     utils,
-    patchwork
+    patchwork,
+    Gviz,
+    rtracklayer,
+    GenomeInfoDb,
+    GenomicRanges,
+    stats,
+    S4Vectors
 Suggests: 
     biomaRt,
     circlize,
@@ -57,7 +61,8 @@ Suggests:
     tidyselect,
     tm,
     testthat (>= 3.0.0),
-    withr
+    withr,
+    Rsamtools
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 4.4.0)
@@ -66,3 +71,4 @@ LazyDataCompression: xz
 VignetteBuilder: knitr
 URL: https://bigmindlab.github.io/OmicsKit
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
