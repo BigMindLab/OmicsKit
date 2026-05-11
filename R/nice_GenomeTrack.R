@@ -79,9 +79,12 @@ nice_GenomeTrack <- function(
       call. = FALSE
     )
   }
-  if (!requireNamespace("biomaRt", quietly = TRUE)) {
+  needs_biomart <- is.null(annotations) || isTRUE(show_transcripts)
+
+  if (isTRUE(needs_biomart) && !requireNamespace("biomaRt", quietly = TRUE)) {
     stop(
-      "Package \"biomaRt\" must be installed to use this function.",
+      "Package \"biomaRt\" must be installed when annotations are queried ",
+      "or when show_transcripts = TRUE.",
       call. = FALSE
     )
   }
@@ -124,35 +127,61 @@ nice_GenomeTrack <- function(
     stop("`region` start must be less than or equal to end.", call. = FALSE)
   }
 
-  # ---- Resolve Ensembl host --------------------------------------------------
-  if (!exists(".resolve_ensembl_host",
-              mode = "function")) {
-    stop(
-      "Internal helper `.resolve_ensembl_host()` not found. ",
-      "Please update OmicsKit to include the Ensembl helpers from PR #44.",
-      call. = FALSE
+  # ---- Validate local annotations before any BioMart connection ---------------
+  required_annotation_cols <- c(
+    "geneID", "symbol", "chromosome", "gene_start", "gene_end"
+  )
+
+  if (!is.null(annotations)) {
+    annotations <- as.data.frame(annotations)
+
+    missing_annotation_cols <- setdiff(
+      required_annotation_cols,
+      names(annotations)
     )
+
+    if (length(missing_annotation_cols) > 0) {
+      stop(
+        "`annotations` must include columns: ",
+        paste(required_annotation_cols, collapse = ", "),
+        call. = FALSE
+      )
+    }
   }
 
-  host <- .resolve_ensembl_host(ensembl_version)
+  # ---- Resolve Ensembl host and connect to BioMart only if needed -------------
+  host <- NULL
+  mart <- NULL
 
-  # ---- Connect to BioMart ----------------------------------------------------
-  mart <- tryCatch(
-    biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset = organism, host = host),
-    error = function(e) {
-      if (exists(".handle_biomart_connection_error", mode = "function")) {
-        .handle_biomart_connection_error(e, host, organism, ensembl_version)
-      }
-      stop(e$message, call. = FALSE)
+  if (isTRUE(needs_biomart)) {
+    if (!exists(".resolve_ensembl_host", mode = "function")) {
+      stop(
+        "Internal helper `.resolve_ensembl_host()` not found. ",
+        "Please update OmicsKit to include the Ensembl helpers.",
+        call. = FALSE
+      )
     }
-  )
+
+    host <- .resolve_ensembl_host(ensembl_version)
+
+    mart <- tryCatch(
+      biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset = organism, host = host),
+      error = function(e) {
+        if (exists(".handle_biomart_connection_error", mode = "function")) {
+          .handle_biomart_connection_error(e, host, organism, ensembl_version)
+        }
+        stop(e$message, call. = FALSE)
+      }
+    )
+  }
 
   # ---- Basic metadata --------------------------------------------------------
   chr_num <- sub("^chr", "", chr)
   is_human <- grepl("^hsapiens", organism)
 
   # Resolve the best symbol attribute for non-human species if available
-  symbol_info <- if (exists(".get_symbol_attribute", mode = "function")) {
+  symbol_info <- if (isTRUE(needs_biomart) &&
+                     exists(".get_symbol_attribute", mode = "function")) {
     .get_symbol_attribute(mart, organism)
   } else {
     list(attr = "external_gene_name", source = "External")
@@ -216,15 +245,6 @@ nice_GenomeTrack <- function(
 
   # ---- Build annotation data -----------------------------------------------
   if (!is.null(annotations)) {
-    required_cols <- c("geneID", "symbol", "chromosome", "gene_start", "gene_end")
-    if (!all(required_cols %in% names(annotations))) {
-      stop(
-        "`annotations` must include columns: ",
-        paste(required_cols, collapse = ", "),
-        call. = FALSE
-      )
-    }
-
     # Use provided annotations directly
     anno_data <- data.frame(
       ensembl_gene_id = annotations$geneID,
@@ -427,6 +447,13 @@ nice_GenomeTrack <- function(
 
   # ---- Optional transcript track --------------------------------------------
   if (isTRUE(show_transcripts)) {
+    if (is.null(mart)) {
+      stop(
+        "`show_transcripts = TRUE` requires a BioMart connection.",
+        call. = FALSE
+      )
+    }
+
     bm_transcripts <- biomaRt::getBM(
       attributes = c(
         "ensembl_gene_id", "ensembl_transcript_id",

@@ -35,7 +35,9 @@ Imports:
     GenomeInfoDb,
     GenomicRanges,
     stats,
-    S4Vectors
+    S4Vectors,
+    grDevices,
+    tools
 Suggests: 
     biomaRt,
     circlize,
@@ -49,8 +51,8 @@ Suggests:
     ggraph,
     ggrepel,
     igraph,
-    grDevices,
     matrixStats,
+    mockery,
     openxlsx,
     pheatmap,
     readr,
