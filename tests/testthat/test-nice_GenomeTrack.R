@@ -1,12 +1,7 @@
-test_that("nice_GenomeTrack validates inputs and returns tracks", {
+test_that("nice_GenomeTrack validates inputs and returns tracks without BioMart", {
   skip_if_not_installed("Gviz")
-  skip_if_not_installed("biomaRt")
   skip_if_not_installed("GenomicRanges")
   skip_if_not_installed("GenomeInfoDb")
-
-  host <- .resolve_ensembl_host("113")
-  testthat::skip_if_offline(gsub("^https?://", "", host))
-
 
   # ---- Minimal annotations (no BioMart queries) -----------------------------
   annotations <- data.frame(
@@ -64,6 +59,8 @@ test_that("nice_GenomeTrack validates inputs and returns tracks", {
 
   expect_type(tracks, "list")
   expect_length(tracks, 2) # GenomeAxis + Genes
+  expect_true(file.exists(out_pdf))
+  expect_gt(file.info(out_pdf)$size, 0)
 
   # ---- Error when track_sizes length does not match track_list --------------
   expect_error(
