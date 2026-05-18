@@ -18,6 +18,7 @@ License: CC BY-NC-SA 4.0
 Encoding: UTF-8
 Imports:
     dplyr,
+    broom,
     ggplot2,
     ggpubr,
     tsne,
@@ -37,6 +38,7 @@ Imports:
     GenomeInfoDb,
     GenomicRanges,
     stats,
+    survival,
     S4Vectors,
     grDevices,
     tools
@@ -57,7 +59,6 @@ Suggests:
     openxlsx,
     pheatmap,
     readr,
-    survival,
     survminer,
     tidygraph,
     tidyr,
