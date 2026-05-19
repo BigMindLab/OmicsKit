@@ -41,7 +41,8 @@ Imports:
     survival,
     S4Vectors,
     grDevices,
-    tools
+    tools,
+    pROC
 Suggests: 
     biomaRt,
     circlize,
