@@ -58,7 +58,7 @@
 #'
 #' @seealso [nice_VSB()] to plot expression of detected genes;
 #' [norm_counts] for an example normalized counts matrix.
-#'
+#' [trend_filter()] to find genes with significant expression trends across conditions.
 #' @export
 
 
