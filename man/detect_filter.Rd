@@ -85,4 +85,5 @@ head(detected$Comparison1)
 \seealso{
 \code{\link[=nice_VSB]{nice_VSB()}} to plot expression of detected genes;
 \link{norm_counts} for an example normalized counts matrix.
+\code{\link[=trend_filter]{trend_filter()}} to find genes with significant expression trends across conditions.
 }

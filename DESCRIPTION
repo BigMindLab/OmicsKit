@@ -18,9 +18,12 @@ License: CC BY-NC-SA 4.0
 Encoding: UTF-8
 Imports:
     dplyr,
+    broom,
     ggplot2,
+    ggpubr,
     tsne,
     cowplot,
+    ggraph,
     graphics,
     magrittr,
     rlang,
@@ -35,9 +38,11 @@ Imports:
     GenomeInfoDb,
     GenomicRanges,
     stats,
+    survival,
     S4Vectors,
     grDevices,
-    tools
+    tools,
+    pROC
 Suggests: 
     biomaRt,
     circlize,
@@ -48,7 +53,6 @@ Suggests:
     rmarkdown,
     DESeq2,
     ggnewscale,
-    ggraph,
     ggrepel,
     igraph,
     matrixStats,
@@ -56,7 +60,6 @@ Suggests:
     openxlsx,
     pheatmap,
     readr,
-    survival,
     survminer,
     tidygraph,
     tidyr,
