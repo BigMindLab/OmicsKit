@@ -1,0 +1,2 @@
+comparison	rnk_file	source_dea	gene_column	rank_metric	n_genes	min_rank	max_rank	duplicated_rank_values_after_tie_break	created
+Tumor_vs_Normal	BRCA_Tumor_vs_Normal.rnk	DEA_RNAseq_limma_Tumor_vs_Normal.tsv	gene	limma_t_stat	18200	-37.6014331937932	36.6558753984778	0	2026-05-19 12:09:25

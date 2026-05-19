@@ -1,0 +1,2 @@
+comparison	rnk_file	source_dea	gene_column	rank_metric	n_genes	min_rank	max_rank	duplicated_rank_values_after_tie_break	created
+ERpositive_vs_ERnegative	BRCA_ERpositive_vs_ERnegative.rnk	DEA_RNAseq_limma_ERpositive_vs_ERnegative.tsv	gene	limma_t_stat	18129	-25.4655916585783	39.2156761951095	0	2026-05-19 12:09:25
