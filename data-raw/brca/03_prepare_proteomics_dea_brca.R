@@ -34,8 +34,14 @@ options(stringsAsFactors = FALSE)
 ## If discovery is ambiguous, set this to a project-relative path under
 ## inst/extdata/brca/raw_xena/, for example:
 ## manual_rppa_matrix_file <- "inst/extdata/brca/raw_xena/TCGA.BRCA.sampleMap_RPPA/RPPA"
-manual_rppa_matrix_file <- NULL
-
+manual_rppa_matrix_file <- file.path(
+  "inst",
+  "extdata",
+  "brca",
+  "raw_xena",
+  "TCGA.BRCA.sampleMap_RPPA",
+  "RPPA"
+)
 max_rppa_matrix_data_mb <- 25
 
 project_file <- function(...) {
@@ -313,29 +319,204 @@ clean_single_gene <- function(x) {
   y
 }
 
-make_feature_map <- function(feature_ids, feature_annotation = NULL) {
-  feature_ids <- trimws(as.character(feature_ids))
-  gene <- rep(NA_character_, length(feature_ids))
-  mapping_source <- rep(NA_character_, length(feature_ids))
+normalize_rppa_key <- function(x) {
+  gsub("[^a-z0-9]+", "", tolower(trimws(as.character(x))))
+}
 
+strip_rppa_antibody_suffix <- function(x) {
+  sub("-[A-Z]-[A-Z]$", "", trimws(as.character(x)))
+}
+
+rppa_gene_map_named <- c(
+  "14-3-3_beta" = "YWHAB",
+  "14-3-3_epsilon" = "YWHAE",
+  "14-3-3_zeta" = "YWHAZ",
+  "4E-BP1" = "EIF4EBP1",
+  "53BP1" = "TP53BP1",
+  "A-Raf" = "ARAF",
+  "ACC1" = "ACACA",
+  "ACVRL1" = "ACVRL1",
+  "ADAR1" = "ADAR",
+  "alpha-Catenin" = "CTNNA1",
+  "Annexin-1" = "ANXA1",
+  "Annexin_VII" = "ANXA7",
+  "AR" = "AR",
+  "DIRAS3" = "DIRAS3",
+  "ASNS" = "ASNS",
+  "ATM" = "ATM",
+  "B-Raf" = "BRAF",
+  "Bak" = "BAK1",
+  "Bap1-c-4" = "BAP1",
+  "Bax" = "BAX",
+  "Bcl-2" = "BCL2",
+  "Bcl-xL" = "BCL2L1",
+  "Bcl2A1" = "BCL2A1",
+  "Beclin" = "BECN1",
+  "beta-Catenin" = "CTNNB1",
+  "Bid" = "BID",
+  "Bim" = "BCL2L11",
+  "BRCA2" = "BRCA2",
+  "BRD4" = "BRD4",
+  "c-Abl" = "ABL1",
+  "c-Kit" = "KIT",
+  "c-Met" = "MET",
+  "c-Myc" = "MYC",
+  "C-Raf" = "RAF1",
+  "Caspase-3" = "CASP3",
+  "Caspase-7" = "CASP7",
+  "Caspase-8" = "CASP8",
+  "Caspase-9" = "CASP9",
+  "Caveolin-1" = "CAV1",
+  "CD20" = "MS4A1",
+  "CD26" = "DPP4",
+  "CD31" = "PECAM1",
+  "CD49b" = "ITGA2",
+  "CDK1" = "CDK1",
+  "Chk1" = "CHEK1",
+  "Chk2" = "CHEK2",
+  "Claudin-7" = "CLDN7",
+  "COG3" = "COG3",
+  "Cyclin_B1" = "CCNB1",
+  "Cyclin_D1" = "CCND1",
+  "Cyclin_E1" = "CCNE1",
+  "Cyclin_E2" = "CCNE2",
+  "DJ-1" = "PARK7",
+  "DUSP4" = "DUSP4",
+  "Dvl3" = "DVL3",
+  "E-Cadherin" = "CDH1",
+  "eEF2" = "EEF2",
+  "eEF2K" = "EEF2K",
+  "EGFR" = "EGFR",
+  "eIF4E" = "EIF4E",
+  "eIF4G" = "EIF4G1",
+  "ENY2" = "ENY2",
+  "EPPK1" = "EPPK1",
+  "ER-alpha" = "ESR1",
+  "ERCC1" = "ERCC1",
+  "ERCC5" = "ERCC5",
+  "ERK2" = "MAPK1",
+  "ETS-1" = "ETS1",
+  "FASN" = "FASN",
+  "Fibronectin" = "FN1",
+  "FoxM1" = "FOXM1",
+  "FOXO3a" = "FOXO3",
+  "G6PD" = "G6PD",
+  "GAB2" = "GAB2",
+  "GAPDH" = "GAPDH",
+  "GATA3" = "GATA3",
+  "GATA6" = "GATA6",
+  "GCN5L2" = "KAT2A",
+  "HER2" = "ERBB2",
+  "HER3" = "ERBB3",
+  "IGFBP2" = "IGFBP2",
+  "INPP4B" = "INPP4B",
+  "IRF-1" = "IRF1",
+  "IRS1" = "IRS1",
+  "JAB1" = "COPS5",
+  "Jak2" = "JAK2",
+  "JNK2" = "MAPK9",
+  "Ku80" = "XRCC5",
+  "Lck" = "LCK",
+  "LKB1" = "STK11",
+  "MEK1" = "MAP2K1",
+  "MIG-6" = "ERRFI1",
+  "Mre11" = "MRE11",
+  "MSH2" = "MSH2",
+  "MSH6" = "MSH6",
+  "mTOR" = "MTOR",
+  "Myosin-IIa" = "MYH9",
+  "MYH11" = "MYH11",
+  "N-Cadherin" = "CDH2",
+  "N-Ras" = "NRAS",
+  "NF2" = "NF2",
+  "Notch1" = "NOTCH1",
+  "p16_INK4a" = "CDKN2A",
+  "P-Cadherin" = "CDH3",
+  "p21" = "CDKN1A",
+  "p27" = "CDKN1B",
+  "p53" = "TP53",
+  "p70S6K" = "RPS6KB1",
+  "p90RSK" = "RPS6KA1",
+  "PAI-1" = "SERPINE1",
+  "PARP1" = "PARP1",
+  "Paxillin" = "PXN",
+  "PCNA" = "PCNA",
+  "PDCD4" = "PDCD4",
+  "PDK1" = "PDPK1",
+  "PEA15" = "PEA15",
+  "PI3K-p110-alpha" = "PIK3CA",
+  "PI3K-p85" = "PIK3R1",
+  "PKC-alpha" = "PRKCA",
+  "PR" = "PGR",
+  "PRDX1" = "PRDX1",
+  "PREX1" = "PREX1",
+  "PTEN" = "PTEN",
+  "Rab25" = "RAB25",
+  "Rad50" = "RAD50",
+  "Rad51" = "RAD51",
+  "Raptor" = "RPTOR",
+  "Rb" = "RB1",
+  "RBM15" = "RBM15",
+  "Rictor" = "RICTOR",
+  "S6" = "RPS6",
+  "SCD" = "SCD",
+  "SETD2" = "SETD2",
+  "SF2" = "SRSF1",
+  "Smac" = "DIABLO",
+  "Smad1" = "SMAD1",
+  "Smad3" = "SMAD3",
+  "Smad4" = "SMAD4",
+  "Snail" = "SNAI1",
+  "Src" = "SRC",
+  "STAT5-alpha" = "STAT5A",
+  "Stathmin" = "STMN1",
+  "Syk" = "SYK",
+  "TAZ" = "WWTR1",
+  "TFRC" = "TFRC",
+  "TIGAR" = "TIGAR",
+  "TSC1" = "TSC1",
+  "TTF1" = "NKX2-1",
+  "Tuberin" = "TSC2",
+  "VEGFR2" = "KDR",
+  "XBP1" = "XBP1",
+  "XRCC1" = "XRCC1",
+  "YAP" = "YAP1",
+  "YB-1" = "YBX1"
+)
+rppa_gene_map_named <- setNames(
+  unname(rppa_gene_map_named),
+  normalize_rppa_key(names(rppa_gene_map_named))
+)
+
+rppa_dict <- data.frame(
+  protein_key = names(rppa_gene_map_named),
+  gene = unname(rppa_gene_map_named),
+  stringsAsFactors = FALSE
+)
+
+ambiguous_or_pan <- normalize_rppa_key(c(
+  "Akt", "AMPK_alpha", "GSK3-alpha-beta", "GSK3", "HSP70", "JNK",
+  "MAPK", "p38_MAPK", "PKC-pan_BetaII", "Rab11", "cIAP",
+  "Collagen_VI", "Heregulin", "Transglutaminase", "Axl", "ARID1A"
+))
+
+classify_rppa_feature_type <- function(protein_base) {
+  out <- rep("total", length(protein_base))
+  out[grepl("_p[STY][0-9]|_pT|_pS|_pY", protein_base, ignore.case = TRUE)] <- "phospho"
+  out[grepl("cleaved|acetyl", protein_base, ignore.case = TRUE)] <- "modified"
+  out
+}
+
+build_rppa_curated_feature_map <- function(feature_ids, feature_annotation = NULL) {
+  feature_ids <- trimws(as.character(feature_ids))
   protein_label <- feature_ids
 
   if (!is.null(feature_annotation) && nrow(feature_annotation) == length(feature_ids)) {
-    gene_col <- find_column(
-      feature_annotation,
-      c("gene", "Gene", "genes", "Genes", "gene_symbol", "Gene Symbol",
-        "Hugo_Symbol", "HUGO_SYMBOL", "HGNC", "hgnc_symbol")
-    )
     protein_col <- find_column(
       feature_annotation,
       c("protein_label", "Protein", "protein", "antibody", "Antibody",
         "Composite.Element.REF", "feature", "Feature")
     )
-
-    if (!is.null(gene_col)) {
-      gene <- clean_single_gene(feature_annotation[[gene_col]])
-      mapping_source[has_value(gene)] <- paste0("annotation_column:", gene_col)
-    }
 
     if (!is.null(protein_col)) {
       protein_label <- trimws(as.character(feature_annotation[[protein_col]]))
@@ -343,36 +524,36 @@ make_feature_map <- function(feature_ids, feature_annotation = NULL) {
     }
   }
 
-  parsed_gene <- vapply(feature_ids, extract_single_explicit_gene, character(1L))
-  fill_from_feature_id <- !has_value(gene) & has_value(parsed_gene)
-  gene[fill_from_feature_id] <- parsed_gene[fill_from_feature_id]
-  mapping_source[fill_from_feature_id] <- "feature_id_explicit_gene_token"
+  protein_base <- strip_rppa_antibody_suffix(protein_label)
+  protein_key <- normalize_rppa_key(protein_base)
+  gene <- unname(rppa_gene_map_named[protein_key])
+  gene <- clean_single_gene(gene)
 
-  has_explicit_delimiter <- grepl("[|;]", feature_ids) |
-    grepl("\\([A-Z0-9-]{2,20}\\)", feature_ids)
-  has_ambiguous_mapping <- has_explicit_delimiter & !has_value(gene)
+  mapping_class <- rep("unmapped", length(feature_ids))
+  mapping_class[protein_key %in% ambiguous_or_pan] <- "ambiguous_or_pan"
+  mapping_class[has_value(gene)] <- "unique"
 
-  feature_type <- ifelse(
-    grepl("phospho|phosphoryl|_p[A-Z0-9]|-p[A-Z0-9]", feature_ids, ignore.case = TRUE),
-    "phospho",
-    "total_or_other"
+  feature_type <- classify_rppa_feature_type(protein_base)
+  mapping_source <- ifelse(
+    mapping_class == "unique",
+    "curated_rppa_dict",
+    ifelse(mapping_class == "ambiguous_or_pan", "curated_ambiguous_or_pan", NA_character_)
   )
 
-  mapping_class <- ifelse(
-    has_value(gene),
-    "single_explicit_gene",
-    ifelse(has_ambiguous_mapping, "ambiguous_explicit_mapping", "unmapped")
-  )
+  include_in_gene_level_concordance <- has_value(gene) &
+    mapping_class == "unique" &
+    feature_type == "total"
 
   data.frame(
     feature_id = feature_ids,
     protein_label = protein_label,
-    protein_base = sub("[|;].*$", "", protein_label),
+    protein_base = protein_base,
     gene = gene,
     feature_type = feature_type,
     mapping_class = mapping_class,
     mapping_source = mapping_source,
-    eligible_for_rna_protein_concordance = has_value(gene),
+    include_in_gene_level_concordance = include_in_gene_level_concordance,
+    protein_key = protein_key,
     stringsAsFactors = FALSE
   )
 }
@@ -404,8 +585,20 @@ fit_limma_contrast <- function(expr, group, levels, contrast_expr, comparison, r
     row.names = NULL,
     check.names = FALSE
   )
+  out$pvalue <- out$P.Value
   out$padj <- out$adj.P.Val
   out$stat <- out$t
+  out$layer <- "RPPA"
+  out$significant <- !is.na(out$padj) & out$padj < 0.05 & abs(out$logFC) >= 0.20
+  out$direction <- ifelse(
+    out$significant & out$logFC > 0,
+    "ER_positive_up",
+    ifelse(
+      out$significant & out$logFC < 0,
+      "ER_negative_up",
+      "not_significant"
+    )
+  )
   out$comparison <- comparison
   out$reference <- reference
   out$contrast <- contrast_expr
@@ -461,6 +654,28 @@ load_rna_er_shared_sample_ids <- function() {
   colnames(readRDS(rds_path))
 }
 
+load_optional_rna_dea_genes <- function() {
+  object_name <- "brca_rna_dea_er_pos_vs_er_neg"
+  preferred_path <- project_file("data", paste0(object_name, ".rda"))
+
+  if (!file.exists(preferred_path)) {
+    return(character())
+  }
+
+  rna_dea <- load_rda_object(object_name, preferred_path)
+  gene_col <- if ("gene" %in% names(rna_dea)) {
+    "gene"
+  } else if ("gene_symbol" %in% names(rna_dea)) {
+    "gene_symbol"
+  } else if ("gene_id" %in% names(rna_dea)) {
+    "gene_id"
+  } else {
+    return(character())
+  }
+
+  unique(clean_single_gene(rna_dea[[gene_col]]))
+}
+
 require_file(metadata_file, "data/brca_metadata.rda")
 
 if (!requireNamespace("limma", quietly = TRUE)) {
@@ -507,7 +722,7 @@ if (length(missing_metadata_cols) > 0L) {
 rppa_tbl <- read_xena_matrix(rppa_matrix_file)
 rppa_expr <- matrix_from_xena_table(rppa_tbl)
 raw_feature_annotation <- attr(rppa_expr, "feature_annotation")
-raw_feature_map <- make_feature_map(rownames(rppa_expr), raw_feature_annotation)
+raw_feature_map <- build_rppa_curated_feature_map(rownames(rppa_expr), raw_feature_annotation)
 
 if (all(is.na(rppa_expr))) {
   stop("RPPA matrix values could not be converted to numeric values.", call. = FALSE)
@@ -527,6 +742,13 @@ brca_rppa_feature_map <- raw_feature_map[
   drop = FALSE
 ]
 rownames(brca_rppa_feature_map) <- NULL
+
+message("RPPA features: ", nrow(brca_rppa_feature_map))
+message("RPPA features mapped to a gene: ", sum(has_value(brca_rppa_feature_map$gene)))
+message(
+  "RPPA features included in gene-level concordance: ",
+  sum(brca_rppa_feature_map$include_in_gene_level_concordance)
+)
 
 brca_metadata$sample16 <- clean_tcga_barcode(brca_metadata$sample16, level = "sample")
 brca_metadata$sample_code <- tcga_sample_code(brca_metadata$sample16)
@@ -597,13 +819,12 @@ names(brca_rppa_dea_feature_er_pos_vs_er_neg)[
   names(brca_rppa_dea_feature_er_pos_vs_er_neg) == "id"
 ] <- "feature_id"
 
-gene_features <- brca_rppa_feature_map$eligible_for_rna_protein_concordance &
+gene_features <- brca_rppa_feature_map$include_in_gene_level_concordance &
   brca_rppa_feature_map$feature_id %in% rownames(brca_rppa_expr_feature_er_shared)
 
 if (!any(gene_features)) {
   stop(
-    "No RPPA features have explicit single-gene mappings. Gene-level RPPA DEA ",
-    "cannot be created without inventing gene mappings.",
+    "No total RPPA features have unique curated gene mappings for gene-level concordance.",
     call. = FALSE
   )
 }
@@ -625,17 +846,49 @@ if (nrow(brca_rppa_expr_gene_er_shared) == 0L) {
   )
 }
 
-gene_dea <- fit_limma_contrast(
-  expr = brca_rppa_expr_gene_er_shared,
-  group = er_metadata$ER_group,
-  levels = c("ER_negative", "ER_positive"),
-  contrast_expr = "ER_positive - ER_negative",
-  comparison = "ER_positive_vs_ER_negative",
-  reference = "ER_negative"
-)
+gene_dea <- brca_rppa_dea_feature_er_pos_vs_er_neg[
+  brca_rppa_dea_feature_er_pos_vs_er_neg$include_in_gene_level_concordance,
+  ,
+  drop = FALSE
+]
+gene_dea$gene <- clean_single_gene(gene_dea$gene)
+gene_dea <- gene_dea[has_value(gene_dea$gene), , drop = FALSE]
 
-names(gene_dea)[names(gene_dea) == "id"] <- "gene"
-brca_rppa_dea_gene_er_pos_vs_er_neg <- gene_dea
+if (nrow(gene_dea) == 0L) {
+  stop(
+    "No feature-level RPPA DEA rows remain after applying curated gene-level concordance mappings.",
+    call. = FALSE
+  )
+}
+
+ranking_stat <- abs(suppressWarnings(as.numeric(gene_dea$stat)))
+ranking_logfc <- abs(suppressWarnings(as.numeric(gene_dea$logFC)))
+ranking_score <- ifelse(is.na(ranking_stat), ranking_logfc, ranking_stat)
+ranking_score[is.na(ranking_score)] <- -Inf
+gene_dea <- gene_dea[order(gene_dea$gene, -ranking_score), , drop = FALSE]
+brca_rppa_dea_gene_er_pos_vs_er_neg <- gene_dea[
+  !duplicated(gene_dea$gene),
+  ,
+  drop = FALSE
+]
+rownames(brca_rppa_dea_gene_er_pos_vs_er_neg) <- NULL
+
+message("Unique gene-level RPPA rows: ", nrow(brca_rppa_dea_gene_er_pos_vs_er_neg))
+
+rna_dea_genes <- load_optional_rna_dea_genes()
+if (length(rna_dea_genes) > 0L) {
+  shared_rppa_rna_genes <- intersect(brca_rppa_dea_gene_er_pos_vs_er_neg$gene, rna_dea_genes)
+  message("RPPA genes shared with RNA DEA genes: ", length(shared_rppa_rna_genes))
+  message(
+    "First shared RPPA/RNA genes: ",
+    paste(utils::head(shared_rppa_rna_genes, 20L), collapse = ", ")
+  )
+} else {
+  message(
+    "RNA DEA file data/brca_rna_dea_er_pos_vs_er_neg.rda not found; ",
+    "skipping RPPA/RNA shared-gene diagnostic."
+  )
+}
 
 gene_matrix_mb <- compressed_rds_size_mb(brca_rppa_expr_gene_er_shared)
 if (gene_matrix_mb > max_rppa_matrix_data_mb) {
