@@ -1,0 +1,274 @@
+---
+title: "TCGA-BRCA Clinical-Only Modeling"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TCGA-BRCA Clinical-Only Modeling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.align = "center",
+  warning   = FALSE,
+  message   = FALSE
+)
+```
+
+## Dataset provenance
+
+This vignette documents clinical-only TCGA-BRCA modeling examples prepared for
+OmicsKit. The modeling data are derived from real TCGA-BRCA clinical and
+survival inputs:
+
+- `inst/extdata/brca/raw_xena/TCGA.BRCA.sampleMap_BRCA_clinicalMatrix`
+- `inst/extdata/brca/raw_xena/BRCA_survival.txt`
+
+The heavy data preparation and model fitting are performed outside the vignette
+in `data-raw/brca/08_prepare_modeling_objects_brca.R`. This vignette loads
+package-ready objects from `data/` and displays real prerendered figures from
+`vignettes/figures/`.
+
+```{r packages}
+library(OmicsKit)
+```
+
+```{r load_objects}
+data(brca_clinical_modeling_data)
+data(brca_cox_univariable_clinical)
+data(brca_cox_adjusted_clinical)
+data(brca_glm_stage_clinical)
+data(brca_roc_stage_clinical)
+
+list(
+  clinical_rows = nrow(brca_clinical_modeling_data),
+  clinical_columns = ncol(brca_clinical_modeling_data),
+  cox_univariable_rows = nrow(brca_cox_univariable_clinical),
+  cox_adjusted_rows = nrow(brca_cox_adjusted_clinical)
+)
+```
+
+## Clinical-only design
+
+These examples intentionally use clinical variables only. Molecular scores,
+expression principal components, molecular subtype calls, and molecular cluster
+variables are not used in the modeling examples.
+
+For the binary `stage_advanced` GLM/ROC example, stage-defining variables are
+also excluded from the predictor set. In particular, `AJCC_Stage_nature2012`,
+`AJCC_stage_broad`, `pathologic_T`, `pathologic_N`, and `pathologic_M` are not
+used as predictors for `stage_advanced`.
+
+```{r clinical_columns}
+intersect(
+  c(
+    "sample", "patient", "OS", "OS.time", "PFI", "PFI.time",
+    "age_at_initial_pathologic_diagnosis", "age_group",
+    "ER_Status_nature2012", "PR_Status_nature2012",
+    "HER2_Final_Status_nature2012", "AJCC_stage_broad",
+    "stage_advanced", "histological_type", "menopause_status",
+    "radiation_therapy", "history_of_neoadjuvant_treatment"
+  ),
+  names(brca_clinical_modeling_data)
+)
+```
+
+## Survival endpoint
+
+The Cox modeling examples use progression-free interval:
+
+- `PFI.time`: progression-free interval time
+- `PFI`: progression-free interval event indicator
+
+The Kaplan-Meier example below uses overall survival for a simple age-group
+visualization, while the Cox models focus on PFI.
+
+```{r endpoint_summary}
+data.frame(
+  endpoint = c("OS", "PFI"),
+  time_col = c("OS.time", "PFI.time"),
+  n_with_time = c(
+    sum(is.finite(brca_clinical_modeling_data$OS.time)),
+    sum(is.finite(brca_clinical_modeling_data$PFI.time))
+  ),
+  n_events = c(
+    sum(brca_clinical_modeling_data$OS == 1, na.rm = TRUE),
+    sum(brca_clinical_modeling_data$PFI == 1, na.rm = TRUE)
+  )
+)
+```
+
+## nice_KM with age_group or ER clinical status
+
+`nice_KM()` renders Kaplan-Meier curves for a grouping variable and a survival
+endpoint. The prepared BRCA figure uses clinical `age_group` with `OS.time` and
+`OS`.
+
+```{r nice_km_age_call, eval = FALSE}
+nice_KM(
+  data = brca_clinical_modeling_data,
+  gene = "age_group",
+  time_var = "OS.time",
+  event_var = "OS",
+  title_prefix = "",
+  conf_int = TRUE,
+  risk_table = FALSE
+)
+```
+
+```{r km_age_figure, echo = FALSE, fig.cap = "Clinical-only Kaplan-Meier example for TCGA-BRCA age group using overall survival.", fig.width = 7, fig.height = 5}
+knitr::include_graphics("figures/brca_km_age_OS.png")
+```
+
+If `ER_Status_nature2012` has enough samples and events in the prepared
+clinical data, the same function can be used with PFI:
+
+```{r nice_km_er_call, eval = FALSE}
+nice_KM(
+  data = brca_clinical_modeling_data,
+  gene = "ER_Status_nature2012",
+  time_var = "PFI.time",
+  event_var = "PFI",
+  title_prefix = ""
+)
+```
+
+## get_cox clinical-only
+
+`get_cox()` fits univariable, multivariable, or adjusted Cox proportional
+hazards models and returns tidy tables ready for downstream plotting. The
+prepared BRCA Cox examples use PFI as the outcome and clinical-only candidate
+variables.
+
+```{r get_cox_call, eval = FALSE}
+clinical_cox_vars <- c(
+  "age_at_initial_pathologic_diagnosis",
+  "age_group",
+  "ER_Status_nature2012",
+  "PR_Status_nature2012",
+  "HER2_Final_Status_nature2012",
+  "AJCC_stage_broad",
+  "pathologic_T",
+  "pathologic_N",
+  "pathologic_M",
+  "histological_type",
+  "menopause_status",
+  "radiation_therapy",
+  "history_of_neoadjuvant_treatment"
+)
+
+brca_cox_univariable_clinical <- get_cox(
+  data = brca_clinical_modeling_data,
+  time_col = "PFI.time",
+  event_col = "PFI",
+  vars = clinical_cox_vars,
+  model = "univariable"
+)
+
+brca_cox_adjusted_clinical <- get_cox(
+  data = brca_clinical_modeling_data,
+  time_col = "PFI.time",
+  event_col = "PFI",
+  vars = clinical_cox_vars,
+  model = "adjusted",
+  adjust_vars = c("age_at_initial_pathologic_diagnosis", "AJCC_stage_broad")
+)
+```
+
+```{r cox_preview}
+head(brca_cox_univariable_clinical)
+```
+
+## nice_forest clinical-only
+
+`nice_forest()` visualizes the tidy Cox output from `get_cox()`. The figure
+below is prerendered from the prepared clinical-only Cox object.
+
+```{r nice_forest_call, eval = FALSE}
+nice_forest(
+  brca_cox_adjusted_clinical,
+  title = "TCGA-BRCA clinical Cox model for PFI",
+  sort_by = "p.value"
+)
+```
+
+```{r forest_figure, echo = FALSE, fig.cap = "Clinical-only Cox model forest plot for TCGA-BRCA progression-free interval.", fig.width = 8, fig.height = 6}
+knitr::include_graphics("figures/brca_forest_cox_clinical_pfi.png")
+```
+
+## GLM stage_advanced prediction
+
+The GLM example predicts `stage_advanced`, where:
+
+- `0` means Stage I-II
+- `1` means Stage III-IV
+
+The model uses a 60/40 train/test split with `set.seed(2025)` and clinical
+predictors only. It does not use AJCC stage, broad AJCC stage, pathologic T,
+pathologic N, or pathologic M as predictors because those variables define or
+closely encode the outcome.
+
+```{r glm_call, eval = FALSE}
+clinical_glm_predictors <- c(
+  "age_at_initial_pathologic_diagnosis",
+  "ER_Status_nature2012",
+  "PR_Status_nature2012",
+  "HER2_Final_Status_nature2012",
+  "histological_type",
+  "menopause_status"
+)
+
+brca_glm_stage_clinical <- get_glm(
+  data = brca_glm_stage_train,
+  outcome = "stage_advanced",
+  predictors = clinical_glm_predictors,
+  family = "binomial"
+)
+```
+
+```{r glm_preview}
+brca_glm_stage_clinical
+```
+
+## nice_ROC clinical-only
+
+`nice_ROC()` evaluates the clinical-only GLM on held-out test data and renders
+the ROC curve with AUC. The object `brca_roc_stage_clinical` contains the
+prepared ROC result; the figure below is prerendered from that object.
+
+```{r roc_call, eval = FALSE}
+nice_ROC(
+  models = list("Clinical only" = clinical_glm_fit),
+  data = brca_glm_stage_test,
+  outcome = "stage_advanced",
+  show_delong = FALSE,
+  return_data = TRUE
+)
+```
+
+```{r roc_summary}
+if (is.list(brca_roc_stage_clinical) &&
+    "auc_table" %in% names(brca_roc_stage_clinical)) {
+  brca_roc_stage_clinical$auc_table
+} else {
+  brca_roc_stage_clinical
+}
+```
+
+```{r roc_figure, echo = FALSE, fig.cap = "Clinical-only ROC curve for TCGA-BRCA advanced-stage prediction.", fig.width = 7, fig.height = 5}
+knitr::include_graphics("figures/brca_roc_stage_clinical.png")
+```
+
+## Reproducibility
+
+All model objects shown here are generated by
+`data-raw/brca/08_prepare_modeling_objects_brca.R`, and all figures are
+generated by `data-raw/brca/09_render_brca_figures.R`. This vignette is a
+lightweight documentation layer and does not rerun heavy model fitting by
+default.
+
+```{r session_info}
+sessionInfo()
+```
