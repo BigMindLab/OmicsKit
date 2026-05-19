@@ -47,6 +47,42 @@ require_file <- function(path, label) {
   }
 }
 
+has_value <- function(x) {
+  y <- trimws(as.character(x))
+  !is.na(y) &
+    nzchar(y) &
+    !(tolower(y) %in% c(
+      "na", "n/a", "nan", "null", "none", "unknown", "not available",
+      "not reported", "not applicable", "[not available]",
+      "[not applicable]", "[unknown]", "--"
+    ))
+}
+
+clean_tcga_barcode <- function(x, level = c("sample", "patient")) {
+  level <- match.arg(level)
+  y <- toupper(trimws(as.character(x)))
+  y <- gsub("\\.", "-", y)
+  y[!has_value(y)] <- NA_character_
+
+  if (identical(level, "patient")) {
+    return(ifelse(!is.na(y) & nchar(y) >= 12L, substr(y, 1L, 12L), NA_character_))
+  }
+
+  sample_match <- regexpr(
+    "^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}-[0-9]{2}",
+    y,
+    perl = TRUE
+  )
+  out <- rep(NA_character_, length(y))
+  matched <- !is.na(y) & sample_match > 0L
+  out[matched] <- substr(
+    y[matched],
+    sample_match[matched],
+    sample_match[matched] + attr(sample_match, "match.length")[matched] - 1L
+  )
+  out
+}
+
 load_rda_object <- function(object_name, path) {
   env <- new.env(parent = emptyenv())
   load(path, envir = env)
@@ -170,6 +206,23 @@ standardize_matrix <- function(mat, label) {
     stop(label, " matrix contains no numeric values.", call. = FALSE)
   }
 
+  sample_ids <- clean_tcga_barcode(colnames(mat), level = "sample")
+  if (any(!has_value(sample_ids))) {
+    stop(
+      label,
+      " matrix columns must be TCGA sample barcodes such as TCGA-A1-A0SH-01.",
+      call. = FALSE
+    )
+  }
+  if (anyDuplicated(sample_ids) > 0L) {
+    stop(
+      label,
+      " matrix has duplicated TCGA sample barcodes after cleaning; rerun the source data-raw script so duplicate columns are collapsed.",
+      call. = FALSE
+    )
+  }
+  colnames(mat) <- sample_ids
+
   mat
 }
 
@@ -219,6 +272,17 @@ if (length(shared_genes) < 2L) {
     call. = FALSE
   )
 }
+
+shared_samples <- intersect(colnames(rna_expr), colnames(rppa_expr))
+if (length(shared_samples) == 0L) {
+  stop(
+    "No shared TCGA sample barcodes between RNA and RPPA expression matrices.",
+    call. = FALSE
+  )
+}
+
+rna_expr <- rna_expr[shared_genes, shared_samples, drop = FALSE]
+rppa_expr <- rppa_expr[shared_genes, shared_samples, drop = FALSE]
 
 top_n <- min(length(shared_genes), 146L)
 

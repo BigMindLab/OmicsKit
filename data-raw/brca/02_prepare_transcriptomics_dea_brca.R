@@ -33,7 +33,6 @@ options(stringsAsFactors = FALSE)
 min_expr <- 1
 min_prop_samples <- 0.10
 small_matrix_n_genes <- 1000
-max_full_matrix_data_mb <- 25
 
 project_file <- function(...) {
   if (requireNamespace("here", quietly = TRUE)) {
@@ -105,11 +104,19 @@ clean_tcga_barcode <- function(x, level = c("sample", "patient")) {
     return(ifelse(!is.na(y) & nchar(y) >= 12L, substr(y, 1L, 12L), NA_character_))
   }
 
-  ifelse(
-    !is.na(y) & nchar(y) >= 16L,
-    substr(y, 1L, 16L),
-    ifelse(!is.na(y) & nchar(y) >= 15L, substr(y, 1L, 15L), NA_character_)
+  sample_match <- regexpr(
+    "^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}-[0-9]{2}",
+    y,
+    perl = TRUE
   )
+  out <- rep(NA_character_, length(y))
+  matched <- !is.na(y) & sample_match > 0L
+  out[matched] <- substr(
+    y[matched],
+    sample_match[matched],
+    sample_match[matched] + attr(sample_match, "match.length")[matched] - 1L
+  )
+  out
 }
 
 tcga_sample_code <- function(x) {
@@ -237,7 +244,7 @@ if (!exists("brca_metadata")) {
 }
 
 required_metadata_cols <- c(
-  "sample16", "patient", "sample_code", "tumor_normal", "ER_group"
+  "sample16", "patient", "sample_code", "sample_type", "tumor_normal", "ER_group"
 )
 missing_metadata_cols <- setdiff(required_metadata_cols, names(brca_metadata))
 if (length(missing_metadata_cols) > 0L) {
@@ -288,28 +295,21 @@ message(
   nrow(rna_expr), " genes x ", ncol(rna_expr), " samples"
 )
 
-brca_metadata$sample_code <- normalize_sample_code(brca_metadata$sample_code)
+brca_metadata$sample16 <- clean_tcga_barcode(brca_metadata$sample16, level = "sample")
+brca_metadata$sample_code <- tcga_sample_code(brca_metadata$sample16)
+brca_metadata$rna_sample16 <- brca_metadata$sample16
 
-if ("RNA_genomic_id" %in% names(brca_metadata)) {
-  brca_metadata$rna_sample16 <- clean_tcga_barcode(
-    brca_metadata$RNA_genomic_id,
-    level = "sample"
-  )
-  missing_rna_id <- !has_value(brca_metadata$RNA_genomic_id)
-  brca_metadata$rna_sample16[missing_rna_id] <- clean_tcga_barcode(
-    brca_metadata$sample16[missing_rna_id],
-    level = "sample"
-  )
-} else {
-  warning(
-    "RNA_genomic_id is missing from brca_metadata; matching RNA samples by sample16.",
-    call. = FALSE
-  )
-  brca_metadata$rna_sample16 <- clean_tcga_barcode(brca_metadata$sample16, level = "sample")
+brca_metadata <- brca_metadata[has_value(brca_metadata$sample16), , drop = FALSE]
+brca_metadata <- brca_metadata[!duplicated(brca_metadata$sample16), , drop = FALSE]
+
+format_table_for_stop <- function(x) {
+  paste(capture.output(print(x)), collapse = "\n")
 }
 
-brca_metadata <- brca_metadata[has_value(brca_metadata$rna_sample16), , drop = FALSE]
-brca_metadata <- brca_metadata[!duplicated(brca_metadata$rna_sample16), , drop = FALSE]
+rna_match_count <- sum(colnames(rna_expr) %in% brca_metadata$sample16)
+
+message("RNA matrix columns: ", ncol(rna_expr))
+message("RNA columns matching brca_metadata$sample16: ", rna_match_count)
 
 make_matched_metadata <- function(metadata, expr, sample_ids) {
   metadata <- metadata[metadata$rna_sample16 %in% sample_ids, , drop = FALSE]
@@ -318,13 +318,30 @@ make_matched_metadata <- function(metadata, expr, sample_ids) {
   metadata
 }
 
+stop_no_rna_samples <- function(comparison, filter_description) {
+  stop(
+    "No RNA-seq samples are available for ", comparison, " after ",
+    filter_description, ".\n",
+    "Diagnostics:\n",
+    "- ncol(rna_mat): ", ncol(rna_expr), "\n",
+    "- sum(colnames(rna_mat) %in% brca_metadata$sample16): ", rna_match_count, "\n",
+    "- table(brca_metadata$ER_group, useNA = \"ifany\"):\n",
+    format_table_for_stop(table(brca_metadata$ER_group, useNA = "ifany")), "\n",
+    "- table(brca_metadata$sample_type, useNA = \"ifany\"):\n",
+    format_table_for_stop(table(brca_metadata$sample_type, useNA = "ifany")), "\n",
+    "- table(brca_metadata$tumor_normal, useNA = \"ifany\"):\n",
+    format_table_for_stop(table(brca_metadata$tumor_normal, useNA = "ifany")),
+    call. = FALSE
+  )
+}
+
 ## Comparison A: ER_positive vs ER_negative, primary tumor only.
-er_keep <- brca_metadata$sample_code == "01" &
-  brca_metadata$ER_group %in% c("ER_negative", "ER_positive") &
-  brca_metadata$rna_sample16 %in% colnames(rna_expr)
+er_keep_before_rna <- brca_metadata$sample_type == "Primary Tumor" &
+  brca_metadata$sample_code == "01" &
+  brca_metadata$ER_group %in% c("ER_negative", "ER_positive")
 
 if ("RPPA_genomic_id" %in% names(brca_metadata)) {
-  er_keep <- er_keep & has_value(brca_metadata$RPPA_genomic_id)
+  er_keep_before_rna <- er_keep_before_rna & has_value(brca_metadata$RPPA_genomic_id)
 } else {
   warning(
     "RPPA_genomic_id is missing from brca_metadata; ER RNA subset cannot be restricted to RNA/RPPA-shared samples.",
@@ -332,11 +349,20 @@ if ("RPPA_genomic_id" %in% names(brca_metadata)) {
   )
 }
 
+message("ER group distribution before RNA matching:")
+print(table(brca_metadata$ER_group[er_keep_before_rna], useNA = "ifany"))
+
+er_keep <- er_keep_before_rna &
+  brca_metadata$rna_sample16 %in% colnames(rna_expr)
+
+message("ER group distribution after RNA matching:")
+print(table(brca_metadata$ER_group[er_keep], useNA = "ifany"))
+
 er_sample_ids <- brca_metadata$rna_sample16[er_keep]
 if (length(er_sample_ids) == 0L) {
-  stop(
-    "No RNA-seq samples are available for ER_positive vs ER_negative after applying primary tumor, ER_group, RNA, and RPPA-sharing filters.",
-    call. = FALSE
+  stop_no_rna_samples(
+    comparison = "ER_positive vs ER_negative",
+    filter_description = "applying Primary Tumor, sample_code == \"01\", ER_group, RPPA availability, and RNA sample16 matching filters"
   )
 }
 
@@ -370,18 +396,26 @@ brca_rna_dea_er_pos_vs_er_neg <- fit_limma_contrast(
 )
 
 ## Comparison B: Tumor vs Normal, RNA-seq only.
-tumor_normal_group <- brca_metadata$tumor_normal
-tumor_normal_group[is.na(tumor_normal_group) & brca_metadata$sample_code %in% sprintf("%02d", 1:9)] <- "Tumor"
-tumor_normal_group[is.na(tumor_normal_group) & brca_metadata$sample_code %in% sprintf("%02d", 10:19)] <- "Normal"
+tumor_normal_group <- rep(NA_character_, nrow(brca_metadata))
+tumor_normal_group[brca_metadata$sample_type == "Primary Tumor"] <- "Tumor"
+tumor_normal_group[brca_metadata$sample_type == "Solid Tissue Normal"] <- "Normal"
 
-tn_keep <- tumor_normal_group %in% c("Normal", "Tumor") &
+tn_keep_before_rna <- tumor_normal_group %in% c("Normal", "Tumor")
+
+message("Tumor/Normal distribution before RNA matching:")
+print(table(tumor_normal_group[tn_keep_before_rna], useNA = "ifany"))
+
+tn_keep <- tn_keep_before_rna &
   brca_metadata$rna_sample16 %in% colnames(rna_expr)
+
+message("Tumor/Normal distribution after RNA matching:")
+print(table(tumor_normal_group[tn_keep], useNA = "ifany"))
 
 tn_sample_ids <- brca_metadata$rna_sample16[tn_keep]
 if (length(tn_sample_ids) == 0L) {
-  stop(
-    "No RNA-seq samples are available for Tumor vs Normal after matching brca_metadata to the expression matrix.",
-    call. = FALSE
+  stop_no_rna_samples(
+    comparison = "Tumor vs Normal",
+    filter_description = "applying Primary Tumor/Solid Tissue Normal and RNA sample16 matching filters"
   )
 }
 
@@ -455,40 +489,18 @@ saveRDS(
 
 er_matrix_mb <- compressed_rds_size_mb(brca_rna_expr_er_shared_filtered)
 tn_matrix_mb <- compressed_rds_size_mb(brca_rna_expr_tumor_normal_filtered)
-save_full_matrices_to_data <- er_matrix_mb <= max_full_matrix_data_mb &&
-  tn_matrix_mb <= max_full_matrix_data_mb
 
-if (save_full_matrices_to_data) {
-  usethis::use_data(
-    brca_rna_dea_er_pos_vs_er_neg,
-    brca_rna_dea_tumor_vs_normal,
-    brca_rna_expr_er_shared_filtered,
-    brca_rna_expr_tumor_normal_filtered,
-    brca_rna_metadata_er_shared,
-    brca_rna_metadata_tumor_normal,
-    brca_rna_vst_or_logexpr_small,
-    compress = "xz",
-    overwrite = TRUE
-  )
-} else {
-  warning(
-    "Full filtered RNA matrices are larger than ",
-    max_full_matrix_data_mb,
-    " MB compressed and were not saved into data/. ",
-    "They were written as RDS files under inst/extdata/brca/intermediate/.",
-    call. = FALSE
-  )
-
-  usethis::use_data(
-    brca_rna_dea_er_pos_vs_er_neg,
-    brca_rna_dea_tumor_vs_normal,
-    brca_rna_metadata_er_shared,
-    brca_rna_metadata_tumor_normal,
-    brca_rna_vst_or_logexpr_small,
-    compress = "xz",
-    overwrite = TRUE
-  )
-}
+usethis::use_data(
+  brca_rna_dea_er_pos_vs_er_neg,
+  brca_rna_dea_tumor_vs_normal,
+  brca_rna_expr_er_shared_filtered,
+  brca_rna_expr_tumor_normal_filtered,
+  brca_rna_metadata_er_shared,
+  brca_rna_metadata_tumor_normal,
+  brca_rna_vst_or_logexpr_small,
+  compress = "xz",
+  overwrite = TRUE
+)
 
 message("Saved RNA-seq DEA TSV files to inst/extdata/brca/intermediate/.")
 message("Saved filtered RNA-seq expression RDS files to inst/extdata/brca/intermediate/.")

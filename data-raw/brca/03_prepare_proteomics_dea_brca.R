@@ -7,6 +7,8 @@
 ## Inputs:
 ##   - inst/extdata/brca/raw_xena/[RPPA matrix file]
 ##   - data/brca_metadata.rda
+##   - data/brca_rna_expr_er_shared_filtered.rda or
+##     inst/extdata/brca/intermediate/expr_RNAseq_ERpositive_vs_ERnegative_filtered.rds
 ##
 ## Outputs:
 ##   Package objects:
@@ -79,11 +81,19 @@ clean_tcga_barcode <- function(x, level = c("sample", "patient")) {
     return(ifelse(!is.na(y) & nchar(y) >= 12L, substr(y, 1L, 12L), NA_character_))
   }
 
-  ifelse(
-    !is.na(y) & nchar(y) >= 16L,
-    substr(y, 1L, 16L),
-    ifelse(!is.na(y) & nchar(y) >= 15L, substr(y, 1L, 15L), NA_character_)
+  sample_match <- regexpr(
+    "^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}-[0-9]{2}",
+    y,
+    perl = TRUE
   )
+  out <- rep(NA_character_, length(y))
+  matched <- !is.na(y) & sample_match > 0L
+  out[matched] <- substr(
+    y[matched],
+    sample_match[matched],
+    sample_match[matched] + attr(sample_match, "match.length")[matched] - 1L
+  )
+  out
 }
 
 tcga_sample_code <- function(x) {
@@ -410,6 +420,47 @@ compressed_rds_size_mb <- function(object) {
   file.info(temp_file)$size / 1024^2
 }
 
+load_rda_object <- function(object_name, path) {
+  env <- new.env(parent = emptyenv())
+  load(path, envir = env)
+
+  if (!exists(object_name, envir = env, inherits = FALSE)) {
+    stop(
+      "File does not contain expected object `", object_name, "`: ",
+      normalizePath(path, mustWork = FALSE),
+      call. = FALSE
+    )
+  }
+
+  get(object_name, envir = env, inherits = FALSE)
+}
+
+load_rna_er_shared_sample_ids <- function() {
+  object_name <- "brca_rna_expr_er_shared_filtered"
+  preferred_path <- project_file("data", paste0(object_name, ".rda"))
+
+  if (file.exists(preferred_path)) {
+    return(colnames(load_rda_object(object_name, preferred_path)))
+  }
+
+  data_dir <- project_file("data")
+  all_rda <- list.files(data_dir, pattern = "\\.rda$", full.names = TRUE)
+  for (path in all_rda) {
+    env <- new.env(parent = emptyenv())
+    load(path, envir = env)
+    if (exists(object_name, envir = env, inherits = FALSE)) {
+      return(colnames(get(object_name, envir = env, inherits = FALSE)))
+    }
+  }
+
+  rds_path <- file.path(
+    intermediate_dir,
+    "expr_RNAseq_ERpositive_vs_ERnegative_filtered.rds"
+  )
+  require_file(rds_path, "expr_RNAseq_ERpositive_vs_ERnegative_filtered.rds")
+  colnames(readRDS(rds_path))
+}
+
 require_file(metadata_file, "data/brca_metadata.rda")
 
 if (!requireNamespace("limma", quietly = TRUE)) {
@@ -442,7 +493,7 @@ if (!exists("brca_metadata")) {
 }
 
 required_metadata_cols <- c(
-  "sample16", "sample_code", "ER_group", "RNA_genomic_id", "RPPA_genomic_id"
+  "sample16", "sample_code", "sample_type", "ER_group"
 )
 missing_metadata_cols <- setdiff(required_metadata_cols, names(brca_metadata))
 if (length(missing_metadata_cols) > 0L) {
@@ -468,6 +519,8 @@ rppa_expr <- collapse_duplicate_columns_by_mean(
   clean_tcga_barcode(colnames(rppa_expr), level = "sample")
 )
 
+message("RPPA matrix columns after TCGA barcode cleaning: ", ncol(rppa_expr))
+
 brca_rppa_feature_map <- raw_feature_map[
   match(rownames(rppa_expr), raw_feature_map$feature_id),
   ,
@@ -475,14 +528,29 @@ brca_rppa_feature_map <- raw_feature_map[
 ]
 rownames(brca_rppa_feature_map) <- NULL
 
-brca_metadata$sample_code <- normalize_sample_code(brca_metadata$sample_code)
-brca_metadata$rna_sample16 <- clean_tcga_barcode(brca_metadata$RNA_genomic_id, level = "sample")
-brca_metadata$rppa_sample16 <- clean_tcga_barcode(brca_metadata$RPPA_genomic_id, level = "sample")
+brca_metadata$sample16 <- clean_tcga_barcode(brca_metadata$sample16, level = "sample")
+brca_metadata$sample_code <- tcga_sample_code(brca_metadata$sample16)
+brca_metadata$rppa_sample16 <- brca_metadata$sample16
+brca_metadata <- brca_metadata[has_value(brca_metadata$sample16), , drop = FALSE]
+brca_metadata <- brca_metadata[!duplicated(brca_metadata$sample16), , drop = FALSE]
 
-er_keep <- brca_metadata$sample_code == "01" &
+rna_er_sample_ids <- clean_tcga_barcode(load_rna_er_shared_sample_ids(), level = "sample")
+rna_er_sample_ids <- rna_er_sample_ids[has_value(rna_er_sample_ids)]
+
+message(
+  "RPPA columns matching brca_metadata$sample16: ",
+  sum(colnames(rppa_expr) %in% brca_metadata$sample16)
+)
+message(
+  "RPPA columns shared with RNA ER expression samples: ",
+  sum(colnames(rppa_expr) %in% rna_er_sample_ids)
+)
+
+er_keep <- brca_metadata$sample_type == "Primary Tumor" &
+  brca_metadata$sample_code == "01" &
   brca_metadata$ER_group %in% c("ER_negative", "ER_positive") &
-  has_value(brca_metadata$rna_sample16) &
   has_value(brca_metadata$rppa_sample16) &
+  brca_metadata$rppa_sample16 %in% rna_er_sample_ids &
   brca_metadata$rppa_sample16 %in% colnames(rppa_expr)
 
 er_metadata <- brca_metadata[er_keep, , drop = FALSE]
@@ -490,7 +558,7 @@ er_metadata <- er_metadata[!duplicated(er_metadata$rppa_sample16), , drop = FALS
 
 if (nrow(er_metadata) == 0L) {
   stop(
-    "No RPPA samples are available for ER_positive vs ER_negative after applying primary tumor, ER_group, and RNA+RPPA sharing filters.",
+    "No RPPA samples are available for ER_positive vs ER_negative after applying Primary Tumor, sample_code == \"01\", ER_group, RPPA sample16 matching, and RNA+RPPA sharing filters.",
     call. = FALSE
   )
 }
