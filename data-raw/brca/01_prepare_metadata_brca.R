@@ -59,17 +59,39 @@ has_value <- function(x) {
 
 clean_tcga_barcode <- function(x, level = c("sample", "patient")) {
   level <- match.arg(level)
+
   y <- toupper(trimws(as.character(x)))
   y <- gsub("\\.", "-", y)
   y[!has_value(y)] <- NA_character_
 
-  n_chars <- if (identical(level, "sample")) 16L else 12L
-  ifelse(!is.na(y) & nchar(y) >= n_chars, substr(y, 1L, n_chars), NA_character_)
+  out <- rep(NA_character_, length(y))
+
+  if (identical(level, "patient")) {
+    hit <- regexpr("^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}", y)
+    ok <- !is.na(y) & hit > 0
+    out[ok] <- regmatches(y, hit)[ok]
+    return(out)
+  }
+
+  # TCGA sample-level barcode:
+  # TCGA-XX-XXXX-01 or TCGA-XX-XXXX-01A
+  # We keep the 15-character form TCGA-XX-XXXX-01,
+  # because Xena clinicalMatrix commonly uses that format.
+  hit <- regexpr("^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}-[0-9]{2}", y)
+  ok <- !is.na(y) & hit > 0
+  out[ok] <- regmatches(y, hit)[ok]
+
+  out
 }
 
 tcga_sample_code <- function(x) {
   y <- clean_tcga_barcode(x, level = "sample")
-  ifelse(!is.na(y) & nchar(y) >= 15L, substr(y, 14L, 15L), NA_character_)
+  out <- rep(NA_character_, length(y))
+
+  ok <- !is.na(y)
+  out[ok] <- substr(y[ok], 14L, 15L)
+
+  out
 }
 
 make_er_group <- function(x) {
@@ -179,7 +201,14 @@ survival <- read_xena_table(survival_file)
 
 clinical_id_col <- get_required_column(
   clinical,
-  candidates = c("sampleID", "sample", "Samples", "Sample", "ID"),
+  candidates = c(
+    "sampleID",
+    "bcr_sample_barcode",
+    "sample",
+    "Samples",
+    "Sample",
+    "ID"
+  ),
   label = "clinical sample identifier",
   source_file = clinical_file
 )
@@ -243,8 +272,23 @@ age_col <- get_required_column(
   source_file = clinical_file
 )
 
-rna_genomic_candidates <- c("RNA_genomic_id", "RNA genomic id", "RNAseq_genomic_id")
-rppa_genomic_candidates <- c("RPPA_genomic_id", "RPPA genomic id")
+rna_genomic_candidates <- c(
+  "RNA_genomic_id",
+  "RNA genomic id",
+  "RNAseq_genomic_id",
+  "_GENOMIC_ID_TCGA_BRCA_exp_HiSeqV2",
+  "_GENOMIC_ID_TCGA_BRCA_exp_HiSeqV2_percentile",
+  "_GENOMIC_ID_TCGA_BRCA_exp_HiSeqV2_PANCAN",
+  "_GENOMIC_ID_TCGA_BRCA_exp_HiSeqV2_exon",
+  "_GENOMIC_ID_TCGA_BRCA_PDMRNAseq"
+)
+
+rppa_genomic_candidates <- c(
+  "RPPA_genomic_id",
+  "RPPA genomic id",
+  "_GENOMIC_ID_TCGA_BRCA_RPPA",
+  "_GENOMIC_ID_TCGA_BRCA_RPPA_RBN"
+)
 
 rna_genomic_col <- find_column(clinical, rna_genomic_candidates)
 rppa_genomic_col <- find_column(clinical, rppa_genomic_candidates)
@@ -277,24 +321,49 @@ pfi_time_col <- get_required_column(
   source_file = survival_file
 )
 
-sample16 <- clean_tcga_barcode(clinical[[clinical_id_col]], level = "sample")
+clinical_id_raw <- clean_text(clinical[[clinical_id_col]])
 
-if (!is.null(rna_genomic_col)) {
-  rna_sample16 <- clean_tcga_barcode(clinical[[rna_genomic_col]], level = "sample")
-  sample16 <- ifelse(is.na(sample16), rna_sample16, sample16)
+sample16_from_clinical <- clean_tcga_barcode(clinical_id_raw, level = "sample")
+patient_from_clinical  <- clean_tcga_barcode(clinical_id_raw, level = "patient")
+
+rna_sample16 <- if (!is.null(rna_genomic_col)) {
+  clean_tcga_barcode(clinical[[rna_genomic_col]], level = "sample")
+} else {
+  rep(NA_character_, nrow(clinical))
 }
 
-if (!is.null(rppa_genomic_col)) {
-  rppa_sample16 <- clean_tcga_barcode(clinical[[rppa_genomic_col]], level = "sample")
-  sample16 <- ifelse(is.na(sample16), rppa_sample16, sample16)
+rppa_sample16 <- if (!is.null(rppa_genomic_col)) {
+  clean_tcga_barcode(clinical[[rppa_genomic_col]], level = "sample")
+} else {
+  rep(NA_character_, nrow(clinical))
 }
 
-patient <- clean_tcga_barcode(clinical[[clinical_id_col]], level = "patient")
+# Prefer the clinical sample barcode if available.
+# If the clinical table is patient-level or incomplete, fall back to RNA/RPPA IDs.
+sample16 <- sample16_from_clinical
+
+# Only use genomic ID columns as fallback if they actually contain TCGA barcodes.
+# In TCGA-BRCA Xena, RNA genomic IDs may be UUIDs, so they must not overwrite
+# sample-level TCGA barcodes.
+sample16 <- ifelse(
+  is.na(sample16) & grepl("^TCGA-", rna_sample16),
+  rna_sample16,
+  sample16
+)
+
+sample16 <- ifelse(
+  is.na(sample16) & grepl("^TCGA-", rppa_sample16),
+  rppa_sample16,
+  sample16
+)
+
+patient <- patient_from_clinical
 patient <- ifelse(is.na(patient), clean_tcga_barcode(sample16, level = "patient"), patient)
+
 sample_code <- tcga_sample_code(sample16)
 
 brca_metadata <- data.frame(
-  sampleID = sample16,
+  sampleID =  clinical_id_raw,
   sample16 = sample16,
   patient = patient,
   sample_code = sample_code,
@@ -342,9 +411,18 @@ for (output_name in names(optional_columns)) {
 }
 
 if (any(is.na(brca_metadata$sampleID))) {
-  stop(
-    "Some clinical rows do not contain a valid TCGA sample barcode in column: ",
+  warning(
+    "Some clinical rows have missing sampleID values in column: ",
     clinical_id_col,
+    call. = FALSE
+  )
+}
+
+if (any(is.na(brca_metadata$sample16))) {
+  warning(
+    "Some clinical rows do not have sample-level TCGA barcodes. ",
+    "This is acceptable for patient-level clinical modeling, but DEA/RPPA scripts ",
+    "must filter to rows with non-missing sample16.",
     call. = FALSE
   )
 }
