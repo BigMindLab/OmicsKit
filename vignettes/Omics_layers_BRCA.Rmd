@@ -1,0 +1,269 @@
+---
+title: "TCGA-BRCA Omics-Layer Visualization and Concordance"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TCGA-BRCA Omics-Layer Visualization and Concordance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.align = "center",
+  warning   = FALSE,
+  message   = FALSE
+)
+```
+
+## Why sample TCGA-A1-A0SH-01 was selected
+
+This vignette demonstrates OmicsKit functions for multi-omics genomic tracks,
+circos visualization, and RNA-RPPA concordance using real TCGA-BRCA-derived
+example data.
+
+The sample `TCGA-A1-A0SH-01` was selected because it has the layers needed for
+a compact multi-omics track example: RNA-seq expression, SNP6 copy-number
+segments, HumanMethylation450 beta values, and MC3 mutation calls. It is also
+documented in the prepared object notes as carrying a BRCA1 nonsense mutation,
+`p.Q934*`, making the BRCA1 region useful for an interpretable track example.
+
+The heavy layer preparation is done in `data-raw/brca/07_prepare_omics_layer_objects_brca.R`.
+This vignette does not regenerate BigWig or BED files.
+
+```{r packages}
+library(OmicsKit)
+```
+
+```{r load_objects}
+data(brca_omics_layer_tracks)
+data(brca_concordance_rna_rppa_er)
+data(brca_crosslayercorr_rna_rppa_er)
+
+brca_omics_layer_tracks$sample_id
+brca_omics_layer_tracks$genome_build
+brca_omics_layer_tracks$brca1_region_hg38
+```
+
+## BRCA1 region and available omics layers
+
+The main genomic window is the BRCA1 region in hg38. The track files stored in
+`inst/extdata/brca/omics_layers/` are project/package assets prepared from real
+TCGA-BRCA inputs and are referenced with `system.file()` when used from an
+installed package.
+
+```{r track_inventory}
+track_files <- unlist(brca_omics_layer_tracks$track_files)
+
+data.frame(
+  track = names(track_files),
+  file = basename(track_files),
+  stringsAsFactors = FALSE
+)
+```
+
+```{r system_file_paths, eval = FALSE}
+rna_bw <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_rna_expr_hg38.bw",
+  package = "OmicsKit"
+)
+cnv_bw <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_cnv_hg38.bw",
+  package = "OmicsKit"
+)
+cnv_bed <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_cnv_hg38.bed",
+  package = "OmicsKit"
+)
+methyl_brca1_bw <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_methyl_brca1_hg38.bw",
+  package = "OmicsKit"
+)
+mutation_bed <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_mutations_brca1_hg38.bed",
+  package = "OmicsKit"
+)
+```
+
+## nice_GenomeTrack()
+
+`nice_GenomeTrack()` renders a regional genomic view with a coordinate axis,
+gene annotation, and optional data tracks. For this example, RNA-seq, CNV,
+methylation 450k, and mutation tracks are shown around BRCA1.
+
+The example call below uses `system.file()` to resolve package-installed files.
+It is marked `eval = FALSE` because reading BigWig/BED tracks and rendering
+Gviz tracks is heavier than a normal vignette build should be.
+
+```{r nice_genometrack_call, eval = FALSE}
+brca1_region <- brca_omics_layer_tracks$brca1_region_hg38
+
+brca1_annotation <- data.frame(
+  geneID = "ENSG00000012048",
+  symbol = "BRCA1",
+  chromosome = "17",
+  gene_start = 43044295,
+  gene_end = 43125483,
+  strand = "-",
+  stringsAsFactors = FALSE
+)
+
+nice_GenomeTrack(
+  region = brca1_region,
+  genome_label = "hg38",
+  organism = "hsapiens_gene_ensembl",
+  ensembl_version = "current",
+  annotations = brca1_annotation,
+  tracks = list(
+    `RNA-seq` = rna_bw,
+    CNV = cnv_bw,
+    `Methylation 450k` = methyl_brca1_bw,
+    Mutations = mutation_bed
+  ),
+  highlight_genes = "BRCA1"
+)
+```
+
+```{r genome_track_figure, echo = FALSE, fig.cap = "Sample-specific TCGA-BRCA omics tracks around BRCA1 for TCGA-A1-A0SH-01. Tracks were prerendered from real RNA-seq, CNV, methylation 450k, and mutation files.", fig.width = 9, fig.height = 6}
+knitr::include_graphics("figures/brca_genome_track_brca1_TCGA-A1-A0SH-01.png")
+```
+
+## nice_circos()
+
+`nice_circos()` displays genome-wide omics tracks in circular coordinates. The
+BRCA example uses binned RNA-seq and methylation tracks, CNV segments, and the
+BRCA1-region mutation BED file prepared for `TCGA-A1-A0SH-01`.
+
+This plotting call is also shown as non-executed code. It reads genomic track
+files and creates a device-level circular plot, so the vignette displays the
+real prerendered figure instead.
+
+```{r nice_circos_call, eval = FALSE}
+rna_1mb_bed <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_rna_expr_1Mb_hg38.bed",
+  package = "OmicsKit"
+)
+methyl_1mb_bed <- system.file(
+  "extdata/brca/omics_layers/TCGA-A1-A0SH-01_methyl_450k_meanBeta_1Mb_hg38.bed",
+  package = "OmicsKit"
+)
+
+nice_circos(
+  genome_build = "hg38",
+  data_tracks = list(
+    `RNA-seq` = list(path = rna_1mb_bed, type = "histogram"),
+    CNV = list(path = cnv_bed, type = "line"),
+    `Methylation 450k` = list(path = methyl_1mb_bed, type = "points"),
+    Mutations = list(path = mutation_bed, type = "mutation")
+  ),
+  ideogram = FALSE,
+  chromosome_index = paste0("chr", c(1:22, "X", "Y")),
+  show_legend = TRUE,
+  show_labels = TRUE
+)
+```
+
+```{r circos_figure, echo = FALSE, fig.cap = "Genome-wide circos view for TCGA-A1-A0SH-01 using real prepared BRCA RNA-seq, CNV, methylation 450k, and mutation tracks.", fig.width = 7, fig.height = 7}
+knitr::include_graphics("figures/brca_circos_TCGA-A1-A0SH-01.png")
+```
+
+## concordanceDE()
+
+`concordanceDE()` compares differential results across two omics layers. In
+this BRCA example, RNA-seq and gene-level RPPA limma results are compared for
+the same ER-positive vs ER-negative primary tumor contrast.
+
+The prepared object uses:
+
+- `gene_col = "gene"`
+- `logfc_col = "logFC"`
+- `padj_col = "padj"`
+- `padj_threshold = 0.05`
+- `logfc_threshold = c(1, 0.20)`
+
+The two log-fold-change thresholds reflect the different scales of RNA-seq and
+RPPA measurements.
+
+```{r concordance_summary}
+brca_concordance_rna_rppa_er$concordance_score
+brca_concordance_rna_rppa_er$summary
+```
+
+```{r concordance_call, eval = FALSE}
+brca_concordance_rna_rppa_er <- concordanceDE(
+  de_x = brca_rna_dea_er_pos_vs_er_neg,
+  de_y = brca_rppa_dea_gene_er_pos_vs_er_neg,
+  gene_col = "gene",
+  logfc_col = "logFC",
+  padj_col = "padj",
+  padj_threshold = 0.05,
+  logfc_threshold = c(1, 0.20)
+)
+```
+
+## crossLayerCorr()
+
+`crossLayerCorr()` estimates sample-level concordance between paired omics
+profiles. Here it compares RNA and RPPA values across shared genes and shared
+samples for the ER-positive vs ER-negative prepared subset, using Spearman
+correlation.
+
+```{r crosslayer_summary}
+data.frame(
+  median_spearman_r = brca_crosslayercorr_rna_rppa_er$median_r,
+  n_shared_samples = brca_crosslayercorr_rna_rppa_er$n_shared_samples,
+  n_shared_features = brca_crosslayercorr_rna_rppa_er$n_shared_features,
+  n_features_used = brca_crosslayercorr_rna_rppa_er$n_features_used
+)
+```
+
+```{r crosslayer_call, eval = FALSE}
+brca_crosslayercorr_rna_rppa_er <- crossLayerCorr(
+  mat_x = brca_rna_expr_er_shared_filtered,
+  mat_y = brca_rppa_expr_gene_er_shared,
+  method = "spearman",
+  top_n = 146,
+  plot = TRUE
+)
+```
+
+```{r crosslayer_figure, echo = FALSE, fig.cap = "Sample-level Spearman correlation between RNA-seq and RPPA profiles across shared genes in TCGA-BRCA ER-status samples.", fig.width = 8, fig.height = 5}
+knitr::include_graphics("figures/brca_crosslayercorr_rna_rppa_er.png")
+```
+
+## nice_ConcordanceScatter()
+
+`nice_ConcordanceScatter()` visualizes the `concordanceDE()` result as a
+log-fold-change scatter plot. Each point is a shared gene, colored by whether
+the RNA and RPPA effects are concordant, discordant, layer-specific, or not
+significant.
+
+The plotting call is inexpensive compared with track rendering, but the
+vignette still displays the prerendered figure so the visual output is stable.
+
+```{r concordance_scatter_call, eval = FALSE}
+nice_ConcordanceScatter(
+  brca_concordance_rna_rppa_er,
+  x_label = "RNA-seq log2FC",
+  y_label = "RPPA log2FC",
+  genes_label = c("ESR1", "ERBB2", "PGR", "GATA3"),
+  method = "spearman",
+  logfc_col = "logFC"
+)
+```
+
+```{r concordance_scatter_figure, echo = FALSE, fig.cap = "RNA-RPPA differential concordance for TCGA-BRCA ER-positive vs ER-negative primary tumors.", fig.width = 7, fig.height = 5}
+knitr::include_graphics("figures/brca_concordance_scatter_rna_rppa_er.png")
+```
+
+## Reproducibility
+
+The raw omics-layer files are prepared outside the vignette and stored under
+`inst/extdata/brca/omics_layers/`. The package-ready metadata object
+`brca_omics_layer_tracks` records the sample ID, genome build, BRCA1 plotting
+region, track labels, file paths, and notes about provenance and liftOver.
+
+```{r session_info}
+sessionInfo()
+```
