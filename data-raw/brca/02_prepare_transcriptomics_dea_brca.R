@@ -180,7 +180,14 @@ filter_expression_matrix <- function(expr, min_expr, min_prop_samples) {
   expr[expressed & variable, , drop = FALSE]
 }
 
-format_limma_results <- function(top_table, comparison, reference, contrast) {
+format_limma_results <- function(
+  top_table,
+  comparison,
+  reference,
+  contrast,
+  positive_direction,
+  negative_direction
+) {
   out <- data.frame(
     gene_symbol = rownames(top_table),
     top_table,
@@ -188,9 +195,22 @@ format_limma_results <- function(top_table, comparison, reference, contrast) {
     check.names = FALSE
   )
 
+  out$gene <- out$gene_symbol
   out$gene_id <- out$gene_symbol
+  out$pvalue <- out$P.Value
   out$padj <- out$adj.P.Val
   out$stat <- out$t
+  out$layer <- "RNAseq"
+  out$significant <- !is.na(out$padj) & out$padj < 0.05 & abs(out$logFC) >= 1
+  out$direction <- ifelse(
+    out$significant & out$logFC > 0,
+    positive_direction,
+    ifelse(
+      out$significant & out$logFC < 0,
+      negative_direction,
+      "not_significant"
+    )
+  )
   out$comparison <- comparison
   out$reference <- reference
   out$contrast <- contrast
@@ -199,7 +219,16 @@ format_limma_results <- function(top_table, comparison, reference, contrast) {
   out
 }
 
-fit_limma_contrast <- function(expr, group, levels, contrast_expr, comparison, reference) {
+fit_limma_contrast <- function(
+  expr,
+  group,
+  levels,
+  contrast_expr,
+  comparison,
+  reference,
+  positive_direction,
+  negative_direction
+) {
   group <- factor(group, levels = levels)
   group_counts <- table(group)
 
@@ -224,7 +253,9 @@ fit_limma_contrast <- function(expr, group, levels, contrast_expr, comparison, r
     top_table = top_table,
     comparison = comparison,
     reference = reference,
-    contrast = contrast_expr
+    contrast = contrast_expr,
+    positive_direction = positive_direction,
+    negative_direction = negative_direction
   )
 }
 
@@ -392,7 +423,9 @@ brca_rna_dea_er_pos_vs_er_neg <- fit_limma_contrast(
   levels = c("ER_negative", "ER_positive"),
   contrast_expr = "ER_positive - ER_negative",
   comparison = "ER_positive_vs_ER_negative",
-  reference = "ER_negative"
+  reference = "ER_negative",
+  positive_direction = "ER_positive_up",
+  negative_direction = "ER_negative_up"
 )
 
 ## Comparison B: Tumor vs Normal, RNA-seq only.
@@ -448,7 +481,9 @@ brca_rna_dea_tumor_vs_normal <- fit_limma_contrast(
   levels = c("Normal", "Tumor"),
   contrast_expr = "Tumor - Normal",
   comparison = "Tumor_vs_Normal",
-  reference = "Normal"
+  reference = "Normal",
+  positive_direction = "Tumor_up",
+  negative_direction = "Normal_up"
 )
 
 er_vars <- row_variance(brca_rna_expr_er_shared_filtered)
