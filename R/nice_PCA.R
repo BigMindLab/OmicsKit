@@ -57,7 +57,7 @@
 #'   legend_names = c(fill = "Sample Type"),
 #'   colors       = c("steelblue", "firebrick"),
 #'   shapes       = c(21, 21),
-#'   title        = "TCGA-LUAD PCA"
+#'   title        = "TCGA-BRCA PCA"
 #' )
 #'
 #' # Return PCA coordinates instead of plot

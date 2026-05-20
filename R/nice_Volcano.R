@@ -38,7 +38,7 @@
 #'   x_var     = "log2FoldChange",
 #'   y_var     = "padj",
 #'   label_var = "gene_id",
-#'   title     = "TCGA-LUAD: Tumor vs Normal",
+#'   title     = "TCGA-BRCA: Tumor vs Normal",
 #'   cutoff_y  = 0.05,
 #'   cutoff_x  = 1,
 #'   x_range   = 8,
@@ -51,7 +51,7 @@
 #'   x_var     = "log2FoldChange",
 #'   y_var     = "padj",
 #'   label_var = "gene_id",
-#'   title     = "TCGA-LUAD: Tumor vs Normal",
+#'   title     = "TCGA-BRCA: Tumor vs Normal",
 #'   genes     = deseq2_results$gene_id[1:5]
 #' )
 #'

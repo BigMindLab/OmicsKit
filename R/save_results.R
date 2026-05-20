@@ -29,15 +29,15 @@
 #' # Save full results + over/under-expressed tables as .xlsx files
 #' save_results(
 #'   df           = deseq2_results,
-#'   name         = "TCGA_LUAD_TumorVsNormal",
+#'   name         = "TCGA_BRCA_TumorVsNormal",
 #'   l2fc         = 1,
 #'   cutoff_alpha = 0.05
 #' )
 #'
 #' # Creates:
-#' #   TCGA_LUAD_TumorVsNormal_full.xlsx
-#' #   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
-#' #   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
+#' #   TCGA_BRCA_TumorVsNormal_full.xlsx
+#' #   TCGA_BRCA_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#' #   TCGA_BRCA_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 #' }
 #'
 #' @seealso [detect_filter()] to further filter saved results;

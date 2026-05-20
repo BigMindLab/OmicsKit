@@ -49,7 +49,7 @@
 #'   legend_names = c(fill = "Sample Type"),
 #'   colors       = c("steelblue", "firebrick"),
 #'   shapes       = c(21, 21),
-#'   title        = "TCGA-LUAD UMAP",
+#'   title        = "TCGA-BRCA UMAP",
 #'   neighbors    = 5,
 #'   epochs       = 1000,
 #'   seed         = 1905

@@ -51,7 +51,7 @@
 #'   legend_names   = c(fill = "Sample Type"),
 #'   colors         = c("steelblue", "firebrick"),
 #'   shapes         = c(21, 21),
-#'   title          = "TCGA-LUAD tSNE",
+#'   title          = "TCGA-BRCA tSNE",
 #'   seed           = 1905
 #' )
 #' }
