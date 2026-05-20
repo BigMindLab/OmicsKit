@@ -20,8 +20,8 @@ heatmap_PA(
 \arguments{
 \item{expression_data}{A numeric matrix or data frame of expression values
 with gene symbols or Ensembl IDs as row names and sample IDs as column
-names. Recommended input: VST-transformed counts from \link{vst_counts} or
-normalized coutns \link{norm_counts}.}
+names. Recommended input: VST-transformed counts from \link{brca_rna_vst_or_logexpr_small} or
+normalized coutns \link{brca_rna_expr_tumor_normal_filtered}.}
 
 \item{metadata}{A data frame of sample annotations. Must contain a column
 matching \code{sample_col} (sample IDs) and a column matching \code{group_col}
@@ -79,14 +79,14 @@ The recommended workflow before calling this function is:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{gsl          <- list_gmts("path/to/gmt/")
 pa_data      <- merge_PA("path/to/pa_data/")
-ranked       <- deseq2_results$gene_id[order(deseq2_results$stat,
+ranked       <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
                                              decreasing = TRUE)]
 gene_lists   <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
 pa_annot     <- addgenesPA(pa_data, gene_lists)
 
 heatmap_PA(
-  expression_data = vst_counts,
-  metadata        = sampledata,
+  expression_data = brca_rna_vst_or_logexpr_small,
+  metadata        = brca_rna_metadata_tumor_normal,
   pa_data_annot   = pa_annot,
   ranked_genes    = ranked,
   plot_genes      = c("all_genes", "le_genes")
@@ -95,24 +95,24 @@ heatmap_PA(
 }
 \examples{
 \dontrun{
-data(vst_counts)
-data(sampledata)
-data(deseq2_results)
+data(brca_rna_vst_or_logexpr_small)
+data(brca_rna_metadata_tumor_normal)
+data(brca_rna_dea_tumor_vs_normal)
 data(gsea_results)
-data(geneset_list)
+data(brca_geneset_list)
 
-ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+ranked    <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
                                           decreasing = TRUE)]
 
 # ── Example 1: GSEA results (all_genes + le_genes) ────
 pa_single  <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
-gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
                          genes = c("all", "le"))
 pa_annot   <- addgenesPA(pa_single, gene_lists)
 
 heatmap_PA(
-  expression_data = vst_counts,
-  metadata        = sampledata,
+  expression_data = brca_rna_vst_or_logexpr_small,
+  metadata        = brca_rna_metadata_tumor_normal,
   pa_data_annot   = pa_annot,
   ranked_genes    = ranked,
   plot_genes      = c("all_genes", "le_genes"),
@@ -129,23 +129,23 @@ heatmap_PA(
 #   heatmaps_gsea/jpg/le_genes/<geneset>_heatmap.jpg
 
 # ── Example 2: CAMERA results (all_genes + top_genes)
-# camera_results does not contain leading edge information.
+# brca_pa_results does not contain leading edge information.
 # Use genes = "top" with a manually set top fraction instead.
 # Note: top_genes are rank-based and do NOT represent true leading edge genes.
-data(camera_results)
-camera_pa      <- camera_results
+data(brca_pa_results)
+camera_pa      <- brca_pa_results
 colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
 camera_pa$SIZE <- sapply(camera_pa$NAME,
-                         function(x) length(geneset_list[[x]]))
+                         function(x) length(brca_geneset_list[[x]]))
 camera_pa$top  <- 0.25
 
-gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+gene_lists_cam <- getgenesPA(camera_pa, brca_geneset_list, ranked,
                              genes = c("all", "top"))
 pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
 
 heatmap_PA(
-  expression_data = vst_counts,
-  metadata        = sampledata,
+  expression_data = brca_rna_vst_or_logexpr_small,
+  metadata        = brca_rna_metadata_tumor_normal,
   pa_data_annot   = pa_annot_cam,
   ranked_genes    = ranked,
   plot_genes      = c("all_genes", "top_genes"),
@@ -161,5 +161,5 @@ heatmap_PA(
 \code{\link[=addgenesPA]{addgenesPA()}} to generate \code{pa_data_annot};
 \code{\link[=list_gmts]{list_gmts()}} to generate the geneset list;
 \code{\link[=merge_PA]{merge_PA()}} to generate \code{pa_data};
-\link{vst_counts} for an example expression matrix.
+\link{brca_rna_vst_or_logexpr_small} for an example expression matrix.
 }

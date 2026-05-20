@@ -71,13 +71,13 @@ It will show the data points on top with a small deviation (jitter) for a better
 \dontrun{
 # requires a DESeq2 object
 
-data(sampledata)
+data(brca_rna_metadata_tumor_normal)
 
 nice_VSB_DEseq2(
   object      = vst,
-  annotations = sampledata,
+  annotations = brca_rna_metadata_tumor_normal,
   variables   = c(fill = "sample_type"),
-  genename    = rownames(norm_counts)[1],
+  genename    = rownames(brca_rna_expr_tumor_normal_filtered)[1],
   categories  = c("normal", "tumor"),
   labels      = c("Normal", "Tumor"),
   colors      = c("steelblue", "firebrick"),

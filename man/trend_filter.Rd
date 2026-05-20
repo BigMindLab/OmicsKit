@@ -27,8 +27,6 @@ trend_filter(
 \item{expr}{Numeric matrix or data frame of expression values with genes as
 rows and sample IDs as columns. Row names must contain gene IDs.}
 
-\item{sampledata}{Data frame with sample metadata.}
-
 \item{results}{Data frame or named list of data frames containing
 differential expression results. Each data frame must contain a gene ID
 column and a log2 fold-change column.}
@@ -40,13 +38,13 @@ column and a log2 fold-change column.}
 group for each comparison in \code{results}. If \code{results} is a named list,
 names in \code{conditions} should match names in \code{results}.}
 
-\item{sample.col}{Column in \code{sampledata} containing sample IDs. Default is
+\item{sample.col}{Column in \code{brca_rna_metadata_tumor_normal} containing sample IDs. Default is
 \code{"sample_id"}.}
 
-\item{patient.col}{Column in \code{sampledata} containing patient IDs. Default is
+\item{patient.col}{Column in \code{brca_rna_metadata_tumor_normal} containing patient IDs. Default is
 \code{"patient_id"}.}
 
-\item{group.col}{Column in \code{sampledata} containing group labels. Default is
+\item{group.col}{Column in \code{brca_rna_metadata_tumor_normal} containing group labels. Default is
 \code{"sample_type"}.}
 
 \item{gene.col}{Column in \code{results} containing gene IDs. Default is
@@ -74,6 +72,8 @@ calculating patient-level means? Default is \code{FALSE}.}
 
 \item{return_removed}{Logical. Should the output include a vector of removed
 genes? Default is \code{TRUE}.}
+
+\item{brca_rna_metadata_tumor_normal}{Data frame with sample metadata.}
 }
 \value{
 A named list containing:
@@ -113,8 +113,8 @@ function will use \code{log2(ratio)} as an additive threshold.
 \examples{
 \dontrun{
 trend_res <- trend_filter(
-  expr = norm_counts,
-  sampledata = sampledata,
+  expr = brca_rna_expr_tumor_normal_filtered,
+  brca_rna_metadata_tumor_normal = brca_rna_metadata_tumor_normal,
   results = list(Tumor_vs_Normal = deseq_res),
   baseline = "normal",
   conditions = c(Tumor_vs_Normal = "tumor"),

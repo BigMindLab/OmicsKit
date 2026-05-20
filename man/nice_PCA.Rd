@@ -90,26 +90,26 @@ But including some improvements made by David Requena. Now it allows:
 }
 }
 \examples{
-data(vst_counts)
-data(sampledata)
+data(brca_rna_vst_or_logexpr_small)
+data(brca_rna_metadata_tumor_normal)
 
 # nice_PCA joins by a column named "id" in annotations
-sampledata_pca <- sampledata
+sampledata_pca <- brca_rna_metadata_tumor_normal
 colnames(sampledata_pca)[colnames(sampledata_pca) == "patient_id"] <- "id"
 
 nice_PCA(
-  object       = vst_counts,
+  object       = brca_rna_vst_or_logexpr_small,
   annotations  = sampledata_pca,
   variables    = c(fill = "sample_type"),
   legend_names = c(fill = "Sample Type"),
   colors       = c("steelblue", "firebrick"),
   shapes       = c(21, 21),
-  title        = "TCGA-LUAD PCA"
+  title        = "TCGA-BRCA PCA"
 )
 
 # Return PCA coordinates instead of plot
 pca_data <- nice_PCA(
-  object       = vst_counts,
+  object       = brca_rna_vst_or_logexpr_small,
   annotations  = sampledata_pca,
   variables    = c(fill = "sample_type"),
   legend_names = c(fill = "Sample Type"),
@@ -122,5 +122,5 @@ head(pca_data)
 }
 \seealso{
 \code{\link[=nice_UMAP]{nice_UMAP()}}, \code{\link[=nice_tSNE]{nice_tSNE()}} for other alternatives;
-\link{vst_counts} for the recommended input matrix.
+\link{brca_rna_vst_or_logexpr_small} for the recommended input matrix.
 }

@@ -53,21 +53,21 @@ It returns a list of detectable genes and the comparisons in which they can be f
 }
 \examples{
 \dontrun{
-data(norm_counts)
-data(deseq2_results)
-data(sampledata)
+data(brca_rna_expr_tumor_normal_filtered)
+data(brca_rna_dea_tumor_vs_normal)
+data(brca_rna_metadata_tumor_normal)
 
 # detect_filter requires an "ensembl" column in the results data frame
-res <- deseq2_results
+res <- brca_rna_dea_tumor_vs_normal
 colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
 rownames(res) <- res$ensembl
 
 # Get sample IDs per group
-samples_normal <- sampledata$patient_id[sampledata$sample_type == "normal"]
-samples_tumor  <- sampledata$patient_id[sampledata$sample_type == "tumor"]
+samples_normal <- brca_rna_metadata_tumor_normal$patient_id[brca_rna_metadata_tumor_normal$sample_type == "normal"]
+samples_tumor  <- brca_rna_metadata_tumor_normal$patient_id[brca_rna_metadata_tumor_normal$sample_type == "tumor"]
 
 detected <- detect_filter(
-  norm.counts        = as.data.frame(norm_counts),
+  norm.counts        = as.data.frame(brca_rna_expr_tumor_normal_filtered),
   df.BvsA            = res,
   samples.baseline   = samples_normal,
   samples.condition1 = samples_tumor,
@@ -84,6 +84,6 @@ head(detected$Comparison1)
 }
 \seealso{
 \code{\link[=nice_VSB]{nice_VSB()}} to plot expression of detected genes;
-\link{norm_counts} for an example normalized counts matrix.
+\link{brca_rna_expr_tumor_normal_filtered} for an example normalized counts matrix.
 \code{\link[=trend_filter]{trend_filter()}} to find genes with significant expression trends across conditions.
 }

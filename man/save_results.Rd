@@ -35,24 +35,24 @@ And will save 3 tables:
 }
 \examples{
 \dontrun{
-data(deseq2_results)
+data(brca_rna_dea_tumor_vs_normal)
 
 # Save full results + over/under-expressed tables as .xlsx files
 save_results(
-  df           = deseq2_results,
-  name         = "TCGA_LUAD_TumorVsNormal",
+  df           = brca_rna_dea_tumor_vs_normal,
+  name         = "TCGA_BRCA_TumorVsNormal",
   l2fc         = 1,
   cutoff_alpha = 0.05
 )
 
 # Creates:
-#   TCGA_LUAD_TumorVsNormal_full.xlsx
-#   TCGA_LUAD_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
-#   TCGA_LUAD_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
+#   TCGA_BRCA_TumorVsNormal_full.xlsx
+#   TCGA_BRCA_TumorVsNormal_up_log2FC>1_FDR<0.05.xlsx
+#   TCGA_BRCA_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 }
 
 }
 \seealso{
 \code{\link[=detect_filter]{detect_filter()}} to further filter saved results;
-\link{deseq2_results} for an example input.
+\link{brca_rna_dea_tumor_vs_normal} for an example input.
 }

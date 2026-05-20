@@ -23,7 +23,7 @@
 #' or its individual slots can be used independently (e.g., `$dist_mat` for
 #' UMAP, `$jaccard_sim` for custom visualizations).
 #'
-#' @param geneset_list A named list where each element is a character vector of
+#' @param brca_geneset_list A named list where each element is a character vector of
 #'   gene symbols belonging to that gene set. Typically the output of
 #'   [list_gmts()].
 #' @param results A data frame with at least two columns: `GeneSet` (gene set
@@ -35,10 +35,10 @@
 #'   * `$jaccard_sim`: Numeric matrix of pairwise Jaccard similarities.
 #'   * `$dist_mat`: A `dist` object of 1 - Jaccard similarity, suitable for
 #'     clustering or UMAP.
-#'   * `$geneset_list`: Named list of gene sets retained after FDR filtering.
+#'   * `$brca_geneset_list`: Named list of gene sets retained after FDR filtering.
 #'
 #' @examples
-#' geneset_list <- list(
+#' brca_geneset_list <- list(
 #'   KEGG_APOPTOSIS      = c("TP53", "BCL2", "CASP3", "BAX"),
 #'   KEGG_CELL_CYCLE     = c("CDK2", "CCND1", "TP53", "RB1"),
 #'   HALLMARK_HYPOXIA    = c("HIF1A", "VEGFA", "LDHA", "BNIP3"),
@@ -46,16 +46,16 @@
 #' )
 #'
 #' results <- data.frame(
-#'   GeneSet = names(geneset_list),
+#'   GeneSet = names(brca_geneset_list),
 #'   FDR     = c(0.01, 0.03, 0.04, 0.20)
 #' )
 #'
 #' # Only the first three gene sets pass the FDR threshold
-#' jac <- geneset_similarity(geneset_list, results, fdr_th = 0.05)
+#' jac <- geneset_similarity(brca_geneset_list, results, fdr_th = 0.05)
 #'
 #' jac$jaccard_sim   # similarity matrix
 #' jac$dist_mat      # distance object (usable in UMAP, clustering, etc.)
-#' jac$geneset_list  # filtered gene sets
+#' jac$brca_geneset_list  # filtered gene sets
 #'
 #' @seealso [list_gmts()], [do_clust()], [get_network_communities()],
 #'   [network_clust()], [network_clust_gg()]
@@ -155,7 +155,7 @@ geneset_similarity <- function(geneset_list, results, fdr_th = 0.05) {
 #' @examples
 #' \dontrun{
 #' # Requires ComplexHeatmap and cluster packages
-#' geneset_list <- list(
+#' brca_geneset_list <- list(
 #'   KEGG_APOPTOSIS      = c("TP53", "BCL2", "CASP3", "BAX"),
 #'   KEGG_CELL_CYCLE     = c("CDK2", "CCND1", "TP53", "RB1"),
 #'   HALLMARK_HYPOXIA    = c("HIF1A", "VEGFA", "LDHA", "BNIP3"),
@@ -164,11 +164,11 @@ geneset_similarity <- function(geneset_list, results, fdr_th = 0.05) {
 #' )
 #'
 #' results <- data.frame(
-#'   GeneSet = names(geneset_list),
+#'   GeneSet = names(brca_geneset_list),
 #'   FDR     = c(0.01, 0.02, 0.03, 0.04, 0.01)
 #' )
 #'
-#' jac   <- geneset_similarity(geneset_list, results)
+#' jac   <- geneset_similarity(brca_geneset_list, results)
 #' clust <- do_clust(jac)
 #'
 #' clust$silhouette_plot               # ggplot2 silhouette curve

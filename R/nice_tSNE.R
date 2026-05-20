@@ -35,15 +35,15 @@
 #'
 #' @examples
 #' \dontrun{
-#' data(vst_counts)
-#' data(sampledata)
+#' data(brca_rna_vst_or_logexpr_small)
+#' data(brca_rna_metadata_tumor_normal)
 #'
-#' sampledata_t <- sampledata
+#' sampledata_t <- brca_rna_metadata_tumor_normal
 #' colnames(sampledata_t)[colnames(sampledata_t) == "patient_id"] <- "id"
 #'
 #' # perplexity must be < n_samples / 3; with 32 samples use perplexity = 5
 #' nice_tSNE(
-#'   object         = vst_counts,
+#'   object         = brca_rna_vst_or_logexpr_small,
 #'   annotations    = sampledata_t,
 #'   perplexity     = 5,
 #'   max_iterations = 1000,
@@ -56,7 +56,7 @@
 #' )
 #' }
 #' @seealso [nice_PCA()], [nice_UMAP()] for alternative dimensionality
-#'   reduction methods; [vst_counts] for the recommended input matrix.
+#'   reduction methods; [brca_rna_vst_or_logexpr_small] for the recommended input matrix.
 #'
 #' @references
 #'   van der Maaten, L., & Hinton, G. (2008). Visualizing data using t-SNE.

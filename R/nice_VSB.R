@@ -30,14 +30,14 @@
 #' @return A ggplot2 object.
 #'
 #' @examples
-#' data(norm_counts)
-#' data(sampledata)
+#' data(brca_rna_expr_tumor_normal_filtered)
+#' data(brca_rna_metadata_tumor_normal)
 #'
 #' nice_VSB(
-#'   object      = norm_counts,
-#'   annotations = sampledata,
+#'   object      = brca_rna_expr_tumor_normal_filtered,
+#'   annotations = brca_rna_metadata_tumor_normal,
 #'   variables   = c(fill = "sample_type"),
-#'   genename    = rownames(norm_counts)[1],
+#'   genename    = rownames(brca_rna_expr_tumor_normal_filtered)[1],
 #'   categories  = c("normal", "tumor"),
 #'   labels      = c("Normal", "Tumor"),
 #'   colors      = c("steelblue", "firebrick"),
@@ -47,7 +47,7 @@
 #'
 #' @seealso [nice_Volcano()] for genome-wide visualization; [detect_filter()]
 #'   to identify reliably expressed genes; [get_stars()] to add significance
-#'   annotations; [norm_counts] for an example input matrix.
+#'   annotations; [brca_rna_expr_tumor_normal_filtered] for an example input matrix.
 #'
 #' @export
 

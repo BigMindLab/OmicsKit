@@ -24,11 +24,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' data(deseq2_results)
+#' data(brca_rna_dea_tumor_vs_normal)
 #'
 #' # Save full results + over/under-expressed tables as .xlsx files
 #' save_results(
-#'   df           = deseq2_results,
+#'   df           = brca_rna_dea_tumor_vs_normal,
 #'   name         = "TCGA_BRCA_TumorVsNormal",
 #'   l2fc         = 1,
 #'   cutoff_alpha = 0.05
@@ -41,7 +41,7 @@
 #' }
 #'
 #' @seealso [detect_filter()] to further filter saved results;
-#'   [deseq2_results] for an example input.
+#'   [brca_rna_dea_tumor_vs_normal] for an example input.
 #'
 #' @export
 

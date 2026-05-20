@@ -24,7 +24,7 @@
 #'
 #' @param expr Numeric matrix or data frame of expression values with genes as
 #'   rows and sample IDs as columns. Row names must contain gene IDs.
-#' @param sampledata Data frame with sample metadata.
+#' @param brca_rna_metadata_tumor_normal Data frame with sample metadata.
 #' @param results Data frame or named list of data frames containing
 #'   differential expression results. Each data frame must contain a gene ID
 #'   column and a log2 fold-change column.
@@ -33,11 +33,11 @@
 #' @param conditions Character vector or named list identifying the condition
 #'   group for each comparison in `results`. If `results` is a named list,
 #'   names in `conditions` should match names in `results`.
-#' @param sample.col Column in `sampledata` containing sample IDs. Default is
+#' @param sample.col Column in `brca_rna_metadata_tumor_normal` containing sample IDs. Default is
 #'   `"sample_id"`.
-#' @param patient.col Column in `sampledata` containing patient IDs. Default is
+#' @param patient.col Column in `brca_rna_metadata_tumor_normal` containing patient IDs. Default is
 #'   `"patient_id"`.
-#' @param group.col Column in `sampledata` containing group labels. Default is
+#' @param group.col Column in `brca_rna_metadata_tumor_normal` containing group labels. Default is
 #'   `"sample_type"`.
 #' @param gene.col Column in `results` containing gene IDs. Default is
 #'   `"ensembl"`.
@@ -78,8 +78,8 @@
 #' @examples
 #' \dontrun{
 #' trend_res <- trend_filter(
-#'   expr = norm_counts,
-#'   sampledata = sampledata,
+#'   expr = brca_rna_expr_tumor_normal_filtered,
+#'   brca_rna_metadata_tumor_normal = brca_rna_metadata_tumor_normal,
 #'   results = list(Tumor_vs_Normal = deseq_res),
 #'   baseline = "normal",
 #'   conditions = c(Tumor_vs_Normal = "tumor"),

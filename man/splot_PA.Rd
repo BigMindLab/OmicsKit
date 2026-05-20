@@ -113,5 +113,5 @@ splot_PA(
 \seealso{
 \code{\link[=multiplot_PA]{multiplot_PA()}} for multi-comparison faceted barplots;
 \code{\link[=merge_PA]{merge_PA()}} to generate the input data frame;
-\link{camera_results} for a minimal example dataset.
+\link{brca_pa_results} for a minimal example dataset.
 }

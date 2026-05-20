@@ -30,15 +30,15 @@ are automatically removed. This is the standard format used by MSigDB
 \examples{
 \dontrun{
 # Read all GMT files from a directory
-geneset_list <- list_gmts("path/to/gmt_files/")
+brca_geneset_list <- list_gmts("path/to/gmt_files/")
 
 # Inspect output
-length(geneset_list)              # number of gene sets
-names(geneset_list)[1:5]          # first five gene set names
-geneset_list[["KEGG_APOPTOSIS"]]  # genes in a specific set
+length(brca_geneset_list)              # number of gene sets
+names(brca_geneset_list)[1:5]          # first five gene set names
+brca_geneset_list[["KEGG_APOPTOSIS"]]  # genes in a specific set
 
 # Pass directly to geneset_similarity
-jac <- geneset_similarity(geneset_list, results_df, fdr_th = 0.05)
+jac <- geneset_similarity(brca_geneset_list, results_df, fdr_th = 0.05)
 }
 
 }

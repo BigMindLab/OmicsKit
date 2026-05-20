@@ -15,10 +15,10 @@
 #'   from `object`.
 #'
 #' @examples
-#' data(deseq2_results)
+#' data(brca_rna_dea_tumor_vs_normal)
 #'
 #' # get_stars expects a column named "ensembl"
-#' res <- deseq2_results
+#' res <- brca_rna_dea_tumor_vs_normal
 #' colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
 #'
 #' # Get significance stars for the most significant gene
@@ -42,7 +42,7 @@
 #'
 #' @seealso [detect_filter()] to identify detectable genes before annotating;
 #'   [nice_VSB()] where significance stars can be added to plots;
-#'   [deseq2_results] for an example input.
+#'   [brca_rna_dea_tumor_vs_normal] for an example input.
 #'
 #' @export
 

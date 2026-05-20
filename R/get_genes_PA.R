@@ -48,9 +48,9 @@
 #'     `pa_data$top <- 0.25` for the top 25%). Required for `genes = "top"`.
 #'
 #'   Typically the output of [merge_PA()].
-#' @param geneset_list A named list of gene sets, where each element is a
+#' @param brca_geneset_list A named list of gene sets, where each element is a
 #'   character vector of gene symbols. Typically the output of [list_gmts()],
-#'   or use the built-in [geneset_list] for quick testing.
+#'   or use the built-in [brca_geneset_list] for quick testing.
 #' @param ranked_genes A character vector of gene symbols ordered by their
 #'   ranking metric (e.g., DESeq2 `stat`, log2FC, or signal-to-noise ratio),
 #'   from most positive to most negative. Non-significant genes fall in the
@@ -72,23 +72,23 @@
 #' @examples
 #' \dontrun{
 #' data(gsea_results)
-#' data(geneset_list)
-#' data(deseq2_results)
+#' data(brca_geneset_list)
+#' data(brca_rna_dea_tumor_vs_normal)
 #'
 #' #or
 #' gsl <- list_gmts("path/to/gmt_folder/")
 #'
-#' ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+#' ranked    <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
 #'                                           decreasing = TRUE)]
 #' pa_single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 #'
 #' # ── GSEA results: all three modes available
-#' gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+#' gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
 #'                          genes = c("all", "le", "top"))
 #'
 #' # But first add the top column (e.g. top 30% of genes by rank)
 #' pa_single$top <- 0.30
-#' gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+#' gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
 #'                          genes = c("all", "le", "top"))
 #'
 #' gene_lists$le[["KEGG_APOPTOSIS"]]    # leading edge genes
@@ -99,14 +99,14 @@
 #' head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
 #'
 #' # ── CAMERA results: use "top" (no leading edge available) ───
-#' data(camera_results)
-#' camera_pa      <- camera_results
+#' data(brca_pa_results)
+#' camera_pa      <- brca_pa_results
 #' colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
 #' camera_pa$SIZE <- sapply(camera_pa$NAME,
-#'                          function(x) length(geneset_list[[x]]))
+#'                          function(x) length(brca_geneset_list[[x]]))
 #' camera_pa$top  <- 0.25   # top 25% by rank
 #'
-#' gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+#' gene_lists_cam <- getgenesPA(camera_pa, brca_geneset_list, ranked,
 #'                              genes = c("all", "top"))
 #' pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
 #' head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])
@@ -114,7 +114,7 @@
 #'
 #' @seealso [addgenesPA()] to append gene columns to pa_data;
 #'   [heatmap_PA()] for heatmap visualization;
-#'   [list_gmts()] to generate `geneset_list`;
+#'   [list_gmts()] to generate `brca_geneset_list`;
 #'   [merge_PA()] to generate `pa_data` with the required `tags` column.
 #'
 #' @export
@@ -258,33 +258,33 @@ getgenesPA <- function(pa_data, geneset_list, ranked_genes,
 #' @examples
 #' \dontrun{
 #' data(gsea_results)
-#' data(geneset_list)
-#' data(deseq2_results)
+#' data(brca_geneset_list)
+#' data(brca_rna_dea_tumor_vs_normal)
 #'
-#' ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+#' ranked    <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
 #'                                           decreasing = TRUE)]
 #' pa_single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 #' pa_single$top <- 0.30
 #'
 #' # Add all three columns
-#' gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+#' gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
 #'                          genes = c("all", "le", "top"))
 #' pa_annot   <- addgenesPA(pa_single, gene_lists)
 #' head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
 #'
 #' # Add only leading edge genes
-#' le_only  <- getgenesPA(pa_single, geneset_list, ranked, genes = "le")
+#' le_only  <- getgenesPA(pa_single, brca_geneset_list, ranked, genes = "le")
 #' pa_annot <- addgenesPA(pa_single, le_only)
 #' head(pa_annot[, c("NAME", "le_genes")])
 #'
 #' # CAMERA: add only top and all (no leading edge)
-#' data(camera_results)
-#' camera_pa      <- camera_results
+#' data(brca_pa_results)
+#' camera_pa      <- brca_pa_results
 #' colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
 #' camera_pa$SIZE <- sapply(camera_pa$NAME,
-#'                          function(x) length(geneset_list[[x]]))
+#'                          function(x) length(brca_geneset_list[[x]]))
 #' camera_pa$top  <- 0.25
-#' gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+#' gene_lists_cam <- getgenesPA(camera_pa, brca_geneset_list, ranked,
 #'                              genes = c("all", "top"))
 #' pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
 #' head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])

@@ -81,7 +81,7 @@ utils::globalVariables(c(
 #'
 #' # Use directly in downstream functions
 #' gsl        <- list_gmts("path/to/gmt_folder/")
-#' ranked     <- deseq2_results$gene_id[order(deseq2_results$stat,
+#' ranked     <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
 #'                                            decreasing = TRUE)]
 #' gene_lists <- getgenesPA(gsea_data, gsl, ranked)
 #' pa_annot   <- addgenesPA(gsea_data, gene_lists)

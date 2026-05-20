@@ -36,14 +36,14 @@
 #'
 #' @examples
 #' \dontrun{
-#' data(vst_counts)
-#' data(sampledata)
+#' data(brca_rna_vst_or_logexpr_small)
+#' data(brca_rna_metadata_tumor_normal)
 #'
-#' sampledata_u <- sampledata
+#' sampledata_u <- brca_rna_metadata_tumor_normal
 #' colnames(sampledata_u)[colnames(sampledata_u) == "patient_id"] <- "id"
 #'
 #' nice_UMAP(
-#'   object       = vst_counts,
+#'   object       = brca_rna_vst_or_logexpr_small,
 #'   annotations  = sampledata_u,
 #'   variables    = c(fill = "sample_type"),
 #'   legend_names = c(fill = "Sample Type"),
@@ -57,7 +57,7 @@
 #' }
 #'
 #' @seealso [nice_PCA()], [nice_tSNE()] for alternative dimensionality
-#'   reduction methods; [vst_counts] for the recommended input matrix.
+#'   reduction methods; [brca_rna_vst_or_logexpr_small] for the recommended input matrix.
 #'
 #' @references
 #'   McInnes, L., Healy, J., & Melville, J. (2018). Umap: Uniform Manifold
