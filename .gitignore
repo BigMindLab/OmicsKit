@@ -57,3 +57,60 @@ docs
 /doc/
 /Meta/
 inst/extdata/brca/raw_xena/
+
+# -------------------------------------------------------------------
+# Local legacy TCGA-LUAD materials
+# -------------------------------------------------------------------
+archive_local/
+
+# Legacy TCGA-LUAD data objects
+data/camera_results.rda
+data/deseq2_results.rda
+data/geneset_list.rda
+data/gsea_results.rda
+data/norm_counts.rda
+data/raw_counts.rda
+data/sampledata.rda
+data/vst_counts.rda
+
+# Legacy TCGA-LUAD data-raw scripts
+data-raw/deseq2_results.R
+data-raw/example_PA.R
+data-raw/gsea_results.R
+data-raw/raw_counts.R
+data-raw/sampledata.R
+
+# Legacy TCGA-LUAD vignette figures
+vignettes/figures/nice_PCA.png
+vignettes/figures/nice_UMAP.png
+vignettes/figures/nice_VSB.png
+vignettes/figures/nice_Volcano.png
+vignettes/figures/nice_tSNE.png
+
+# Legacy vignette build outputs
+doc/
+Meta/
+
+# Heavy local raw data
+inst/extdata/brca/raw_xena/
+*.bam
+*.bai
+*.bw
+*.bigWig
+*.bedGraph
+*.fastq
+*.fastq.gz
+*.fq.gz
+
+# Legacy TCGA-LUAD exported dataset documentation/functions
+R/deseq2_results.R
+R/gsea_results.R
+R/raw_counts.R
+R/sampledata.R
+man/camera_results.Rd
+man/deseq2_results.Rd
+man/geneset_list.Rd
+man/gsea_results.Rd
+man/norm_counts.Rd
+man/raw_counts.Rd
+man/sampledata.Rd
