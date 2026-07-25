@@ -22,7 +22,6 @@ Imports:
     ggplot2,
     ggpubr,
     tsne,
-    cowplot,
     ggraph,
     graphics,
     magrittr,
