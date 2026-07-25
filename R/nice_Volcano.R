@@ -31,14 +31,14 @@
 #' @return A ggplot2 object
 #'
 #' @examples
-#' data(deseq2_results)
+#' data(brca_rna_dea_tumor_vs_normal)
 #'
 #' nice_Volcano(
-#'   results   = deseq2_results,
-#'   x_var     = "log2FoldChange",
+#'   results   = brca_rna_dea_tumor_vs_normal,
+#'   x_var     = "logFC",
 #'   y_var     = "padj",
 #'   label_var = "gene_id",
-#'   title     = "TCGA-LUAD: Tumor vs Normal",
+#'   title     = "TCGA-BRCA: Tumor vs Normal",
 #'   cutoff_y  = 0.05,
 #'   cutoff_x  = 1,
 #'   x_range   = 8,
@@ -47,17 +47,17 @@
 #'
 #' # Highlight specific genes
 #' nice_Volcano(
-#'   results   = deseq2_results,
-#'   x_var     = "log2FoldChange",
+#'   results   = brca_rna_dea_tumor_vs_normal,
+#'   x_var     = "logFC",
 #'   y_var     = "padj",
 #'   label_var = "gene_id",
-#'   title     = "TCGA-LUAD: Tumor vs Normal",
-#'   genes     = deseq2_results$gene_id[1:5]
+#'   title     = "TCGA-BRCA: Tumor vs Normal",
+#'   genes     = brca_rna_dea_tumor_vs_normal$gene_id[1:5]
 #' )
 #'
 #' @seealso [nice_VSB()] for gene-level expression visualization;
 #'   [detect_filter()] to filter detectable genes before plotting;
-#'   [deseq2_results] for an example input dataset.
+#'   [brca_rna_dea_tumor_vs_normal] for an example input dataset.
 #'
 #' @export
 

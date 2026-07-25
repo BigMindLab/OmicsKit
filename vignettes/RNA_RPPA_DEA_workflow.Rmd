@@ -1,0 +1,683 @@
+---
+title: "TCGA-BRCA RNA & RPPA: Differential Expression, Concordance and Visualization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TCGA-BRCA RNA & RPPA: Differential Expression, Concordance and Visualization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.align = "center",
+  warning   = FALSE,
+  message   = FALSE
+)
+```
+
+```{r load-data}
+library(OmicsKit)
+
+data(brca_metadata)
+data(brca_rna_dea_er_pos_vs_er_neg)
+data(brca_rna_dea_tumor_vs_normal)
+data(brca_rna_metadata_er_shared)
+data(brca_rna_metadata_tumor_normal)
+data(brca_rna_vst_or_logexpr_small)
+data(brca_rna_expr_er_shared_filtered)
+data(brca_rna_expr_tumor_normal_filtered)
+data(brca_rppa_dea_gene_er_pos_vs_er_neg)
+data(brca_rppa_expr_gene_er_shared)
+data(brca_concordance_rna_rppa_er)
+data(brca_crosslayercorr_rna_rppa_er)
+```
+
+These package objects are TCGA-BRCA-derived examples prepared from UCSC Xena data. The RNA-seq objects were derived from log2-normalized TCGA HiSeqV2 expression matrices, while RPPA examples were generated from the TCGA RPPA matrix with explicit protein-feature-to-gene mappings. Differential-expression tables, compact expression matrices, concordance summaries, and pre-rendered figures are shipped with OmicsKit so that this vignette does not download data or read raw files at build time. PNG figures are displayed from `vignettes/figures/`, and the displayed code also writes PDF companions to the same folder when run interactively.
+
+## 1. Power Analysis
+
+Power analysis is a useful first check before running a large differential-expression analysis. TCGA-BRCA includes roughly 1100 tumor samples and 113 adjacent normal samples, but the analysis still tests about 20,000 genes simultaneously. Bulk RNA-seq studies often show biological dispersion near 0.1, so even a well-powered cohort needs multiple-testing correction in mind. Here we estimate the minimum per-group sample size needed to detect a log2 fold-change of 1 at 80% power.
+
+```{r power-analysis}
+pa_result <- power_analysis(
+  effect_size  = 1,       # log2FC = 1 detectable minimum
+  dispersion   = 0.1,     # typical bulk RNA-seq biological variance
+  n_genes      = 20000,
+  prop_de      = 0.05,    # ~5% DE expected
+  alpha        = 0.05,
+  power_target = 0.8,
+  max_n        = 30,
+  plot         = TRUE
+)
+
+cat("Minimum samples per group needed:", pa_result$min_sample_size, "\n")
+pa_result$plot
+```
+
+```{r save-power-analysis, eval = FALSE}
+ggplot2::ggsave("vignettes/figures/power_analysis.png",
+       pa_result$plot, width = 8, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/power_analysis.pdf",
+               width = 8, height = 5)
+print(pa_result$plot)
+grDevices::dev.off()
+```
+
+```{r show-power-analysis, echo = FALSE, eval = TRUE, fig.cap = "Power analysis for a bulk RNA-seq differential-expression workflow with TCGA-BRCA-like assumptions."}
+knitr::include_graphics("figures/power_analysis.png")
+```
+
+With TCGA-BRCA we have N >> minimum required, giving high power to detect even modest fold-changes.
+
+## 2. Unsupervised Expression Visualization
+
+The object `brca_rna_vst_or_logexpr_small` contains the top 1000 most variable genes from the ER-positive vs ER-negative RNA-seq matrix. This compact matrix is suitable for PCA, UMAP, and t-SNE examples without shipping a full expression matrix in the vignette. The dimensionality-reduction helpers join annotations by an `"id"` column, so the sample barcodes are copied from row names before plotting.
+
+### 2.1 PCA
+
+```{r pca-rna-er}
+metadata_dim        <- brca_rna_metadata_er_shared
+metadata_dim$id     <- rownames(metadata_dim)
+
+p_pca <- nice_PCA(
+  object        = brca_rna_vst_or_logexpr_small,
+  annotations   = metadata_dim,
+  variables     = c(fill = "ER_group"),
+  legend_names  = c(fill = "ER status"),
+  colors        = c("steelblue", "firebrick"),
+  shapes        = c(21, 21),
+  title         = "TCGA-BRCA: PCA by ER status"
+)
+p_pca
+```
+
+```{r save-pca-rna-er, eval = FALSE}
+ggplot2::ggsave("vignettes/figures/brca_pca_rna_er_status.png",
+       p_pca, width = 7, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_pca_rna_er_status.pdf",
+               width = 7, height = 5)
+print(p_pca)
+grDevices::dev.off()
+```
+
+```{r show-pca-rna-er, echo = FALSE, eval = TRUE, fig.cap = "PCA of top-1000 variable genes from TCGA-BRCA RNA-seq, colored by ER status."}
+knitr::include_graphics("figures/brca_pca_rna_er_status.png")
+```
+
+### 2.2 UMAP
+
+```{r umap-rna-er}
+metadata_dim        <- brca_rna_metadata_er_shared
+metadata_dim$id     <- rownames(metadata_dim)
+
+p_umap <- nice_UMAP(
+  object        = brca_rna_vst_or_logexpr_small,
+  annotations   = metadata_dim,
+  variables     = c(fill = "ER_group"),
+  legend_names  = c(fill = "ER status"),
+  colors        = c("steelblue", "firebrick"),
+  shapes        = c(21, 21),
+  seed          = 2025,
+  title         = "TCGA-BRCA: UMAP by ER status"
+)
+p_umap
+```
+
+```{r save-umap-rna-er, eval = FALSE}
+ggplot2::ggsave("vignettes/figures/brca_umap_rna_er_status.png",
+       p_umap, width = 7, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_umap_rna_er_status.pdf",
+               width = 7, height = 5)
+print(p_umap)
+grDevices::dev.off()
+```
+
+```{r show-umap-rna-er, echo = FALSE, eval = TRUE, fig.cap = "UMAP of top-1000 variable genes from TCGA-BRCA RNA-seq, colored by ER status."}
+knitr::include_graphics("figures/brca_umap_rna_er_status.png")
+```
+
+### 2.3 t-SNE
+
+```{r tsne-rna-er}
+metadata_dim        <- brca_rna_metadata_er_shared
+metadata_dim$id     <- rownames(metadata_dim)
+
+p_tsne <- nice_tSNE(
+  object        = brca_rna_vst_or_logexpr_small,
+  annotations   = metadata_dim,
+  variables     = c(fill = "ER_group"),
+  legend_names  = c(fill = "ER status"),
+  colors        = c("steelblue", "firebrick"),
+  shapes        = c(21, 21),
+  seed          = 2025,
+  title         = "TCGA-BRCA: t-SNE by ER status"
+)
+p_tsne
+```
+
+```{r save-tsne-rna-er, eval = FALSE}
+ggplot2::ggsave("vignettes/figures/brca_tsne_rna_er_status.png",
+       p_tsne, width = 7, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_tsne_rna_er_status.pdf",
+               width = 7, height = 5)
+print(p_tsne)
+grDevices::dev.off()
+```
+
+```{r show-tsne-rna-er, echo = FALSE, eval = TRUE, fig.cap = "t-SNE of top-1000 variable genes from TCGA-BRCA RNA-seq, colored by ER status."}
+knitr::include_graphics("figures/brca_tsne_rna_er_status.png")
+```
+
+## 3. ER-positive vs ER-negative Comparison
+
+The ER-positive vs ER-negative comparison uses primary tumor samples only. The contrast is `ER_positive - ER_negative` from a limma workflow, so `logFC > 0` means higher abundance in ER-positive tumors. RNA-seq and RPPA results are summarized separately because RNA and protein dynamic ranges differ.
+
+```{r er-comparison-summary}
+er_sig <- sum(brca_rna_dea_er_pos_vs_er_neg$padj < 0.05, na.rm = TRUE)
+rp_sig <- sum(brca_rppa_dea_gene_er_pos_vs_er_neg$padj < 0.05, na.rm = TRUE)
+
+data.frame(
+  layer      = c("RNA-seq", "RPPA"),
+  n_features = c(
+    nrow(brca_rna_dea_er_pos_vs_er_neg),
+    nrow(brca_rppa_dea_gene_er_pos_vs_er_neg)
+  ),
+  n_FDR_lt_0.05 = c(er_sig, rp_sig)
+)
+```
+
+```{r er-group-sizes}
+table(brca_rna_metadata_er_shared$ER_group)
+```
+
+## 4. Gene Annotations
+
+`get_annotations()` queries Ensembl BioMart, here shown for Ensembl v112, and `add_annotations()` joins the annotation table to the differential-expression result using gene IDs as keys. This section is not evaluated during vignette builds because it requires internet access and BioMart queries can be slow or temporarily unavailable. The shipped object `brca_rna_dea_er_pos_vs_er_neg` already contains a `gene_symbol` column precomputed from this workflow.
+
+```{r gene-annotations, eval = FALSE}
+# Step 1: fetch annotations for genes in ER DEA (eval = FALSE)
+er_gene_ids <- brca_rna_dea_er_pos_vs_er_neg$gene_id
+
+annotations <- get_annotations(
+  ensembl_ids = er_gene_ids,
+  species     = "hsapiens_gene_ensembl",
+  version     = "112",
+  mode        = "genes",
+  filename    = NULL          # return data frame, do not write file
+)
+
+# Step 2: join symbol and biotype to DEA table
+brca_rna_dea_er_annotated <- add_annotations(
+  object    = brca_rna_dea_er_pos_vs_er_neg,
+  reference = annotations,
+  variables = c("symbol", "biotype", "chromosome")
+)
+
+head(brca_rna_dea_er_annotated[, c("gene_id", "symbol", "logFC", "padj")])
+```
+
+## 5. Filtering Genes by Expression Detectability and Trend
+
+`detect_filter()` identifies genes that are actually expressed above baseMean and mean-count thresholds in the groups of interest. This prevents reporting genes that are technically significant but biologically undetectable. `trend_filter()` is complementary: for paired or ordered comparisons it checks that the fold-change direction is patient-level consistent, removing genes that are significant mainly because of a few outlier patients. Both functions are shown with `eval = FALSE` because `trend_filter()` requires validated paired tumor-normal relationships and full-size expression matrices. Run these examples only after confirming that the metadata and expression matrices use the same sample identifiers.
+
+### 5.1 detect_filter
+
+```{r detect-filter, eval = FALSE}
+# detect_filter requires a column named "ensembl" in the DEA results
+res_tn <- brca_rna_dea_tumor_vs_normal
+colnames(res_tn)[colnames(res_tn) == "gene_id"] <- "ensembl"
+rownames(res_tn) <- res_tn$ensembl
+
+# Get sample IDs per group from metadata
+samples_normal <- rownames(brca_rna_metadata_tumor_normal)[
+  brca_rna_metadata_tumor_normal$rna_tumor_normal == "Normal"
+]
+samples_tumor <- rownames(brca_rna_metadata_tumor_normal)[
+  brca_rna_metadata_tumor_normal$rna_tumor_normal == "Tumor"
+]
+
+detected <- detect_filter(
+  norm.counts        = as.data.frame(brca_rna_expr_tumor_normal_filtered),
+  df.BvsA            = res_tn,
+  samples.baseline   = samples_normal,
+  samples.condition1 = samples_tumor,
+  cutoffs            = c(50, 50, 0)
+)
+
+cat("Total detectable genes:", length(detected$DetectGenes), "\n")
+head(detected$Comparison1)
+```
+
+### 5.2 trend_filter
+
+> **Note:** `trend_filter()` is designed for paired/ordered comparisons where patient-level pairing has been validated. The Tumor vs Normal example requires confirmed patient-level pairing. Run this only after validating your metadata.
+
+```{r trend-filter, eval = FALSE}
+# Requires validated patient-level pairing in metadata
+# The gene.col and lfc.col must match columns in the results data frame
+tn_metadata <- brca_rna_metadata_tumor_normal
+tn_metadata$sample_id <- rownames(tn_metadata)
+tn_metadata$patient_id <- tn_metadata$patient
+
+trend_res <- trend_filter(
+  expr       = brca_rna_expr_tumor_normal_filtered,
+  sampledata = tn_metadata,
+  results    = list(Tumor_vs_Normal = res_tn),
+  baseline   = "Normal",
+  conditions = c(Tumor_vs_Normal = "Tumor"),
+  sample.col  = "sample_id",
+  patient.col = "patient_id",
+  group.col   = "rna_tumor_normal",
+  gene.col    = "ensembl",
+  lfc.col     = "logFC",
+  scale       = "log2"
+)
+
+# Genes retained after trend consistency filter
+cat("Trend-consistent genes:", length(trend_res$filtered_genes), "\n")
+```
+
+## 6. Saving Top Marker Tables
+
+`save_results()` exports three `.xlsx` files from a DEA data frame: all genes, upregulated markers, and downregulated markers. This makes it easy to share marker tables with collaborators. The example is shown with `eval = FALSE` because it writes files to disk.
+
+```{r save-results, eval = FALSE}
+# Save ER+ vs ER- RNA-seq top markers (eval = FALSE)
+save_results(
+  df           = brca_rna_dea_er_pos_vs_er_neg,
+  name         = "BRCA_RNA_ER_pos_vs_ER_neg",
+  l2fc         = 1,
+  cutoff_alpha = 0.05
+)
+# Creates:
+#   BRCA_RNA_ER_pos_vs_ER_neg_full.xlsx
+#   BRCA_RNA_ER_pos_vs_ER_neg_up_log2FC>1_FDR<0.05.xlsx
+#   BRCA_RNA_ER_pos_vs_ER_neg_down_log2FC<1_FDR<0.05.xlsx
+
+# Save RPPA top markers
+save_results(
+  df           = brca_rppa_dea_gene_er_pos_vs_er_neg,
+  name         = "BRCA_RPPA_ER_pos_vs_ER_neg",
+  l2fc         = 0.2,
+  cutoff_alpha = 0.05
+)
+```
+
+## 7. Volcano Plots
+
+`nice_Volcano()` displays genome-wide differential results with automatic labeling of top hits, triangle markers for extreme p-values, and color coding for upregulated, downregulated, and non-significant genes. We show three volcanoes: RNA-seq Tumor vs Normal, RNA-seq ER-positive vs ER-negative, and RPPA ER-positive vs ER-negative. Each plotting call is shown as `eval = FALSE` code followed by a prerendered figure. `y_max = 15` is used for all three volcano calls; the RPPA volcano uses a smaller `x_range` and `cutoff_x` because RPPA fold-changes are compressed relative to RNA-seq.
+
+### 7.1 RNA-seq: Tumor vs Normal
+
+```{r volcano-rna-tumor-normal, eval = FALSE}
+p_vol_tn <- nice_Volcano(
+  results   = brca_rna_dea_tumor_vs_normal,
+  x_var     = "logFC",
+  y_var     = "padj",
+  label_var = "gene_symbol",
+  title     = "RNA-seq: Tumor vs Normal",
+  cutoff_y  = 0.05,
+  cutoff_x  = 1,
+  x_range   = 10,
+  y_max     = 15
+)
+ggplot2::ggsave("vignettes/figures/brca_volcano_rna_tumor_vs_normal.png",
+       p_vol_tn, width = 8, height = 6, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_volcano_rna_tumor_vs_normal.pdf",
+               width = 8, height = 6)
+print(p_vol_tn)
+grDevices::dev.off()
+```
+
+```{r show-volcano-rna-tumor-normal, echo = FALSE, eval = TRUE, fig.cap = "RNA-seq DEA Tumor vs Normal. Positive logFC = higher in tumor. Triangles indicate FDR < 10^-15."}
+knitr::include_graphics("figures/brca_volcano_rna_tumor_vs_normal.png")
+```
+
+### 7.2 RNA-seq: ER+ vs ER-
+
+```{r volcano-rna-er, eval = FALSE}
+p_vol_er_rna <- nice_Volcano(
+  results   = brca_rna_dea_er_pos_vs_er_neg,
+  x_var     = "logFC",
+  y_var     = "padj",
+  label_var = "gene_symbol",
+  title     = "RNA-seq: ER-positive vs ER-negative",
+  cutoff_y  = 0.05,
+  cutoff_x  = 1,
+  x_range   = 10,
+  y_max     = 15
+)
+ggplot2::ggsave("vignettes/figures/brca_volcano_rna_er_pos_vs_er_neg.png",
+       p_vol_er_rna, width = 8, height = 6, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_volcano_rna_er_pos_vs_er_neg.pdf",
+               width = 8, height = 6)
+print(p_vol_er_rna)
+grDevices::dev.off()
+```
+
+```{r show-volcano-rna-er, echo = FALSE, eval = TRUE, fig.cap = "RNA-seq DEA ER-positive vs ER-negative primary tumors. Top ER-associated markers (ESR1, PGR, GATA3) appear as strongly upregulated in ER+."}
+knitr::include_graphics("figures/brca_volcano_rna_er_pos_vs_er_neg.png")
+```
+
+### 7.3 RPPA: ER+ vs ER-
+
+```{r volcano-rppa-er, eval = FALSE}
+p_vol_er_rppa <- nice_Volcano(
+  results   = brca_rppa_dea_gene_er_pos_vs_er_neg,
+  x_var     = "logFC",
+  y_var     = "padj",
+  label_var = "gene",
+  title     = "RPPA: ER-positive vs ER-negative",
+  cutoff_y  = 0.05,
+  cutoff_x  = 0.20,
+  x_range   = 2,
+  y_max     = 15
+)
+ggplot2::ggsave("vignettes/figures/brca_volcano_rppa_er_pos_vs_er_neg.png",
+       p_vol_er_rppa, width = 8, height = 6, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_volcano_rppa_er_pos_vs_er_neg.pdf",
+               width = 8, height = 6)
+print(p_vol_er_rppa)
+grDevices::dev.off()
+```
+
+```{r show-volcano-rppa-er, echo = FALSE, eval = TRUE, fig.cap = "RPPA DEA ER-positive vs ER-negative. logFC scale is compressed vs RNA-seq; cutoff_x = 0.20 reflects RPPA dynamic range."}
+knitr::include_graphics("figures/brca_volcano_rppa_er_pos_vs_er_neg.png")
+```
+
+## 8. RNA–RPPA Cross-Layer Concordance
+
+Integrating RNA-seq and RPPA data for the same comparison allows us to assess transcription-to-protein concordance. Genes concordant in both layers provide stronger evidence of true biological change. OmicsKit provides three complementary functions: `concordanceDE()` classifies genes into concordant, discordant, only_x, only_y, and not_significant categories and computes a concordance score. `crossLayerCorr()` computes sample-level Spearman correlations between the two omics layers using the most variable shared features. `nice_ConcordanceScatter()` visualizes the logFC-logFC relationship between layers.
+
+### 8.1 concordanceDE
+
+The package includes the precomputed output of `concordanceDE()` as `brca_concordance_rna_rppa_er`.
+
+```{r concordance-summary}
+# The object is already the output of concordanceDE()
+# Explore the concordance summary
+brca_concordance_rna_rppa_er$summary
+
+cat("Concordance score (RNA vs RPPA, ER comparison):",
+    brca_concordance_rna_rppa_er$concordance_score, "\n")
+
+cat("Shared genes:", brca_concordance_rna_rppa_er$n_shared_genes, "\n")
+cat("Both significant:", brca_concordance_rna_rppa_er$n_both_significant, "\n")
+```
+
+```{r concordance-reference-code, eval = FALSE}
+# How the concordance object was generated (eval = FALSE, for reference)
+# NOTE: both tables are standardized to a shared `gene` column first.
+rna_de_for_concordance <- brca_rna_dea_er_pos_vs_er_neg
+rna_de_for_concordance$gene <- rna_de_for_concordance$gene_symbol
+
+rppa_de_for_concordance <- brca_rppa_dea_gene_er_pos_vs_er_neg
+
+brca_concordance_rna_rppa_er <- concordanceDE(
+  de_x            = rna_de_for_concordance,
+  de_y            = rppa_de_for_concordance,
+  gene_col        = "gene",
+  logfc_col       = "logFC",
+  padj_col        = "padj",
+  padj_threshold  = c(0.05, 0.05),
+  logfc_threshold = c(1, 0.20)
+)
+```
+
+### 8.2 crossLayerCorr
+
+```{r crosslayercorr-summary}
+# Precomputed crossLayerCorr output
+cat("Median Spearman r (RNA vs RPPA, ER samples):",
+    brca_crosslayercorr_rna_rppa_er$median_r, "\n")
+
+cat("Shared samples:", brca_crosslayercorr_rna_rppa_er$n_shared_samples, "\n")
+cat("Features used:", brca_crosslayercorr_rna_rppa_er$n_features_used, "\n")
+```
+
+```{r crosslayercorr-reference-code, eval = FALSE}
+# How the crossLayerCorr object was generated (eval = FALSE, for reference)
+brca_crosslayercorr_rna_rppa_er <- crossLayerCorr(
+  mat_x  = brca_rna_expr_er_shared_filtered,
+  mat_y  = brca_rppa_expr_gene_er_shared,
+  method = "spearman",
+  top_n  = 500,
+  plot   = TRUE
+)
+```
+
+```{r crosslayercorr-plot-save, eval = FALSE}
+# Plot from the crossLayerCorr workflow (eval = FALSE)
+brca_crosslayercorr_rna_rppa_er_plot <- crossLayerCorr(
+  mat_x  = brca_rna_expr_er_shared_filtered,
+  mat_y  = brca_rppa_expr_gene_er_shared,
+  method = "spearman",
+  top_n  = 500,
+  plot   = TRUE
+)
+
+p_crosslayer <- brca_crosslayercorr_rna_rppa_er_plot$plot
+
+ggplot2::ggsave(
+  "vignettes/figures/CrossLayerCorr_RNAseq_RPPA_samples.png",
+  p_crosslayer,
+  width = 10, height = 5, dpi = 150
+)
+
+grDevices::pdf("vignettes/figures/CrossLayerCorr_RNAseq_RPPA_samples.pdf",
+               width = 10, height = 5)
+print(p_crosslayer)
+grDevices::dev.off()
+```
+
+```{r show-crosslayercorr, echo = FALSE, eval = TRUE, fig.cap = "Sample-level Spearman correlation between RNA-seq and RPPA expression profiles in TCGA-BRCA ER-comparison samples. Dashed line = median r. Sorted by decreasing correlation."}
+knitr::include_graphics("figures/CrossLayerCorr_RNAseq_RPPA_samples.png")
+```
+
+### 8.3 nice_ConcordanceScatter
+
+```{r concordance-scatter-save, eval = FALSE}
+p_conc <- nice_ConcordanceScatter(
+  concordance_result = brca_concordance_rna_rppa_er,
+  x_label            = "log2FC (RNA-seq)",
+  y_label            = "log2FC (RPPA)",
+  genes_label        = c("ESR1", "PGR", "GATA3", "ERBB2", "EGFR",
+                         "MKI67", "CDH1", "AR")
+)
+ggplot2::ggsave(
+  "vignettes/figures/ConcordanceScatter_RNAseq_RPPA_ERpositive_vs_ERnegative.png",
+  p_conc, width = 7, height = 7, dpi = 150
+)
+
+grDevices::pdf(
+  "vignettes/figures/ConcordanceScatter_RNAseq_RPPA_ERpositive_vs_ERnegative.pdf",
+  width = 7, height = 7
+)
+print(p_conc)
+grDevices::dev.off()
+```
+
+```{r show-concordance-scatter, echo = FALSE, eval = TRUE, fig.cap = "Concordance scatter plot: RNA-seq vs RPPA logFC for ER+ vs ER- comparison. Concordant genes (same direction in both layers) are shown in teal, discordant in orange. Key ER-associated genes are labeled."}
+knitr::include_graphics(
+  "figures/ConcordanceScatter_RNAseq_RPPA_ERpositive_vs_ERnegative.png"
+)
+```
+
+## 9. Gene-level Expression: Violin-Scatter-Box Plots
+
+`nice_VSB()` displays per-gene expression across sample groups by combining violin, scatter, and box layers. `get_stars()` returns a significance string such as `"***"` from a DEA results object for a given gene, enabling annotation of comparisons. We show biologically relevant BRCA markers: **ESR1**, the master regulator of ER signaling and a strong ER-positive RNA marker; **PGR**, a progesterone receptor marker co-expressed with ESR1 in luminal tumors; **GATA3**, a luminal transcription factor and robust ER-positive marker; and **ERBB2**, the HER2 protein measured by RPPA. Because the current `nice_VSB()` implementation uses `sample_type` for the x-axis, the plotting annotations below copy `ER_group` into `sample_type` while preserving `ER_group` for point color. `nice_VSB()` also log2-transforms the supplied matrix internally, so the displayed code applies a plot-only positive shift when a normalized matrix contains zero or negative values.
+
+### 9.1 ESR1 - RNA-seq
+
+```{r vsb-esr1-rna, eval = FALSE}
+# Prepare DEA for get_stars (needs "ensembl" column)
+er_res_for_stars <- brca_rna_dea_er_pos_vs_er_neg
+colnames(er_res_for_stars)[colnames(er_res_for_stars) == "gene_symbol"] <- "ensembl"
+
+stars_ESR1 <- get_stars(
+  geneID = "ESR1",
+  object = er_res_for_stars
+)
+
+vsb_rna_expr <- brca_rna_expr_er_shared_filtered
+if (min(vsb_rna_expr, na.rm = TRUE) <= 0) {
+  vsb_rna_expr <- vsb_rna_expr - min(vsb_rna_expr, na.rm = TRUE) + 1e-3
+}
+
+vsb_annotations_rna <- brca_rna_metadata_er_shared[
+  colnames(vsb_rna_expr), , drop = FALSE
+]
+vsb_annotations_rna$sample_type <- vsb_annotations_rna$ER_group
+
+p_vsb_esr1 <- nice_VSB(
+  object      = vsb_rna_expr,
+  annotations = vsb_annotations_rna,
+  variables   = c(fill = "ER_group"),
+  genename    = "ESR1",
+  symbol      = paste0("(", stars_ESR1, ")"),
+  categories  = c("ER_negative", "ER_positive"),
+  labels      = c("ER-", "ER+"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+
+ggplot2::ggsave("vignettes/figures/brca_vsb_rna_ESR1.png",
+       p_vsb_esr1, width = 6, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_vsb_rna_ESR1.pdf",
+               width = 6, height = 5)
+print(p_vsb_esr1)
+grDevices::dev.off()
+```
+
+```{r show-vsb-esr1-rna, echo = FALSE, eval = TRUE, fig.cap = "ESR1 RNA-seq expression (log2 normalized counts) across ER-negative and ER-positive TCGA-BRCA primary tumors. ESR1 is the direct target of ER signaling and the most discriminant marker in this comparison."}
+knitr::include_graphics("figures/brca_vsb_rna_ESR1.png")
+```
+
+### 9.2 PGR - RNA-seq
+
+```{r vsb-pgr-rna, eval = FALSE}
+stars_PGR <- get_stars(geneID = "PGR", object = er_res_for_stars)
+
+p_vsb_pgr <- nice_VSB(
+  object      = vsb_rna_expr,
+  annotations = vsb_annotations_rna,
+  variables   = c(fill = "ER_group"),
+  genename    = "PGR",
+  symbol      = paste0("(", stars_PGR, ")"),
+  categories  = c("ER_negative", "ER_positive"),
+  labels      = c("ER-", "ER+"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+
+ggplot2::ggsave("vignettes/figures/brca_vsb_rna_PGR.png",
+       p_vsb_pgr, width = 6, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_vsb_rna_PGR.pdf",
+               width = 6, height = 5)
+print(p_vsb_pgr)
+grDevices::dev.off()
+```
+
+```{r show-vsb-pgr-rna, echo = FALSE, eval = TRUE, fig.cap = "PGR (progesterone receptor) RNA-seq expression in TCGA-BRCA. PGR is a luminal marker co-expressed with ESR1 and part of the canonical ER+ gene program."}
+knitr::include_graphics("figures/brca_vsb_rna_PGR.png")
+```
+
+### 9.3 GATA3 - RNA-seq
+
+```{r vsb-gata3-rna, eval = FALSE}
+stars_GATA3 <- get_stars(geneID = "GATA3", object = er_res_for_stars)
+
+p_vsb_gata3 <- nice_VSB(
+  object      = vsb_rna_expr,
+  annotations = vsb_annotations_rna,
+  variables   = c(fill = "ER_group"),
+  genename    = "GATA3",
+  symbol      = paste0("(", stars_GATA3, ")"),
+  categories  = c("ER_negative", "ER_positive"),
+  labels      = c("ER-", "ER+"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+
+ggplot2::ggsave("vignettes/figures/brca_vsb_rna_GATA3.png",
+       p_vsb_gata3, width = 6, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_vsb_rna_GATA3.pdf",
+               width = 6, height = 5)
+print(p_vsb_gata3)
+grDevices::dev.off()
+```
+
+```{r show-vsb-gata3-rna, echo = FALSE, eval = TRUE, fig.cap = "GATA3 RNA-seq expression in TCGA-BRCA. GATA3 is a luminal transcription factor and a robust marker of ER-positive breast tumors, also used in clinical diagnostics."}
+knitr::include_graphics("figures/brca_vsb_rna_GATA3.png")
+```
+
+### 9.4 ERBB2 - RPPA protein level
+
+```{r vsb-erbb2-rppa, eval = FALSE}
+# RPPA get_stars: use RPPA DEA table
+rppa_res_for_stars <- brca_rppa_dea_gene_er_pos_vs_er_neg
+colnames(rppa_res_for_stars)[colnames(rppa_res_for_stars) == "gene"] <- "ensembl"
+
+stars_ERBB2 <- get_stars(geneID = "ERBB2", object = rppa_res_for_stars)
+
+vsb_rppa_expr <- brca_rppa_expr_gene_er_shared
+if (min(vsb_rppa_expr, na.rm = TRUE) <= 0) {
+  vsb_rppa_expr <- vsb_rppa_expr - min(vsb_rppa_expr, na.rm = TRUE) + 1e-3
+}
+
+stopifnot("ERBB2" %in% rownames(vsb_rppa_expr))
+
+vsb_annotations_rppa <- brca_rna_metadata_er_shared[
+  colnames(vsb_rppa_expr), , drop = FALSE
+]
+vsb_annotations_rppa$sample_type <- vsb_annotations_rppa$ER_group
+
+p_vsb_erbb2 <- nice_VSB(
+  object      = vsb_rppa_expr,
+  annotations = vsb_annotations_rppa,
+  variables   = c(fill = "ER_group"),
+  genename    = "ERBB2",
+  symbol      = paste0("RPPA (", stars_ERBB2, ")"),
+  categories  = c("ER_negative", "ER_positive"),
+  labels      = c("ER-", "ER+"),
+  colors      = c("steelblue", "firebrick"),
+  shapes      = 21,
+  markersize  = 3
+)
+
+ggplot2::ggsave("vignettes/figures/brca_vsb_rppa_ERBB2.png",
+       p_vsb_erbb2, width = 6, height = 5, dpi = 150)
+
+grDevices::pdf("vignettes/figures/brca_vsb_rppa_ERBB2.pdf",
+               width = 6, height = 5)
+print(p_vsb_erbb2)
+grDevices::dev.off()
+```
+
+```{r show-vsb-erbb2-rppa, echo = FALSE, eval = TRUE, fig.cap = "ERBB2 protein signal (RPPA) across ER-negative and ER-positive TCGA-BRCA primary tumors. ERBB2 (HER2) amplification occurs in a subset of both ER groups, generating the bimodal distribution characteristic of this marker."}
+knitr::include_graphics("figures/brca_vsb_rppa_ERBB2.png")
+```
+
+## Reproducibility
+
+Package objects and pre-rendered figures are generated by scripts in `data-raw/brca/`. The vignette does not re-run data preparation to keep build times short and results reproducible across environments.
+
+```{r session-info}
+sessionInfo()
+```
+

@@ -113,13 +113,13 @@ function will use \code{log2(ratio)} as an additive threshold.
 \examples{
 \dontrun{
 trend_res <- trend_filter(
-  expr = norm_counts,
-  sampledata = sampledata,
+  expr = brca_rna_expr_tumor_normal_filtered,
+  sampledata = brca_rna_metadata_tumor_normal,
   results = list(Tumor_vs_Normal = deseq_res),
-  baseline = "normal",
-  conditions = c(Tumor_vs_Normal = "tumor"),
-  sample.col = "sample_id",
-  patient.col = "patient_id",
+  baseline = "Solid Tissue Normal",
+  conditions = c(Tumor_vs_Normal = "Primary Tumor"),
+  sample.col = "sampleID",
+  patient.col = "patient",
   group.col = "sample_type"
 )
 

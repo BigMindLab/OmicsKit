@@ -13,6 +13,11 @@ splot_PA(
   order = "desc",
   fill_limits = NULL,
   fill_palette = c("white", "red"),
+  top_n = NULL,
+  top_n_per_direction = NULL,
+  clean_labels = TRUE,
+  label_wrap = 35,
+  symmetric_x = TRUE,
   theme_params = list()
 )
 }
@@ -49,6 +54,27 @@ rest. Default: \code{NULL} (auto  uses the actual data range).}
 
 \item{fill_palette}{Character vector of two colors for the fill gradient
 (low to high -log10(FDR)). Default: \code{c("white", "red")}.}
+
+\item{top_n}{Integer. If set, keep only the top \code{top_n} gene sets ranked
+by \code{abs(nes_col)}. Ignored if \code{top_n_per_direction} is set.
+Default: \code{NULL} (keep all).}
+
+\item{top_n_per_direction}{Integer. If set, keep the top N gene sets with
+the highest positive NES and the top N with the lowest (most negative)
+NES separately, so both directions remain represented. Takes precedence
+over \code{top_n}. Default: \code{NULL} (keep all).}
+
+\item{clean_labels}{Logical. If \code{TRUE}, strip common MSigDB collection
+prefixes (\code{"HALLMARK_"}, \code{"KEGG_"}, \code{"REACTOME_"}, \code{"GOBP_"}, \code{"GOCC_"},
+\code{"GOMF_"}) from gene set names, replace underscores with spaces, and
+convert to title case. Default: \code{TRUE}.}
+
+\item{label_wrap}{Integer. Character width at which gene set labels are
+wrapped onto multiple lines. Default: \code{35}.}
+
+\item{symmetric_x}{Logical. If \code{TRUE}, the x-axis (NES) range is made
+symmetric around zero using the largest absolute NES value in \code{data}.
+Default: \code{TRUE}.}
 
 \item{theme_params}{Named list to override default theme parameters.
 See Details.}
@@ -113,5 +139,5 @@ splot_PA(
 \seealso{
 \code{\link[=multiplot_PA]{multiplot_PA()}} for multi-comparison faceted barplots;
 \code{\link[=merge_PA]{merge_PA()}} to generate the input data frame;
-\link{camera_results} for a minimal example dataset.
+\link{brca_pa_results} for a minimal example dataset.
 }

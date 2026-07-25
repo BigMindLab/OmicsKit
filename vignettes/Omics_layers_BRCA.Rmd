@@ -1,0 +1,104 @@
+---
+title: "TCGA-BRCA Omics-Layer Visualization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TCGA-BRCA Omics-Layer Visualization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.align = "center",
+  warning   = FALSE,
+  message   = FALSE,
+  error     = FALSE,
+  fig.width = 7,
+  fig.height = 5
+)
+
+plot_or_message <- function(expr) {
+  res <- try(eval.parent(substitute(expr)), silent = TRUE)
+
+  if (inherits(res, "try-error")) {
+    message("Plot call was evaluated but did not complete in this environment:")
+    message(conditionMessage(attr(res, "condition")))
+    return(invisible(NULL))
+  }
+
+  if (inherits(res, "ggplot")) {
+    print(res)
+  } else if (!is.null(res)) {
+    print(res)
+  }
+
+  invisible(res)
+}
+
+include_optional_figure <- function(path) {
+  if (file.exists(path)) {
+    knitr::include_graphics(path)
+  } else {
+    cat("Figure not found: ", path, "\n", sep = "")
+  }
+}
+```
+
+## Overview
+
+This vignette demonstrates how to visualize multi-omics data integrated into genomic coordinates using **OmicsKit**. This workflow focuses on:
+
+1. Mapping and plotting omics features along linear chromosomes using `nice_GenomeTrack()`.
+2. Generating whole-genome circular representations via `nice_circos()`.
+
+## 1. Data Loading
+
+We begin by loading the package and the multi-layer tracking dataset pre-computed for the TCGA-BRCA cohort.
+
+```{r load-data}
+library(OmicsKit)
+
+# Load integrated genomic track coordinates and data
+data("brca_omics_layer_tracks")
+```
+
+## 2. Linear Genomic Tracks (`nice_GenomeTrack`)
+
+The `nice_GenomeTrack()` function allows you to plot specific molecular features or statistical metrics, such as log2 fold changes or mutation frequencies, across individual chromosomes or specific genomic regions.
+
+This provides a clear one-dimensional overview of how molecular changes are spatially distributed across the genome.
+
+```{r genome-track-call, fig.cap = "Linear genomic track visualization for selected chromosomes."}
+plot_or_message(
+  nice_GenomeTrack(
+    tracks = brca_omics_layer_tracks$genome_tracks
+  )
+)
+```
+
+## 3. Circular Genome Visualization (`nice_circos`)
+
+For a global, multi-layered perspective of the entire genome, a circular layout, commonly known as a Circos plot, is widely used in bioinformatics. The `nice_circos()` function integrates multiple tracks, such as copy number variation, expression levels, and clinical groups, into a single unified plot.
+
+Since rendering interactive or highly detailed Circos plots during package compilation can be resource-intensive, the code block below is set to `eval = FALSE`. A pre-rendered high-resolution static image can be saved in the package figures directory for rapid documentation rendering.
+
+```{r nice-circos-call, eval = FALSE}
+# Example code to generate the full circular layout
+nice_circos(
+  tracks    = brca_omics_layer_tracks$circos_tracks,
+  genome    = "hg38",
+  sample_id = brca_omics_layer_tracks$sample_id
+)
+```
+
+```{r circos-display, echo = FALSE, out.width = "90%", fig.cap = "Whole-genome circular multi-omics layout for TCGA-BRCA."}
+include_optional_figure("figures/TCGA_A1_A0SH_genomewide_circos.jpg")
+```
+
+## Session Info
+
+```{r session-info}
+sessionInfo()
+```

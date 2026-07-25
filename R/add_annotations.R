@@ -15,18 +15,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' data(norm_counts)
+#' data(brca_rna_expr_tumor_normal_filtered)
 #'
 #' # Requires a reference table with a "geneID" column.
 #' # Use get_annotations() to generate it:
 #' annotations <- get_annotations(
-#'   ensembl_ids = rownames(norm_counts),
+#'   ensembl_ids = rownames(brca_rna_expr_tumor_normal_filtered),
 #'   mode        = "genes"
 #' )
 #'
 #' # Add gene symbol and biotype columns to the counts matrix
 #' norm_counts_annot <- add_annotations(
-#'   object    = norm_counts,
+#'   object    = brca_rna_expr_tumor_normal_filtered,
 #'   reference = annotations,
 #'   variables = c("symbol", "biotype")
 #' )
@@ -36,13 +36,13 @@
 #'
 #' # Add all annotation columns (variables = NULL uses everything)
 #' norm_counts_full <- add_annotations(
-#'   object    = norm_counts,
+#'   object    = brca_rna_expr_tumor_normal_filtered,
 #'   reference = annotations
 #' )
 #' }
 #'
 #' @seealso [get_annotations()] to generate the `reference` table;
-#'   [norm_counts] for an example input matrix.
+#'   [brca_rna_expr_tumor_normal_filtered] for an example input matrix.
 #'
 #' @export
 

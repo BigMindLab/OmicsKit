@@ -1,0 +1,374 @@
+---
+title: "TCGA-BRCA Pathway Analysis and Clustering Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TCGA-BRCA Pathway Analysis and Clustering Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>",
+  fig.align = "center",
+  warning   = FALSE,
+  message   = FALSE,
+  error     = FALSE,
+  fig.width = 7,
+  fig.height = 5
+)
+
+plot_or_message <- function(expr) {
+  res <- try(eval.parent(substitute(expr)), silent = TRUE)
+
+  if (inherits(res, "try-error")) {
+    message("Plot call was evaluated but did not complete in this environment:")
+    message(conditionMessage(attr(res, "condition")))
+    return(invisible(NULL))
+  }
+
+  if (inherits(res, "ggplot")) {
+    print(res)
+  } else if (!is.null(res)) {
+    print(res)
+  }
+
+  invisible(res)
+}
+
+include_optional_figure <- function(path) {
+  if (file.exists(path)) {
+    knitr::include_graphics(path)
+  } else {
+    cat("Figure not found: ", path, "\n", sep = "")
+  }
+}
+
+```
+
+## Overview
+
+This vignette demonstrates a downstream workflow for Pathway Analysis (e.g., GSEA) using **OmicsKit**, applied to the TCGA-BRCA dataset. The workflow covers:
+
+1. **Exploring enriched pathways** using single and multi-comparison visualizations (`splot_PA`, `multiplot_PA`).
+2. **Extracting and annotating genes** from pathway results (`getgenesPA`, `addgenesPA`).
+3. **Visualizing gene-level expression** inside selected pathways via heatmaps (`heatmap_PA`).
+4. **Reducing redundancy** by computing pathway similarity and clustering pathway terms (`geneset_similarity`, `do_clust`).
+5. **Detecting network communities** and identifying biological super-terms (`get_network_communities`, `network_clust_gg`).
+
+Several computationally intensive visualizations are shown as pre-rendered static figures to keep vignette compilation fast and reproducible.
+
+## 1. Data Loading
+
+First, we load the package and the pre-computed TCGA-BRCA objects provided in the `data/` folder.
+
+```{r load-data}
+library(OmicsKit)
+
+# Load pathway analysis results, gene set lists, and ranked genes
+data("brca_pa_merged")
+data("brca_geneset_list")
+data("brca_ranked_genes")
+
+# Load pre-computed clustering and similarity objects
+data("brca_pa_similarity")
+data("brca_pa_clustering")
+
+```
+
+Let's take a quick look at the merged pathway analysis results:
+
+```{r overview-results}
+table(brca_pa_merged$COMPARISON, brca_pa_merged$COLLECTION)
+
+```
+
+## 2. Visualization of Enriched Pathways
+
+OmicsKit provides specialized functions to visualize GSEA results easily.
+
+### Single Comparison (`splot_PA`)
+
+We can visualize the significant pathways for a specific comparison, for example, *ER positive vs ER negative* within the Hallmark collection.
+
+The code below shows how the plot was generated. The vignette displays a pre-rendered figure to avoid re-rendering a large pathway plot during package checks or website builds.
+
+```{r splot-example-code, eval = FALSE}
+pa_single <- subset(
+  brca_pa_merged,
+  COMPARISON == "ERpositive_vs_ERnegative" & COLLECTION == "Hallmark"
+)
+
+splot_PA(
+  data           = pa_single,
+  geneset_col    = "NAME",
+  collection_col = "COLLECTION",
+  nes_col        = "NES",
+  fdr_col        = "FDR",
+  order          = "desc",
+  fill_limits    = c(0, 5),
+  top_n_per_direction = 15,
+  clean_labels   = TRUE,
+  label_wrap     = 32,
+  theme_params   = list(
+    axis_title_size   = 12,
+    axis_text_size_x  = 10,
+    axis_text_size_y  = 7,
+    strip_text_size   = 10,
+    legend_title_size = 10,
+    legend_text_size  = 9,
+    bar_size          = 0.3,
+    bar_width         = 0.72,
+    hline_size        = 0.45
+  )
+)
+
+```
+
+```{r splot-example-display, echo = FALSE, out.width = "100%", fig.cap = "Top Hallmark pathway enrichments for the ER positive vs ER negative comparison."}
+include_optional_figure("figures/pathway_splot_er_status.png")
+
+```
+
+### Multiple Comparisons (`multiplot_PA`)
+
+If we want to compare enrichment patterns across multiple conditions, we can use `multiplot_PA()`. To keep this example compact, we focus on two comparisons and two estrogen-response Hallmark gene sets.
+
+```{r multiplot-example-code, eval = FALSE}
+pa_multi_subset <- subset(
+  brca_pa_merged,
+  COMPARISON %in% c("Tumor_vs_Normal", "ERpositive_vs_ERnegative") &
+    NAME %in% c(
+      "HALLMARK_ESTROGEN_RESPONSE_EARLY",
+      "HALLMARK_ESTROGEN_RESPONSE_LATE"
+    )
+)
+
+# Clean labels for display
+pa_multi_subset$PATHWAY_LABEL <- pa_multi_subset$NAME
+pa_multi_subset$PATHWAY_LABEL[
+  pa_multi_subset$NAME == "HALLMARK_ESTROGEN_RESPONSE_EARLY"
+] <- "Estrogen response\nearly"
+pa_multi_subset$PATHWAY_LABEL[
+  pa_multi_subset$NAME == "HALLMARK_ESTROGEN_RESPONSE_LATE"
+] <- "Estrogen response\nlate"
+
+comparison_labels <- c(
+  "Tumor_vs_Normal" = "Tumor vs\nNormal",
+  "ERpositive_vs_ERnegative" = "ER+ vs\nER-"
+)
+
+multiplot_PA(
+  data             = pa_multi_subset,
+  comparison_col   = "COMPARISON",
+  facet_col        = "PATHWAY_LABEL",
+  axis_y           = "NES",
+  fdr_col          = "FDR",
+  comparison_order = c("Tumor_vs_Normal", "ERpositive_vs_ERnegative"),
+  custom_labels    = comparison_labels,
+  ncol_wrap        = 2,
+  free_y           = FALSE,
+  fill_limits      = c(0, 5),
+  theme_params     = list(
+    axis_title_size     = 13,
+    axis_text_size_x    = 10,
+    axis_text_size_y    = 10,
+    strip_text_size     = 11,
+    hline_size          = 0.6,
+    tick_size           = 0.4,
+    tick_length         = 0.12,
+    panel_spacing_multi = 0.8
+  )
+)
+
+```
+
+```{r multiplot-example-display, echo = FALSE, out.width = "100%", fig.cap = "Multi-comparison plot for selected Hallmark estrogen-response pathways."}
+include_optional_figure("figures/pathway_multiplot_estrogen_response.png")
+
+```
+
+## 3. Gene Extraction and Annotation
+
+Often, we need to know exactly *which* genes are associated with an enriched pathway result. Here, we extract genes for the same ER positive vs ER negative Hallmark subset.
+
+```{r getgenes-pa-example}
+pa_single <- subset(
+  brca_pa_merged,
+  COMPARISON == "ERpositive_vs_ERnegative" & COLLECTION == "Hallmark"
+)
+
+# Extract all pathway genes and leading-edge genes.
+# The leading-edge option is lightweight and avoids requiring additional top-rank columns.
+gene_lists <- plot_or_message(
+  getgenesPA(
+    pa_data      = pa_single,
+    geneset_list = brca_geneset_list,
+    ranked_genes = brca_ranked_genes$ERpositive_vs_ERnegative,
+    genes        = c("all", "le")
+  )
+)
+
+```
+
+Once extracted, we can append this information directly into our results dataframe using `addgenesPA()`.
+
+```{r addgenes-pa-example}
+if (!is.null(gene_lists)) {
+  pa_annotated <- addgenesPA(
+    pa_data    = pa_single,
+    gene_lists = gene_lists
+  )
+
+  # Check the new columns added
+  print(head(pa_annotated[, c("NAME", "NES", "FDR", "le_genes")], 3))
+}
+
+```
+
+## 4. Visualizing Gene Expression inside Pathways (Heatmaps)
+
+OmicsKit's `heatmap_PA()` function automates the process of drawing expression heatmaps for genes associated with enriched pathways.
+
+For this vignette, we display the leading-edge genes from `"HALLMARK_ESTROGEN_RESPONSE_LATE"` in the `"ERpositive_vs_ERnegative"` comparison. Samples are grouped by estrogen receptor status (`ER_group`) and ordered as ER Positive and ER Negative.
+
+**Note:** The heatmap is displayed from a pre-rendered static image to keep vignette compilation lightweight and reproducible.
+
+```{r heatmap-code, eval = FALSE}
+# Example code to generate the heatmap
+heatmap_PA(
+  expression_data = brca_rna_vst_or_logexpr_small,
+  metadata        = brca_rna_metadata_tumor_normal,
+  pa_data_annot   = pa_annotated,
+  ranked_genes    = brca_ranked_genes$ERpositive_vs_ERnegative,
+  plot_genes      = "le_genes",
+  sample_col      = "sampleID",
+  group_col       = "ER_group",
+  out_dir         = "figures/heatmaps"
+)
+
+```
+
+```{r heatmap-display, echo = FALSE, out.width = "100%", fig.cap = "Leading-edge expression heatmap for HALLMARK_ESTROGEN_RESPONSE_LATE grouped by ER status."}
+include_optional_figure("figures/heatmaps/HALLMARK_ESTROGEN_RESPONSE_LATE_heatmap.jpg")
+
+```
+
+## 5. Reducing Redundancy: Similarity and Clustering
+
+Pathway analysis often returns redundant terms. OmicsKit reduces redundancy by computing pairwise pathway similarity and clustering related gene sets.
+
+The code below illustrates how the silhouette plot can be inspected. The displayed figure is pre-rendered from the ER positive vs ER negative pathway similarity subset.
+
+```{r similarity-clustering-code, eval = FALSE}
+# Example code used during figure generation
+brca_pa_clustering_er <- do_clust(brca_pa_similarity_er)
+brca_pa_clustering_er$silhouette_plot
+
+```
+
+```{r similarity-clustering-display, echo = FALSE, out.width = "100%", fig.cap = "Silhouette plot used to evaluate pathway clustering for the ER positive vs ER negative subset."}
+include_optional_figure("figures/pathway_silhouette_plot.png")
+
+```
+
+## 6. Network Communities and Super-terms
+
+To assign biological meaning to pathway clusters, OmicsKit can detect communities within a pathway similarity network and extract representative biological super-terms.
+
+The original similarity object contains multiple comparisons. For this vignette, the network figures were generated from the `ERpositive_vs_ERnegative` subset only. This keeps the examples focused on one biological contrast and avoids mixing nodes from multiple comparisons.
+
+```{r networks-communities-code, eval = FALSE}
+# Example code used during figure generation
+comparison <- "ERpositive_vs_ERnegative"
+
+brca_pa_similarity_er <- brca_pa_similarity
+keep <- grepl(paste0("^", comparison, "::"), rownames(brca_pa_similarity$jaccard_sim))
+
+brca_pa_similarity_er$jaccard_sim <- brca_pa_similarity$jaccard_sim[
+  keep,
+  keep,
+  drop = FALSE
+]
+
+# Remove the comparison prefix from node names for cleaner labels
+node_names <- sub(
+  paste0("^", comparison, "::"),
+  "",
+  rownames(brca_pa_similarity_er$jaccard_sim)
+)
+
+rownames(brca_pa_similarity_er$jaccard_sim) <- make.unique(node_names)
+colnames(brca_pa_similarity_er$jaccard_sim) <- make.unique(node_names)
+brca_pa_similarity_er$dist_mat <- as.dist(1 - brca_pa_similarity_er$jaccard_sim)
+
+brca_pa_clustering_er <- do_clust(brca_pa_similarity_er)
+
+net_results_er <- get_network_communities(
+  x             = brca_pa_similarity_er,
+  threshold     = 0.3,
+  method        = "louvain",
+  superterms    = TRUE,
+  n_terms       = 3,
+  remove_prefix = TRUE,
+  seed          = 174
+)
+
+head(net_results_er$superterms$summary)
+
+network_clust_gg(
+  x                 = brca_pa_similarity_er,
+  clust_result      = brca_pa_clustering_er,
+  jaccard_threshold = 0.3,
+  min_degree        = 1,
+  superterms        = TRUE,
+  superterm_data    = net_results_er$superterms,
+  type              = "superterms",
+  seed              = 174
+)
+
+```
+
+### Network without super-term labels
+
+This version emphasizes the topology of the ER positive vs ER negative pathway similarity network without adding text labels.
+
+```{r network-clean-display, echo = FALSE, out.width = "100%", fig.cap = "ER positive vs ER negative pathway similarity network without super-term labels."}
+include_optional_figure("figures/pathway_network_er_clean_no_superterms.png")
+
+```
+
+### Network with community super-terms
+
+This version labels pathway communities using automatically derived super-terms.
+
+```{r network-superterms-display, echo = FALSE, out.width = "100%", fig.cap = "ER positive vs ER negative pathway similarity network with community-level super-term labels."}
+include_optional_figure("figures/pathway_network_er_superterms.png")
+
+```
+
+### Individual community view
+
+The individual view is useful when detailed community-level inspection is preferred over a single combined network representation.
+
+```{r network-individual-display, echo = FALSE, out.width = "100%", fig.cap = "Individual ER positive vs ER negative pathway community view."}
+include_optional_figure("figures/pathway_network_er_individual_with_superterms.png")
+
+```
+
+### Combined network representation
+
+The combined view provides a compact summary of the ER positive vs ER negative pathway communities.
+
+```{r network-combined-display, echo = FALSE, out.width = "100%", fig.cap = "Combined ER positive vs ER negative pathway community representation."}
+include_optional_figure("figures/pathway_network_communities.png")
+
+```
+
+## Session Info
+
+```{r session-info}
+sessionInfo()
+
+```

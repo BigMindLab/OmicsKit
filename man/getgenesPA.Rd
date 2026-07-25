@@ -29,7 +29,7 @@ Typically the output of \code{\link[=merge_PA]{merge_PA()}}.}
 
 \item{geneset_list}{A named list of gene sets, where each element is a
 character vector of gene symbols. Typically the output of \code{\link[=list_gmts]{list_gmts()}},
-or use the built-in \link{geneset_list} for quick testing.}
+or use the built-in \link{brca_geneset_list} for quick testing.}
 
 \item{ranked_genes}{A character vector of gene symbols ordered by their
 ranking metric (e.g., DESeq2 \code{stat}, log2FC, or signal-to-noise ratio),
@@ -88,23 +88,23 @@ Requires columns \code{SIZE} and \code{top} in \code{pa_data}.
 \examples{
 \dontrun{
 data(gsea_results)
-data(geneset_list)
-data(deseq2_results)
+data(brca_geneset_list)
+data(brca_rna_dea_tumor_vs_normal)
 
 #or
 gsl <- list_gmts("path/to/gmt_folder/")
 
-ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+ranked    <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
                                           decreasing = TRUE)]
 pa_single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 
 # ── GSEA results: all three modes available
-gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
                          genes = c("all", "le", "top"))
 
 # But first add the top column (e.g. top 30\% of genes by rank)
 pa_single$top <- 0.30
-gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
                          genes = c("all", "le", "top"))
 
 gene_lists$le[["KEGG_APOPTOSIS"]]    # leading edge genes
@@ -115,14 +115,14 @@ pa_annot <- addgenesPA(pa_single, gene_lists)
 head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
 
 # ── CAMERA results: use "top" (no leading edge available) ───
-data(camera_results)
-camera_pa      <- camera_results
+data(brca_pa_results)
+camera_pa      <- brca_pa_results
 colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
 camera_pa$SIZE <- sapply(camera_pa$NAME,
-                         function(x) length(geneset_list[[x]]))
+                         function(x) length(brca_geneset_list[[x]]))
 camera_pa$top  <- 0.25   # top 25\% by rank
 
-gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+gene_lists_cam <- getgenesPA(camera_pa, brca_geneset_list, ranked,
                              genes = c("all", "top"))
 pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
 head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])
@@ -132,6 +132,6 @@ head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])
 \seealso{
 \code{\link[=addgenesPA]{addgenesPA()}} to append gene columns to pa_data;
 \code{\link[=heatmap_PA]{heatmap_PA()}} for heatmap visualization;
-\code{\link[=list_gmts]{list_gmts()}} to generate \code{geneset_list};
+\code{\link[=list_gmts]{list_gmts()}} to generate \code{brca_geneset_list};
 \code{\link[=merge_PA]{merge_PA()}} to generate \code{pa_data} with the required \code{tags} column.
 }

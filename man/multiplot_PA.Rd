@@ -136,5 +136,5 @@ multiplot_PA(
 \seealso{
 \code{\link[=splot_PA]{splot_PA()}} for single-comparison patchwork plots;
 \code{\link[=merge_PA]{merge_PA()}} to generate the input data frame;
-\link{camera_results} for a minimal example dataset.
+\link{brca_pa_results} for a minimal example dataset.
 }

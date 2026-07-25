@@ -12,3 +12,69 @@
 ^\.claude$
 ^doc$
 ^Meta$
+^archive_local$
+
+# Intermediate/derived data objects not loaded by any vignette, test, or
+# executed example — kept in data/ and in git for pipeline provenance, but
+# excluded from the built/installed package to reduce installed size.
+^data/brca_clinical_level_summary_pfi\.rda$
+^data/brca_clinical_modeling_log\.rda$
+^data/brca_clinical_ref_template\.rda$
+^data/brca_cox_adjusted_clinical\.rda$
+^data/brca_cox_univariable_clinical\.rda$
+^data/brca_geneset_list_by_collection\.rda$
+^data/brca_glm_stage_clinical\.rda$
+^data/brca_glm_stage_predictions\.rda$
+^data/brca_glm_stage_test\.rda$
+^data/brca_glm_stage_train\.rda$
+^data/brca_gsea_all_comparisons_hallmark_go_bp\.rda$
+^data/brca_gsea_er_pos_vs_er_neg_go_bp\.rda$
+^data/brca_gsea_er_pos_vs_er_neg_hallmark\.rda$
+^data/brca_gsea_er_pos_vs_er_neg_hallmark_go\.rda$
+^data/brca_gsea_pipeline_metadata\.rda$
+^data/brca_gsea_tumor_vs_normal_go_bp\.rda$
+^data/brca_gsea_tumor_vs_normal_hallmark\.rda$
+^data/brca_gsea_tumor_vs_normal_hallmark_go\.rda$
+^data/brca_pa_pathway_metadata\.rda$
+^data/brca_pathway_results_merged\.rda$
+^data/brca_ranked_gene_scores\.rda$
+^data/brca_roc_stage_clinical\.rda$
+^data/brca_rppa_dea_feature_er_pos_vs_er_neg\.rda$
+^data/brca_rppa_expr_feature_er_shared\.rda$
+^data/brca_rppa_feature_map\.rda$
+
+# .Rd docs for the data objects excluded above — must be excluded together,
+# otherwise R CMD check reports "Rd file ... but not in code" for each one.
+^man/brca_clinical_level_summary_pfi\.Rd$
+^man/brca_clinical_modeling_log\.Rd$
+^man/brca_clinical_ref_template\.Rd$
+^man/brca_cox_adjusted_clinical\.Rd$
+^man/brca_cox_univariable_clinical\.Rd$
+^man/brca_geneset_list_by_collection\.Rd$
+^man/brca_glm_stage_clinical\.Rd$
+^man/brca_glm_stage_predictions\.Rd$
+^man/brca_glm_stage_test\.Rd$
+^man/brca_glm_stage_train\.Rd$
+^man/brca_gsea_all_comparisons_hallmark_go_bp\.Rd$
+^man/brca_gsea_er_pos_vs_er_neg_go_bp\.Rd$
+^man/brca_gsea_er_pos_vs_er_neg_hallmark\.Rd$
+^man/brca_gsea_er_pos_vs_er_neg_hallmark_go\.Rd$
+^man/brca_gsea_pipeline_metadata\.Rd$
+^man/brca_gsea_tumor_vs_normal_go_bp\.Rd$
+^man/brca_gsea_tumor_vs_normal_hallmark\.Rd$
+^man/brca_gsea_tumor_vs_normal_hallmark_go\.Rd$
+^man/brca_pa_pathway_metadata\.Rd$
+^man/brca_pathway_results_merged\.Rd$
+^man/brca_ranked_gene_scores\.Rd$
+^man/brca_roc_stage_clinical\.Rd$
+^man/brca_rppa_dea_feature_er_pos_vs_er_neg\.Rd$
+^man/brca_rppa_expr_feature_er_shared\.Rd$
+^man/brca_rppa_feature_map\.Rd$
+
+# Duplicate/unused inst/extdata content, not read by any R code, vignette,
+# or test. Kept on disk and in git; excluded from the built package only.
+^inst/extdata/brca/intermediate/expr_RNAseq_Tumor_vs_Normal_filtered\.rds$
+^inst/extdata/brca/intermediate/expr_RNAseq_ERpositive_vs_ERnegative_filtered\.rds$
+^inst/extdata/brca/gsea_outputs$
+^inst/extdata/brca/raw_xena$
+^inst/extdata/brca/omics_layers$

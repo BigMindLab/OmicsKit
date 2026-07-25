@@ -44,6 +44,22 @@ utils::globalVariables(c(
 #'   rest. Default: `NULL` (auto  uses the actual data range).
 #' @param fill_palette Character vector of two colors for the fill gradient
 #'   (low to high -log10(FDR)). Default: `c("white", "red")`.
+#' @param top_n Integer. If set, keep only the top `top_n` gene sets ranked
+#'   by `abs(nes_col)`. Ignored if `top_n_per_direction` is set.
+#'   Default: `NULL` (keep all).
+#' @param top_n_per_direction Integer. If set, keep the top N gene sets with
+#'   the highest positive NES and the top N with the lowest (most negative)
+#'   NES separately, so both directions remain represented. Takes precedence
+#'   over `top_n`. Default: `NULL` (keep all).
+#' @param clean_labels Logical. If `TRUE`, strip common MSigDB collection
+#'   prefixes (`"HALLMARK_"`, `"KEGG_"`, `"REACTOME_"`, `"GOBP_"`, `"GOCC_"`,
+#'   `"GOMF_"`) from gene set names, replace underscores with spaces, and
+#'   convert to title case. Default: `TRUE`.
+#' @param label_wrap Integer. Character width at which gene set labels are
+#'   wrapped onto multiple lines. Default: `35`.
+#' @param symmetric_x Logical. If `TRUE`, the x-axis (NES) range is made
+#'   symmetric around zero using the largest absolute NES value in `data`.
+#'   Default: `TRUE`.
 #' @param theme_params Named list to override default theme parameters.
 #'   See Details.
 #'
@@ -94,7 +110,7 @@ utils::globalVariables(c(
 #'
 #' @seealso [multiplot_PA()] for multi-comparison faceted barplots;
 #'   [merge_PA()] to generate the input data frame;
-#'   [camera_results] for a minimal example dataset.
+#'   [brca_pa_results] for a minimal example dataset.
 #'
 #' @import ggplot2
 #' @importFrom rlang .data
@@ -110,16 +126,16 @@ splot_PA <- function(data,
                      order          = "desc",
                      fill_limits    = NULL,
                      fill_palette   = c("white", "red"),
+                     top_n          = NULL,
+                     top_n_per_direction = NULL,
+                     clean_labels   = TRUE,
+                     label_wrap     = 35,
+                     symmetric_x    = TRUE,
                      theme_params   = list()) {
 
-  if (!requireNamespace("patchwork", quietly = TRUE)) {
-    stop("Package \"patchwork\" must be installed to use this function.", call. = FALSE)
+  if (!is.data.frame(data)) {
+    stop("`data` must be a data frame.", call. = FALSE)
   }
-  if (!requireNamespace("cowplot", quietly = TRUE)) {
-    stop("Package \"cowplot\" must be installed to use this function.", call. = FALSE)
-  }
-
-  if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
 
   for (col in c(geneset_col, collection_col, nes_col, fdr_col)) {
     if (!col %in% colnames(data)) {
@@ -130,103 +146,150 @@ splot_PA <- function(data,
   order <- match.arg(order, c("desc", "asc"))
 
   defaults <- list(
-    side_label_size      = 35,
-    geneset_text_size    = 5,
-    collection_text_size = 5,
-    panel_widths         = c(4, 25, 15, 3, 10, 3),
-    col_size             = 1,
-    axis_title_size      = 45,
-    axis_text_size_x     = 30,
-    tick_size            = 1.5,
-    tick_length          = 0.3,
-    panel_spacing_single = 4
+    bar_col             = "black",
+    bar_size            = 0.35,
+    bar_width           = 0.75,
+    hline_size          = 0.45,
+    axis_title_size     = 12,
+    axis_text_size_x    = 10,
+    axis_text_size_y    = 8,
+    strip_text_size     = 10,
+    legend_title_size   = 10,
+    legend_text_size    = 9,
+    plot_title_size     = 12,
+    panel_spacing       = 0.6
   )
+
   params <- utils::modifyList(defaults, theme_params)
 
-  # Always compute -log10(FDR) internally
-  data$tmp_log10FDR <- -log10(data[[fdr_col]])
+  df <- data
 
-  data <- data[order(data[[nes_col]], decreasing = (order == "desc")), ]
+  df$tmp_log10FDR <- -log10(pmax(df[[fdr_col]], .Machine$double.xmin))
+  df$tmp_direction <- ifelse(df[[nes_col]] >= 0, "Positive NES", "Negative NES")
 
-  df <- data[, c(geneset_col, collection_col, nes_col, "tmp_log10FDR")]
-  colnames(df) <- c("Geneset", "Collection", "NES", "tmp_log10FDR")
-  df$Geneset    <- factor(df$Geneset,    levels = rev(unique(df$Geneset)))
-  df$Collection <- factor(df$Collection, levels = unique(df$Collection))
+  if (!is.null(top_n_per_direction)) {
+    positive_df <- df[df[[nes_col]] >= 0, , drop = FALSE]
+    negative_df <- df[df[[nes_col]] < 0, , drop = FALSE]
 
-  plot_text_pathways <- ggplot() +
-    annotate("text", label = "Pathways", fontface = "bold.italic", angle = 90,
-             size = params$side_label_size, x = 0, y = 0.5) +
-    theme_void()
+    positive_df <- positive_df[order(positive_df[[nes_col]], decreasing = TRUE), , drop = FALSE]
+    negative_df <- negative_df[order(negative_df[[nes_col]], decreasing = FALSE), , drop = FALSE]
 
-  plot_left <- ggplot(df, aes(y = .data$Geneset, x = 0)) +
-    geom_text(aes(label = .data$Geneset), hjust = 1,
-              size = params$geneset_text_size) +
-    theme_void() +
-    theme(axis.text.y = element_blank(), plot.margin = margin(0, 0, 0, -50))
+    positive_df <- utils::head(positive_df, top_n_per_direction)
+    negative_df <- utils::head(negative_df, top_n_per_direction)
 
-  plot_center <- ggplot(df, aes(x = .data$NES, y = .data$Geneset,
-                                fill = .data$tmp_log10FDR)) +
-    geom_col(color = "black", linewidth = params$col_size) +
-    scale_fill_gradient(low = fill_palette[1], high = fill_palette[2],
-                        limits = fill_limits,
-                        breaks = scales::pretty_breaks()) +
-    scale_y_discrete(position = "right") +
-    facet_grid(Collection ~ ., scales = "free_y", space = "free_y") +
-    theme_bw() + labs(x = "NES", y = "") +
-    theme(
-      axis.text.y       = element_blank(),
-      strip.background  = element_rect(fill = "white", color = "black", linewidth = 1),
-      axis.ticks.y      = element_line(linewidth = params$tick_size),
-      axis.ticks.length = grid::unit(params$tick_length, "cm"),
-      strip.text.y      = element_text(size = 1),
-      legend.position   = "none",
-      axis.title.x      = element_text(size = params$axis_title_size),
-      axis.text.x       = element_text(size = params$axis_text_size_x),
-      panel.spacing     = grid::unit(params$panel_spacing_single, "lines")
+    df <- rbind(positive_df, negative_df)
+  } else if (!is.null(top_n)) {
+    df <- df[order(abs(df[[nes_col]]), decreasing = TRUE), , drop = FALSE]
+    df <- utils::head(df, top_n)
+  }
+
+  df <- df[order(df[[nes_col]], decreasing = (order == "desc")), , drop = FALSE]
+
+  clean_pathway_label <- function(x) {
+    x <- as.character(x)
+
+    if (clean_labels) {
+      x <- gsub("^HALLMARK_", "", x)
+      x <- gsub("^KEGG_", "", x)
+      x <- gsub("^REACTOME_", "", x)
+      x <- gsub("^GOBP_", "", x)
+      x <- gsub("^GOCC_", "", x)
+      x <- gsub("^GOMF_", "", x)
+      x <- gsub("_", " ", x)
+      x <- tools::toTitleCase(tolower(x))
+    }
+
+    vapply(
+      x,
+      function(z) paste(strwrap(z, width = label_wrap), collapse = "\n"),
+      character(1)
+    )
+  }
+
+  df$Geneset_Label <- clean_pathway_label(df[[geneset_col]])
+  df$Collection_Label <- as.character(df[[collection_col]])
+
+  df$Geneset_Label <- factor(
+    df$Geneset_Label,
+    levels = rev(unique(df$Geneset_Label))
+  )
+
+  if (isTRUE(symmetric_x)) {
+    max_abs <- max(abs(df[[nes_col]]), na.rm = TRUE)
+    x_limits <- c(-max_abs, max_abs) * 1.08
+  } else {
+    x_limits <- NULL
+  }
+
+  p <- ggplot2::ggplot(
+    df,
+    ggplot2::aes(
+      x = .data[[nes_col]],
+      y = .data$Geneset_Label,
+      fill = .data$tmp_log10FDR
+    )
+  ) +
+    ggplot2::geom_vline(
+      xintercept = 0,
+      linewidth = params$hline_size,
+      color = "black"
+    ) +
+    ggplot2::geom_col(
+      color = params$bar_col,
+      linewidth = params$bar_size,
+      width = params$bar_width
+    ) +
+    ggplot2::scale_fill_gradient(
+      low = fill_palette[1],
+      high = fill_palette[2],
+      limits = fill_limits,
+      oob = scales::squish,
+      name = expression(-log[10] ~ FDR),
+      guide = ggplot2::guide_colorbar(
+        title.position = "top",
+        barwidth = 0.5,
+        barheight = 3.5
+      )
+    ) +
+    ggplot2::scale_x_continuous(
+      limits = x_limits,
+      expand = ggplot2::expansion(mult = c(0.02, 0.02))
+    ) +
+    ggplot2::labs(
+      x = "Normalized enrichment score",
+      y = NULL
+    ) +
+    ggplot2::facet_grid(
+      Collection_Label ~ .,
+      scales = "free_y",
+      space = "free_y"
+    ) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      axis.title.x = ggplot2::element_text(size = params$axis_title_size),
+      axis.text.x  = ggplot2::element_text(size = params$axis_text_size_x),
+      axis.text.y  = ggplot2::element_text(size = params$axis_text_size_y),
+
+      strip.text.y = ggplot2::element_text(
+        size = params$strip_text_size,
+        face = "bold"
+      ),
+      strip.background = ggplot2::element_rect(
+        fill = "grey90",
+        color = "grey35"
+      ),
+
+      legend.title = ggplot2::element_text(size = params$legend_title_size),
+      legend.text  = ggplot2::element_text(size = params$legend_text_size),
+
+      panel.grid.major.y = ggplot2::element_blank(),
+      panel.grid.minor   = ggplot2::element_blank(),
+      panel.spacing      = grid::unit(params$panel_spacing, "lines"),
+
+      plot.margin = ggplot2::margin(8, 12, 8, 8)
     )
 
-  plot_text_msigdb <- ggplot() +
-    annotate("text", label = "MSigDB", fontface = "bold.italic", angle = 90,
-             size = params$side_label_size, x = 0, y = 0.5) +
-    theme_void()
-
-  plot_right <- ggplot(df, aes(y = .data$Geneset, x = 1.5)) +
-    geom_text(
-      aes(label = ifelse(duplicated(.data$Collection), "",
-                         as.character(.data$Collection))),
-      hjust = 0.5, size = params$collection_text_size, fontface = "bold"
-    ) +
-    facet_grid(Collection ~ ., scales = "free_y", space = "free", switch = "y") +
-    theme_void() +
-    theme(strip.text.y  = element_text(size = params$collection_text_size),
-          panel.spacing = grid::unit(1, "lines"))
-
-  plot_legend <- ggplot(df, aes(x = .data$NES, y = .data$Geneset,
-                                fill = .data$tmp_log10FDR)) +
-    geom_tile() +
-    scale_fill_gradient(
-      low   = fill_palette[1], high = fill_palette[2],
-      name  = expression(-log[10] ~ FDR), limits = fill_limits,
-      guide = guide_colorbar(ticks.colour = "black", ticks.linewidth = 1.5,
-                             draw.ulim = TRUE, draw.llim = TRUE)
-    ) +
-    theme_bw() +
-    theme(
-      legend.title      = element_text(size = 44, face = "bold"),
-      legend.text       = element_text(size = 30),
-      legend.key.size   = grid::unit(1.5, "cm"),
-      legend.key.height = grid::unit(2, "cm"),
-      legend.spacing    = grid::unit(3.5, "cm"),
-      legend.box.margin = margin(10, 20, 10, 10)
-    )
-
-  plot_right_legend <- cowplot::get_legend(plot_legend)
-
-  final_plot <- plot_text_pathways + plot_left + plot_center + plot_right +
-    plot_text_msigdb + plot_right_legend +
-    patchwork::plot_layout(ncol = 6, widths = params$panel_widths)
-
-  return(final_plot)
+  p
 }
 
 
@@ -337,7 +400,7 @@ splot_PA <- function(data,
 #'
 #' @seealso [splot_PA()] for single-comparison patchwork plots;
 #'   [merge_PA()] to generate the input data frame;
-#'   [camera_results] for a minimal example dataset.
+#'   [brca_pa_results] for a minimal example dataset.
 #'
 #' @import ggplot2
 #' @importFrom rlang .data
@@ -462,14 +525,14 @@ multiplot_PA <- function(data,
 #' ```r
 #' gsl          <- list_gmts("path/to/gmt/")
 #' pa_data      <- merge_PA("path/to/pa_data/")
-#' ranked       <- deseq2_results$gene_id[order(deseq2_results$stat,
+#' ranked       <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
 #'                                              decreasing = TRUE)]
 #' gene_lists   <- getgenesPA(pa_data, gsl, ranked, genes = c("all", "le"))
 #' pa_annot     <- addgenesPA(pa_data, gene_lists)
 #'
 #' heatmap_PA(
-#'   expression_data = vst_counts,
-#'   metadata        = sampledata,
+#'   expression_data = brca_rna_vst_or_logexpr_small,
+#'   metadata        = brca_rna_metadata_tumor_normal,
 #'   pa_data_annot   = pa_annot,
 #'   ranked_genes    = ranked,
 #'   plot_genes      = c("all_genes", "le_genes")
@@ -478,8 +541,8 @@ multiplot_PA <- function(data,
 #'
 #' @param expression_data A numeric matrix or data frame of expression values
 #'   with gene symbols or Ensembl IDs as row names and sample IDs as column
-#'   names. Recommended input: VST-transformed counts from [vst_counts] or
-#'   normalized coutns [norm_counts].
+#'   names. Recommended input: VST-transformed counts from [brca_rna_vst_or_logexpr_small] or
+#'   normalized coutns [brca_rna_expr_tumor_normal_filtered].
 #' @param metadata A data frame of sample annotations. Must contain a column
 #'   matching `sample_col` (sample IDs) and a column matching `group_col`
 #'   (condition labels, e.g., `"Control"`, `"Treatment"`).
@@ -516,28 +579,28 @@ multiplot_PA <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' data(vst_counts)
-#' data(sampledata)
-#' data(deseq2_results)
+#' data(brca_rna_vst_or_logexpr_small)
+#' data(brca_rna_metadata_tumor_normal)
+#' data(brca_rna_dea_tumor_vs_normal)
 #' data(gsea_results)
-#' data(geneset_list)
+#' data(brca_geneset_list)
 #'
-#' ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+#' ranked    <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
 #'                                           decreasing = TRUE)]
 #'
 #' # ── Example 1: GSEA results (all_genes + le_genes) ────
 #' pa_single  <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
-#' gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+#' gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
 #'                          genes = c("all", "le"))
 #' pa_annot   <- addgenesPA(pa_single, gene_lists)
 #'
 #' heatmap_PA(
-#'   expression_data = vst_counts,
-#'   metadata        = sampledata,
+#'   expression_data = brca_rna_vst_or_logexpr_small,
+#'   metadata        = brca_rna_metadata_tumor_normal,
 #'   pa_data_annot   = pa_annot,
 #'   ranked_genes    = ranked,
 #'   plot_genes      = c("all_genes", "le_genes"),
-#'   sample_col      = "patient_id",
+#'   sample_col      = "sampleID",
 #'   group_col       = "sample_type",
 #'   out_dir         = "heatmaps_gsea",
 #'   pdf             = TRUE,
@@ -550,27 +613,27 @@ multiplot_PA <- function(data,
 #' #   heatmaps_gsea/jpg/le_genes/<geneset>_heatmap.jpg
 #'
 #' # ── Example 2: CAMERA results (all_genes + top_genes)
-#' # camera_results does not contain leading edge information.
+#' # brca_pa_results does not contain leading edge information.
 #' # Use genes = "top" with a manually set top fraction instead.
 #' # Note: top_genes are rank-based and do NOT represent true leading edge genes.
-#' data(camera_results)
-#' camera_pa      <- camera_results
+#' data(brca_pa_results)
+#' camera_pa      <- brca_pa_results
 #' colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
 #' camera_pa$SIZE <- sapply(camera_pa$NAME,
-#'                          function(x) length(geneset_list[[x]]))
+#'                          function(x) length(brca_geneset_list[[x]]))
 #' camera_pa$top  <- 0.25
 #'
-#' gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+#' gene_lists_cam <- getgenesPA(camera_pa, brca_geneset_list, ranked,
 #'                              genes = c("all", "top"))
 #' pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
 #'
 #' heatmap_PA(
-#'   expression_data = vst_counts,
-#'   metadata        = sampledata,
+#'   expression_data = brca_rna_vst_or_logexpr_small,
+#'   metadata        = brca_rna_metadata_tumor_normal,
 #'   pa_data_annot   = pa_annot_cam,
 #'   ranked_genes    = ranked,
 #'   plot_genes      = c("all_genes", "top_genes"),
-#'   sample_col      = "patient_id",
+#'   sample_col      = "sampleID",
 #'   group_col       = "sample_type",
 #'   out_dir         = "heatmaps_camera"
 #' )
@@ -580,7 +643,7 @@ multiplot_PA <- function(data,
 #'   [addgenesPA()] to generate `pa_data_annot`;
 #'   [list_gmts()] to generate the geneset list;
 #'   [merge_PA()] to generate `pa_data`;
-#'   [vst_counts] for an example expression matrix.
+#'   [brca_rna_vst_or_logexpr_small] for an example expression matrix.
 #'
 #' @export
 
@@ -823,7 +886,7 @@ utils::globalVariables(c(
 #'
 #' # Run with absolute paths (no main_dir)
 #' heatmap_path_PA(
-#'   expression_file   = "/data/vst_counts.tsv",
+#'   expression_file   = "/data/brca_rna_vst_or_logexpr_small.tsv",
 #'   metadata_file     = "/data/metadata.xlsx",
 #'   gmt_file          = "/data/h.all.v2023.gmt",
 #'   ranked_genes_file = "/data/ranked_genes.tsv",

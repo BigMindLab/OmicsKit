@@ -42,33 +42,33 @@ which column(s) to add based on the structure of the input.
 \examples{
 \dontrun{
 data(gsea_results)
-data(geneset_list)
-data(deseq2_results)
+data(brca_geneset_list)
+data(brca_rna_dea_tumor_vs_normal)
 
-ranked    <- deseq2_results$gene_id[order(deseq2_results$stat,
+ranked    <- brca_rna_dea_tumor_vs_normal$gene_id[order(brca_rna_dea_tumor_vs_normal$stat,
                                           decreasing = TRUE)]
 pa_single <- gsea_results[gsea_results$COMPARISON == "TumorVsNormal", ]
 pa_single$top <- 0.30
 
 # Add all three columns
-gene_lists <- getgenesPA(pa_single, geneset_list, ranked,
+gene_lists <- getgenesPA(pa_single, brca_geneset_list, ranked,
                          genes = c("all", "le", "top"))
 pa_annot   <- addgenesPA(pa_single, gene_lists)
 head(pa_annot[, c("NAME", "all_genes", "le_genes", "top_genes")])
 
 # Add only leading edge genes
-le_only  <- getgenesPA(pa_single, geneset_list, ranked, genes = "le")
+le_only  <- getgenesPA(pa_single, brca_geneset_list, ranked, genes = "le")
 pa_annot <- addgenesPA(pa_single, le_only)
 head(pa_annot[, c("NAME", "le_genes")])
 
 # CAMERA: add only top and all (no leading edge)
-data(camera_results)
-camera_pa      <- camera_results
+data(brca_pa_results)
+camera_pa      <- brca_pa_results
 colnames(camera_pa)[colnames(camera_pa) == "GeneSet"] <- "NAME"
 camera_pa$SIZE <- sapply(camera_pa$NAME,
-                         function(x) length(geneset_list[[x]]))
+                         function(x) length(brca_geneset_list[[x]]))
 camera_pa$top  <- 0.25
-gene_lists_cam <- getgenesPA(camera_pa, geneset_list, ranked,
+gene_lists_cam <- getgenesPA(camera_pa, brca_geneset_list, ranked,
                              genes = c("all", "top"))
 pa_annot_cam   <- addgenesPA(camera_pa, gene_lists_cam)
 head(pa_annot_cam[, c("NAME", "all_genes", "top_genes")])
