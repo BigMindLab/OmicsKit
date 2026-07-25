@@ -607,12 +607,14 @@ fwrite(
 ## Save package objects
 ## -------------------------------------------------------------------------
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_tumor_vs_normal_hallmark_go,
   compress = "xz",
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_er_pos_vs_er_neg_hallmark_go,
   compress = "xz",
@@ -631,6 +633,7 @@ usethis::use_data(
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_pathway_results_merged,
   compress = "xz",
@@ -643,6 +646,7 @@ usethis::use_data(
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_geneset_list_by_collection,
   compress = "xz",
@@ -655,6 +659,7 @@ usethis::use_data(
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_ranked_gene_scores,
   compress = "xz",
@@ -673,6 +678,7 @@ usethis::use_data(
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_pa_pathway_metadata,
   compress = "xz",

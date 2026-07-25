@@ -761,15 +761,25 @@ utils::write.table(
 )
 
 usethis::use_data(brca_clinical_modeling_data, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_cox_univariable_clinical, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_cox_adjusted_clinical, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_glm_stage_clinical, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_roc_stage_clinical, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_clinical_level_summary_pfi, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_clinical_ref_template, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_glm_stage_train, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_glm_stage_test, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_glm_stage_predictions, compress = "xz", overwrite = TRUE)
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(brca_clinical_modeling_log, compress = "xz", overwrite = TRUE)
 
 message("Saved clinical-only BRCA modeling objects to data/.")

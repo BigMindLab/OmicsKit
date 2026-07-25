@@ -326,36 +326,42 @@ write_validated_copy(
 )
 
 ## Save package data.
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_er_pos_vs_er_neg_hallmark,
   compress = "xz",
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_er_pos_vs_er_neg_go_bp,
   compress = "xz",
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_tumor_vs_normal_hallmark,
   compress = "xz",
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_tumor_vs_normal_go_bp,
   compress = "xz",
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_all_comparisons_hallmark_go_bp,
   compress = "xz",
   overwrite = TRUE
 )
 
+## NOTE: not currently loaded by any vignette; kept for pipeline provenance / .Rbuildignore-excluded from the built package.
 usethis::use_data(
   brca_gsea_pipeline_metadata,
   compress = "xz",

@@ -57,6 +57,7 @@ docs
 /doc/
 /Meta/
 inst/extdata/brca/raw_xena/
+inst/extdata/brca/omics_layers/
 
 # -------------------------------------------------------------------
 # Local legacy TCGA-LUAD materials
@@ -92,7 +93,6 @@ doc/
 Meta/
 
 # Heavy local raw data
-inst/extdata/brca/raw_xena/
 *.bam
 *.bai
 *.bw
