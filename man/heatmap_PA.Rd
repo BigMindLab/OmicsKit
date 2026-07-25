@@ -116,7 +116,7 @@ heatmap_PA(
   pa_data_annot   = pa_annot,
   ranked_genes    = ranked,
   plot_genes      = c("all_genes", "le_genes"),
-  sample_col      = "patient_id",
+  sample_col      = "sampleID",
   group_col       = "sample_type",
   out_dir         = "heatmaps_gsea",
   pdf             = TRUE,
@@ -149,7 +149,7 @@ heatmap_PA(
   pa_data_annot   = pa_annot_cam,
   ranked_genes    = ranked,
   plot_genes      = c("all_genes", "top_genes"),
-  sample_col      = "patient_id",
+  sample_col      = "sampleID",
   group_col       = "sample_type",
   out_dir         = "heatmaps_camera"
 )

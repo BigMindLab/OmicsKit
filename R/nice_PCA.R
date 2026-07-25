@@ -48,7 +48,7 @@
 #'
 #' # nice_PCA joins by a column named "id" in annotations
 #' sampledata_pca <- brca_rna_metadata_tumor_normal
-#' colnames(sampledata_pca)[colnames(sampledata_pca) == "patient_id"] <- "id"
+#' sampledata_pca$id <- rownames(sampledata_pca)
 #'
 #' nice_PCA(
 #'   object       = brca_rna_vst_or_logexpr_small,

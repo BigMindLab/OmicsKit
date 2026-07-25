@@ -7,15 +7,15 @@
 geneset_similarity(geneset_list, results, fdr_th = 0.05)
 }
 \arguments{
+\item{geneset_list}{A named list where each element is a character vector of
+gene symbols belonging to that gene set. Typically the output of
+\code{\link[=list_gmts]{list_gmts()}}.}
+
 \item{results}{A data frame with at least two columns: \code{GeneSet} (gene set
 names) and \code{FDR} (adjusted p-values).}
 
 \item{fdr_th}{Numeric. FDR cutoff to retain significant gene sets.
 Default: \code{0.05}.}
-
-\item{brca_geneset_list}{A named list where each element is a character vector of
-gene symbols belonging to that gene set. Typically the output of
-\code{\link[=list_gmts]{list_gmts()}}.}
 }
 \value{
 An object of class \code{JaccardResult}, a named list with three slots:
@@ -23,7 +23,7 @@ An object of class \code{JaccardResult}, a named list with three slots:
 \item \verb{$jaccard_sim}: Numeric matrix of pairwise Jaccard similarities.
 \item \verb{$dist_mat}: A \code{dist} object of 1 - Jaccard similarity, suitable for
 clustering or UMAP.
-\item \verb{$brca_geneset_list}: Named list of gene sets retained after FDR filtering.
+\item \verb{$geneset_list}: Named list of gene sets retained after FDR filtering.
 }
 }
 \description{
@@ -52,7 +52,7 @@ jac <- geneset_similarity(brca_geneset_list, results, fdr_th = 0.05)
 
 jac$jaccard_sim   # similarity matrix
 jac$dist_mat      # distance object (usable in UMAP, clustering, etc.)
-jac$brca_geneset_list  # filtered gene sets
+jac$geneset_list  # filtered gene sets
 
 }
 \seealso{

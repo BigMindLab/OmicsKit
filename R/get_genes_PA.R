@@ -48,7 +48,7 @@
 #'     `pa_data$top <- 0.25` for the top 25%). Required for `genes = "top"`.
 #'
 #'   Typically the output of [merge_PA()].
-#' @param brca_geneset_list A named list of gene sets, where each element is a
+#' @param geneset_list A named list of gene sets, where each element is a
 #'   character vector of gene symbols. Typically the output of [list_gmts()],
 #'   or use the built-in [brca_geneset_list] for quick testing.
 #' @param ranked_genes A character vector of gene symbols ordered by their

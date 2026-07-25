@@ -85,7 +85,7 @@ data(brca_rna_vst_or_logexpr_small)
 data(brca_rna_metadata_tumor_normal)
 
 sampledata_t <- brca_rna_metadata_tumor_normal
-colnames(sampledata_t)[colnames(sampledata_t) == "patient_id"] <- "id"
+sampledata_t$id <- rownames(sampledata_t)
 
 # perplexity must be < n_samples / 3; with 32 samples use perplexity = 5
 nice_tSNE(

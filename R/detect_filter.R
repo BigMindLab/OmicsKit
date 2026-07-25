@@ -38,8 +38,9 @@
 #' rownames(res) <- res$ensembl
 #'
 #' # Get sample IDs per group
-#' samples_normal <- brca_rna_metadata_tumor_normal$patient_id[brca_rna_metadata_tumor_normal$sample_type == "normal"]
-#' samples_tumor  <- brca_rna_metadata_tumor_normal$patient_id[brca_rna_metadata_tumor_normal$sample_type == "tumor"]
+#' meta <- brca_rna_metadata_tumor_normal
+#' samples_normal <- meta$patient[meta$sample_type == "Solid Tissue Normal"]
+#' samples_tumor  <- meta$patient[meta$sample_type == "Primary Tumor"]
 #'
 #' detected <- detect_filter(
 #'   norm.counts        = as.data.frame(brca_rna_expr_tumor_normal_filtered),

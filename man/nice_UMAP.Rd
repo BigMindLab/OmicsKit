@@ -88,7 +88,7 @@ data(brca_rna_vst_or_logexpr_small)
 data(brca_rna_metadata_tumor_normal)
 
 sampledata_u <- brca_rna_metadata_tumor_normal
-colnames(sampledata_u)[colnames(sampledata_u) == "patient_id"] <- "id"
+sampledata_u$id <- rownames(sampledata_u)
 
 nice_UMAP(
   object       = brca_rna_vst_or_logexpr_small,

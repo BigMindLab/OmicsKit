@@ -23,7 +23,7 @@
 #' or its individual slots can be used independently (e.g., `$dist_mat` for
 #' UMAP, `$jaccard_sim` for custom visualizations).
 #'
-#' @param brca_geneset_list A named list where each element is a character vector of
+#' @param geneset_list A named list where each element is a character vector of
 #'   gene symbols belonging to that gene set. Typically the output of
 #'   [list_gmts()].
 #' @param results A data frame with at least two columns: `GeneSet` (gene set
@@ -35,7 +35,7 @@
 #'   * `$jaccard_sim`: Numeric matrix of pairwise Jaccard similarities.
 #'   * `$dist_mat`: A `dist` object of 1 - Jaccard similarity, suitable for
 #'     clustering or UMAP.
-#'   * `$brca_geneset_list`: Named list of gene sets retained after FDR filtering.
+#'   * `$geneset_list`: Named list of gene sets retained after FDR filtering.
 #'
 #' @examples
 #' brca_geneset_list <- list(
@@ -55,7 +55,7 @@
 #'
 #' jac$jaccard_sim   # similarity matrix
 #' jac$dist_mat      # distance object (usable in UMAP, clustering, etc.)
-#' jac$brca_geneset_list  # filtered gene sets
+#' jac$geneset_list  # filtered gene sets
 #'
 #' @seealso [list_gmts()], [do_clust()], [get_network_communities()],
 #'   [network_clust()], [network_clust_gg()]

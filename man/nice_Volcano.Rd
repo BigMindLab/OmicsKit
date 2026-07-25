@@ -68,7 +68,7 @@ data(brca_rna_dea_tumor_vs_normal)
 
 nice_Volcano(
   results   = brca_rna_dea_tumor_vs_normal,
-  x_var     = "log2FoldChange",
+  x_var     = "logFC",
   y_var     = "padj",
   label_var = "gene_id",
   title     = "TCGA-BRCA: Tumor vs Normal",
@@ -81,7 +81,7 @@ nice_Volcano(
 # Highlight specific genes
 nice_Volcano(
   results   = brca_rna_dea_tumor_vs_normal,
-  x_var     = "log2FoldChange",
+  x_var     = "logFC",
   y_var     = "padj",
   label_var = "gene_id",
   title     = "TCGA-BRCA: Tumor vs Normal",

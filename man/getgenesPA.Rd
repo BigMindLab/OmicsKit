@@ -27,6 +27,10 @@ genes to extract. Set manually by the user (e.g.,
 
 Typically the output of \code{\link[=merge_PA]{merge_PA()}}.}
 
+\item{geneset_list}{A named list of gene sets, where each element is a
+character vector of gene symbols. Typically the output of \code{\link[=list_gmts]{list_gmts()}},
+or use the built-in \link{brca_geneset_list} for quick testing.}
+
 \item{ranked_genes}{A character vector of gene symbols ordered by their
 ranking metric (e.g., DESeq2 \code{stat}, log2FC, or signal-to-noise ratio),
 from most positive to most negative. Non-significant genes fall in the
@@ -35,10 +39,6 @@ middle of the list. Used to order genes within each extracted set.}
 \item{genes}{Character vector specifying which extraction mode(s) to use.
 Any combination of \code{"all"}, \code{"le"}, and \code{"top"}. Default:
 \code{c("all", "le")}.}
-
-\item{brca_geneset_list}{A named list of gene sets, where each element is a
-character vector of gene symbols. Typically the output of \code{\link[=list_gmts]{list_gmts()}},
-or use the built-in \link{brca_geneset_list} for quick testing.}
 }
 \value{
 Depends on \code{genes}:

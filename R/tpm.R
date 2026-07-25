@@ -10,10 +10,10 @@
 #' - The column names represent the samples.
 #' The gene lengths are in a column of a dataframe with the same row order.
 #'
-#' @param brca_rna_expr_tumor_normal_filtered A table with the gene counts.
+#' @param raw_counts A table with the gene counts.
 #' @param gene_lengths A column with the gene lengths.
 #'
-#' @return A numeric matrix of the same dimensions as `brca_rna_expr_tumor_normal_filtered` with TPM
+#' @return A numeric matrix of the same dimensions as `raw_counts` with TPM
 #'   values. Column sums equal 1,000,000 by definition.
 #'
 #' @note TPM normalizes for both sequencing depth and gene length, making

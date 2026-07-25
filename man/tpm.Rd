@@ -7,12 +7,12 @@
 tpm(raw_counts, gene_lengths)
 }
 \arguments{
-\item{gene_lengths}{A column with the gene lengths.}
+\item{raw_counts}{A table with the gene counts.}
 
-\item{brca_rna_expr_tumor_normal_filtered}{A table with the gene counts.}
+\item{gene_lengths}{A column with the gene lengths.}
 }
 \value{
-A numeric matrix of the same dimensions as \code{brca_rna_expr_tumor_normal_filtered} with TPM
+A numeric matrix of the same dimensions as \code{raw_counts} with TPM
 values. Column sums equal 1,000,000 by definition.
 }
 \description{
