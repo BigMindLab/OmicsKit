@@ -37,7 +37,7 @@ ComplexHeatmap with dendrogram.
 \examples{
 \dontrun{
 # Requires ComplexHeatmap and cluster packages
-geneset_list <- list(
+brca_geneset_list <- list(
   KEGG_APOPTOSIS      = c("TP53", "BCL2", "CASP3", "BAX"),
   KEGG_CELL_CYCLE     = c("CDK2", "CCND1", "TP53", "RB1"),
   HALLMARK_HYPOXIA    = c("HIF1A", "VEGFA", "LDHA", "BNIP3"),
@@ -46,11 +46,11 @@ geneset_list <- list(
 )
 
 results <- data.frame(
-  GeneSet = names(geneset_list),
+  GeneSet = names(brca_geneset_list),
   FDR     = c(0.01, 0.02, 0.03, 0.04, 0.01)
 )
 
-jac   <- geneset_similarity(geneset_list, results)
+jac   <- geneset_similarity(brca_geneset_list, results)
 clust <- do_clust(jac)
 
 clust$silhouette_plot               # ggplot2 silhouette curve

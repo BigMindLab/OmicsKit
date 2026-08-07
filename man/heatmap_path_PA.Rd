@@ -109,7 +109,7 @@ heatmap_path_PA(
 
 # Run with absolute paths (no main_dir)
 heatmap_path_PA(
-  expression_file   = "/data/vst_counts.tsv",
+  expression_file   = "/data/brca_rna_vst_or_logexpr_small.tsv",
   metadata_file     = "/data/metadata.xlsx",
   gmt_file          = "/data/h.all.v2023.gmt",
   ranked_genes_file = "/data/ranked_genes.tsv",

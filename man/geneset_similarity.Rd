@@ -35,7 +35,7 @@ or its individual slots can be used independently (e.g., \verb{$dist_mat} for
 UMAP, \verb{$jaccard_sim} for custom visualizations).
 }
 \examples{
-geneset_list <- list(
+brca_geneset_list <- list(
   KEGG_APOPTOSIS      = c("TP53", "BCL2", "CASP3", "BAX"),
   KEGG_CELL_CYCLE     = c("CDK2", "CCND1", "TP53", "RB1"),
   HALLMARK_HYPOXIA    = c("HIF1A", "VEGFA", "LDHA", "BNIP3"),
@@ -43,12 +43,12 @@ geneset_list <- list(
 )
 
 results <- data.frame(
-  GeneSet = names(geneset_list),
+  GeneSet = names(brca_geneset_list),
   FDR     = c(0.01, 0.03, 0.04, 0.20)
 )
 
 # Only the first three gene sets pass the FDR threshold
-jac <- geneset_similarity(geneset_list, results, fdr_th = 0.05)
+jac <- geneset_similarity(brca_geneset_list, results, fdr_th = 0.05)
 
 jac$jaccard_sim   # similarity matrix
 jac$dist_mat      # distance object (usable in UMAP, clustering, etc.)

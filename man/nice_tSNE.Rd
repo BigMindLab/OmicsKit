@@ -81,15 +81,15 @@ Function to make tSNE plots.
 }
 \examples{
 \dontrun{
-data(vst_counts)
-data(sampledata)
+data(brca_rna_vst_or_logexpr_small)
+data(brca_rna_metadata_tumor_normal)
 
-sampledata_t <- sampledata
-colnames(sampledata_t)[colnames(sampledata_t) == "patient_id"] <- "id"
+sampledata_t <- brca_rna_metadata_tumor_normal
+sampledata_t$id <- rownames(sampledata_t)
 
 # perplexity must be < n_samples / 3; with 32 samples use perplexity = 5
 nice_tSNE(
-  object         = vst_counts,
+  object         = brca_rna_vst_or_logexpr_small,
   annotations    = sampledata_t,
   perplexity     = 5,
   max_iterations = 1000,
@@ -97,7 +97,7 @@ nice_tSNE(
   legend_names   = c(fill = "Sample Type"),
   colors         = c("steelblue", "firebrick"),
   shapes         = c(21, 21),
-  title          = "TCGA-LUAD tSNE",
+  title          = "TCGA-BRCA tSNE",
   seed           = 1905
 )
 }
@@ -109,5 +109,5 @@ van der Maaten, L., & Hinton, G. (2008). Visualizing data using t-SNE.
 }
 \seealso{
 \code{\link[=nice_PCA]{nice_PCA()}}, \code{\link[=nice_UMAP]{nice_UMAP()}} for alternative dimensionality
-reduction methods; \link{vst_counts} for the recommended input matrix.
+reduction methods; \link{brca_rna_vst_or_logexpr_small} for the recommended input matrix.
 }
