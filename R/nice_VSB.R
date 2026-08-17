@@ -23,6 +23,7 @@
 #' @param title_size Font of the title and axis names. Default: c(axis = 20, fig = 24).
 #' @param label_size Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).
 #' @param legend_size Font of the title and elements of the legend. Default: c(title = 14, elements = 12).
+#' @param box_width Width of the boxplot relative to the category spacing. Default: 0.25.
 #' @import ggplot2
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data

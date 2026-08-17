@@ -54,6 +54,8 @@ gene symbols from Ensembl IDs, use \code{\link[=get_annotations]{get_annotations
 \item{label_size}{Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).}
 
 \item{legend_size}{Font of the title and elements of the legend. Default: c(title = 14, elements = 12).}
+
+\item{box_width}{Width of the boxplot relative to the category spacing. Default: 0.25.}
 }
 \value{
 A ggplot2 object.
