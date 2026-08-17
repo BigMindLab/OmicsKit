@@ -24,9 +24,11 @@ gene set to its community ID. Typically the output of
 \item{n_terms}{Integer. Number of top TF-IDF terms to include in each label.
 Default: \code{3}.}
 
-\item{remove_prefix}{Logical. If \code{TRUE}, removes the text before the first
-underscore in gene set names (e.g., strips the \code{"KEGG_"} prefix from
-\code{"KEGG_GLYCOLYSIS"}). Default: \code{TRUE}.}
+\item{remove_prefix}{Logical. If \code{TRUE}, removes leading collection/
+database-tag prefixes from gene set names before scoring (e.g., strips
+the \code{"KEGG_"} prefix from \code{"KEGG_GLYCOLYSIS"}, and both nested prefix
+layers from \code{"GO_BP::GOBP_KERATINIZATION"} to leave
+\code{"KERATINIZATION"}). Default: \code{TRUE}.}
 }
 \value{
 A named list with two elements:
@@ -44,10 +46,14 @@ set names to produce a short, representative label called a \emph{super-term}.
 }
 \details{
 \strong{How TF-IDF works here:} each gene set name is treated as a document and
-each word as a term. TF-IDF upweights words that are frequent within a
-community but rare across all communities, making the resulting label
-specific to that cluster rather than generic. A frequency-based fallback is
-used when TF-IDF returns no terms (e.g., very small communities).
+each word as a term, with one TF-IDF corpus per community (so a community's
+label is scored against its own gene sets only). The IDF term uses additive
+smoothing, \code{log2(1 + N/d_t)} instead of the standard \code{log2(N/d_t)}, so a
+word appearing in every one of a community's gene sets -- typically the
+word that should name it -- gets a positive weight instead of exactly zero,
+while words present in fewer of the community's gene sets still score
+higher. A frequency-based fallback is used when TF-IDF returns no terms
+(e.g., very small communities).
 
 Common pathway words (\code{"pathway"}, \code{"signaling"}, \code{"regulation"}, etc.) and
 standard English stopwords are removed before scoring.

@@ -400,7 +400,14 @@ optional_columns <- list(
     "history of neoadjuvant treatment"
   ),
   RNA_genomic_id = rna_genomic_candidates,
-  RPPA_genomic_id = rppa_genomic_candidates
+  RPPA_genomic_id = rppa_genomic_candidates,
+  PAM50Call_RNAseq = c("PAM50Call_RNAseq", "PAM50 Call RNAseq"),
+  PAM50_mRNA_nature2012 = c("PAM50_mRNA_nature2012", "PAM50 mRNA nature2012"),
+  Integrated_Clusters_PAM50_nature2012 = c(
+    "Integrated_Clusters_with_PAM50__nature2012",
+    "Integrated_Clusters_with_PAM50_nature2012",
+    "Integrated Clusters with PAM50 nature2012"
+  )
 )
 
 for (output_name in names(optional_columns)) {

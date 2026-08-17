@@ -56,7 +56,7 @@
 #' )
 #'
 #' @seealso [nice_VSB()] for gene-level expression visualization;
-#'   [detect_filter()] to filter detectable genes before plotting;
+#'   [detectability_filter()] to filter detectable genes before plotting;
 #'   [brca_rna_dea_tumor_vs_normal] for an example input dataset.
 #'
 #' @export

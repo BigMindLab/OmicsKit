@@ -99,6 +99,6 @@ head(cases$Case1)
 
 }
 \seealso{
-\code{\link[=detect_filter]{detect_filter()}} to pre-filter genes before splitting;
+\code{\link[=detectability_filter]{detectability_filter()}} to pre-filter genes before splitting;
 \code{\link[=nice_Volcano]{nice_Volcano()}} to visualize individual comparison results.
 }

@@ -40,7 +40,7 @@
 #' #   TCGA_BRCA_TumorVsNormal_down_log2FC<1_FDR<0.05.xlsx
 #' }
 #'
-#' @seealso [detect_filter()] to further filter saved results;
+#' @seealso [detectability_filter()] to further filter saved results;
 #'   [brca_rna_dea_tumor_vs_normal] for an example input.
 #'
 #' @export

@@ -49,7 +49,7 @@ get_stars(
 
 }
 \seealso{
-\code{\link[=detect_filter]{detect_filter()}} to identify detectable genes before annotating;
+\code{\link[=detectability_filter]{detectability_filter()}} to identify detectable genes before annotating;
 \code{\link[=nice_VSB]{nice_VSB()}} where significance stars can be added to plots;
 \link{brca_rna_dea_tumor_vs_normal} for an example input.
 }

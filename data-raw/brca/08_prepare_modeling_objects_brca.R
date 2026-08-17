@@ -453,7 +453,8 @@ clinical_vars <- c(
   "ER_Status_nature2012", "PR_Status_nature2012", "HER2_Final_Status_nature2012",
   "AJCC_Stage_nature2012", "pathologic_T", "pathologic_N", "pathologic_M",
   "histological_type", "menopause_status", "radiation_therapy",
-  "history_of_neoadjuvant_treatment"
+  "history_of_neoadjuvant_treatment",
+  "PAM50Call_RNAseq", "PAM50_mRNA_nature2012", "Integrated_Clusters_PAM50_nature2012"
 )
 clinical_vars <- intersect(clinical_vars, names(brca_metadata))
 

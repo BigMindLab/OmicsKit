@@ -134,5 +134,5 @@ trend_res$Summary
 Requena D. et al. Nat Commun 15, 10887 (2024).
 }
 \seealso{
-\code{\link[=detect_filter]{detect_filter()}}
+\code{\link[=detectability_filter]{detectability_filter()}}
 }
