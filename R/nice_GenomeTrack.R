@@ -569,27 +569,35 @@ nice_GenomeTrack <- function(
           }
           bed_gr <- rtracklayer::import(f)
 
-          # Use BED "name" column as labels when available
-          if ("name" %in% names(mcols(bed_gr))) {
-            mcols(bed_gr)$label <- mcols(bed_gr)$name
-          } else {
-            mcols(bed_gr)$label <- NA_character_
-          }
+          # Use BED "name" column as per-feature labels when available. Peak-
+          # call BEDs (e.g. MACS output) typically lack a "name" column, so
+          # `has_labels` is FALSE and grouping is skipped entirely -- passing
+          # an all-NA `group` to Gviz::AnnotationTrack crashes plotTracks()
+          # with "invalid 'xscale' in viewport" as soon as a second such
+          # track is drawn alongside it.
+          has_labels <- "name" %in% names(mcols(bed_gr)) && !all(is.na(mcols(bed_gr)$name))
 
-          Gviz::AnnotationTrack(
+          track_args <- list(
             bed_gr,
             genome = genome_label,
             chromosome = chr,
             name = nm,
             shape = "box",
-            group = bed_gr$label,
-            groupAnnotation = "group",
-            just.group = "below",
-            showFeatureId = FALSE,
-            fontcolor.group = "black",
-            cex.group = 0.8,
             just.title = "right"
           )
+          if (has_labels) {
+            mcols(bed_gr)$label <- mcols(bed_gr)$name
+            track_args$group <- bed_gr$label
+            track_args <- c(track_args, list(
+              groupAnnotation = "group",
+              just.group = "below",
+              showFeatureId = FALSE,
+              fontcolor.group = "black",
+              cex.group = 0.8
+            ))
+          }
+
+          do.call(Gviz::AnnotationTrack, track_args)
         },
         stop(
           "Unsupported file format: .", ext,
