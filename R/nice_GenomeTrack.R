@@ -165,7 +165,14 @@ nice_GenomeTrack <- function(
     host <- .resolve_ensembl_host(ensembl_version)
 
     mart <- tryCatch(
-      biomaRt::useMart("ENSEMBL_MART_ENSEMBL", dataset = organism, host = host),
+      if (identical(host, "https://www.ensembl.org")) {
+        # The live Ensembl site 404s when `host` is passed explicitly to
+        # useEnsembl(); omitting it lets biomaRt auto-resolve (with mirror
+        # fallback) instead.
+        biomaRt::useEnsembl("ENSEMBL_MART_ENSEMBL", dataset = organism)
+      } else {
+        biomaRt::useEnsembl("ENSEMBL_MART_ENSEMBL", dataset = organism, host = host)
+      },
       error = function(e) {
         if (exists(".handle_biomart_connection_error", mode = "function")) {
           .handle_biomart_connection_error(e, host, organism, ensembl_version)
