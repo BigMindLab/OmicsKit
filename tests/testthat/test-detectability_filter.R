@@ -1,7 +1,7 @@
-test_that("detect_filter keeps detectable UP and DOWN genes in one comparison", {
+test_that("detectability_filter keeps detectable UP and DOWN genes in one comparison", {
   fx <- make_detect_fixture()
 
-  out <- detect_filter(
+  out <- detectability_filter(
     norm.counts = fx$norm_counts,
     df.BvsA = fx$df_b,
     samples.baseline = fx$samples_baseline,
@@ -28,10 +28,10 @@ test_that("detect_filter keeps detectable UP and DOWN genes in one comparison", 
   expect_false("g_no_direction" %in% out$DetectGenes)
 })
 
-test_that("detect_filter supports optional second and third comparisons", {
+test_that("detectability_filter supports optional second and third comparisons", {
   fx <- make_detect_fixture()
 
-  out <- detect_filter(
+  out <- detectability_filter(
     norm.counts = fx$norm_counts,
     df.BvsA = fx$df_b,
     df.CvsA = fx$df_c,
@@ -57,12 +57,12 @@ test_that("detect_filter supports optional second and third comparisons", {
   )
 })
 
-test_that("detect_filter removes duplicated genes from DetectGenes", {
+test_that("detectability_filter removes duplicated genes from DetectGenes", {
   fx <- make_detect_fixture()
 
   df_b_dup <- rbind(fx$df_b, fx$df_b[fx$df_b$ensembl == "g_up_detect", ])
 
-  out <- detect_filter(
+  out <- detectability_filter(
     norm.counts = fx$norm_counts,
     df.BvsA = df_b_dup,
     samples.baseline = fx$samples_baseline,
@@ -73,11 +73,11 @@ test_that("detect_filter removes duplicated genes from DetectGenes", {
   expect_equal(length(out$DetectGenes), length(unique(out$DetectGenes)))
 })
 
-test_that("detect_filter validates cutoff length", {
+test_that("detectability_filter validates cutoff length", {
   fx <- make_detect_fixture()
 
   expect_error(
-    detect_filter(
+    detectability_filter(
       norm.counts = fx$norm_counts,
       df.BvsA = fx$df_b,
       samples.baseline = fx$samples_baseline,

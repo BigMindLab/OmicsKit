@@ -53,6 +53,6 @@ save_results(
 
 }
 \seealso{
-\code{\link[=detect_filter]{detect_filter()}} to further filter saved results;
+\code{\link[=detectability_filter]{detectability_filter()}} to further filter saved results;
 \link{brca_rna_dea_tumor_vs_normal} for an example input.
 }

@@ -41,11 +41,6 @@ offering flexible utilities to accelerate end-to-end analysis.
   - [Google Scholar]()
   - [ORCID: 0009-0003-2495-6568](https://orcid.org/0009-0003-2495-6568)
 
-- Angela D. C. Alarcon Guerrero, BSc(s)
-
-  - Author’s name: Angela D. C. Alarcon Guerrero
-  - [Google Scholar]()
-  - [ORCID: 0000-0003-0293-5603](https://orcid.org/0000-0003-0293-5603)
 
 ## License
 

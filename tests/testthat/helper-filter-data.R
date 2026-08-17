@@ -1,4 +1,4 @@
-# Helper fixtures for detect_filter() and trend_filter() tests.
+# Helper fixtures for detectability_filter() and trend_filter() tests.
 # These fixtures are intentionally small and deterministic.
 
 make_detect_fixture <- function() {

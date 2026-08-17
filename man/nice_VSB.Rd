@@ -19,7 +19,8 @@ nice_VSB(
   jitter = 0.2,
   title_size = c(axis = 20, fig = 24),
   label_size = c(x = 20, y = 16),
-  legend_size = c(title = 14, elements = 12)
+  legend_size = c(title = 14, elements = 12),
+  box_width = 0.25
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ gene symbols from Ensembl IDs, use \code{\link[=get_annotations]{get_annotations
 \item{label_size}{Font of the labels (x-axis) and numbers (y-axis). Default: c(x = 20, y = 16).}
 
 \item{legend_size}{Font of the title and elements of the legend. Default: c(title = 14, elements = 12).}
+
+\item{box_width}{Width of the boxplot relative to the category spacing. Default: 0.25.}
 }
 \value{
 A ggplot2 object.
@@ -79,7 +82,7 @@ nice_VSB(
 
 }
 \seealso{
-\code{\link[=nice_Volcano]{nice_Volcano()}} for genome-wide visualization; \code{\link[=detect_filter]{detect_filter()}}
+\code{\link[=nice_Volcano]{nice_Volcano()}} for genome-wide visualization; \code{\link[=detectability_filter]{detectability_filter()}}
 to identify reliably expressed genes; \code{\link[=get_stars]{get_stars()}} to add significance
 annotations; \link{brca_rna_expr_tumor_normal_filtered} for an example input matrix.
 }

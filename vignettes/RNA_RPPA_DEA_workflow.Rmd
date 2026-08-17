@@ -224,12 +224,12 @@ head(brca_rna_dea_er_annotated[, c("gene_id", "symbol", "logFC", "padj")])
 
 ## 5. Filtering Genes by Expression Detectability and Trend
 
-`detect_filter()` identifies genes that are actually expressed above baseMean and mean-count thresholds in the groups of interest. This prevents reporting genes that are technically significant but biologically undetectable. `trend_filter()` is complementary: for paired or ordered comparisons it checks that the fold-change direction is patient-level consistent, removing genes that are significant mainly because of a few outlier patients. Both functions are shown with `eval = FALSE` because `trend_filter()` requires validated paired tumor-normal relationships and full-size expression matrices. Run these examples only after confirming that the metadata and expression matrices use the same sample identifiers.
+`detectability_filter()` identifies genes that are actually expressed above baseMean and mean-count thresholds in the groups of interest. This prevents reporting genes that are technically significant but biologically undetectable. `trend_filter()` is complementary: for paired or ordered comparisons it checks that the fold-change direction is patient-level consistent, removing genes that are significant mainly because of a few outlier patients. Both functions are shown with `eval = FALSE` because `trend_filter()` requires validated paired tumor-normal relationships and full-size expression matrices. Run these examples only after confirming that the metadata and expression matrices use the same sample identifiers.
 
-### 5.1 detect_filter
+### 5.1 detectability_filter
 
-```{r detect-filter, eval = FALSE}
-# detect_filter requires a column named "ensembl" in the DEA results
+```{r detectability-filter, eval = FALSE}
+# detectability_filter requires a column named "ensembl" in the DEA results
 res_tn <- brca_rna_dea_tumor_vs_normal
 colnames(res_tn)[colnames(res_tn) == "gene_id"] <- "ensembl"
 rownames(res_tn) <- res_tn$ensembl
@@ -242,7 +242,7 @@ samples_tumor <- rownames(brca_rna_metadata_tumor_normal)[
   brca_rna_metadata_tumor_normal$rna_tumor_normal == "Tumor"
 ]
 
-detected <- detect_filter(
+detected <- detectability_filter(
   norm.counts        = as.data.frame(brca_rna_expr_tumor_normal_filtered),
   df.BvsA            = res_tn,
   samples.baseline   = samples_normal,

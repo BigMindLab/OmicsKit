@@ -64,7 +64,7 @@ reference:
       - save_results
       - split_cases
       - nice_Volcano
-      - detect_filter
+      - detectability_filter
       - get_stars
       - nice_VSB
       - nice_VSB_DEseq2
