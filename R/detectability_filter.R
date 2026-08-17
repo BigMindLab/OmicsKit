@@ -1,6 +1,6 @@
-##########################
-# Function detect_filter #
-##########################
+##################################
+# Function detectability_filter #
+##################################
 
 #' Find detectable genes across comparisons.
 #'
@@ -32,7 +32,7 @@
 #' data(brca_rna_dea_tumor_vs_normal)
 #' data(brca_rna_metadata_tumor_normal)
 #'
-#' # detect_filter requires an "ensembl" column in the results data frame
+#' # detectability_filter requires an "ensembl" column in the results data frame
 #' res <- brca_rna_dea_tumor_vs_normal
 #' colnames(res)[colnames(res) == "gene_id"] <- "ensembl"
 #' rownames(res) <- res$ensembl
@@ -42,7 +42,7 @@
 #' samples_normal <- meta$patient[meta$sample_type == "Solid Tissue Normal"]
 #' samples_tumor  <- meta$patient[meta$sample_type == "Primary Tumor"]
 #'
-#' detected <- detect_filter(
+#' detected <- detectability_filter(
 #'   norm.counts        = as.data.frame(brca_rna_expr_tumor_normal_filtered),
 #'   df.BvsA            = res,
 #'   samples.baseline   = samples_normal,
@@ -63,7 +63,7 @@
 #' @export
 
 
-detect_filter <- function(norm.counts, df.BvsA, df.CvsA = NULL, df.DvsA = NULL, cutoffs = c(50, 50, 0),
+detectability_filter <- function(norm.counts, df.BvsA, df.CvsA = NULL, df.DvsA = NULL, cutoffs = c(50, 50, 0),
 			  samples.baseline, samples.condition1, samples.condition2 = NULL, samples.condition3 = NULL)
 
 {
