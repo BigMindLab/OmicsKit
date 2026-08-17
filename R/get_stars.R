@@ -40,7 +40,7 @@
 #'   object = res
 #' )
 #'
-#' @seealso [detect_filter()] to identify detectable genes before annotating;
+#' @seealso [detectability_filter()] to identify detectable genes before annotating;
 #'   [nice_VSB()] where significance stars can be added to plots;
 #'   [brca_rna_dea_tumor_vs_normal] for an example input.
 #'

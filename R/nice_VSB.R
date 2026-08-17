@@ -45,7 +45,7 @@
 #'   markersize  = 3
 #' )
 #'
-#' @seealso [nice_Volcano()] for genome-wide visualization; [detect_filter()]
+#' @seealso [nice_Volcano()] for genome-wide visualization; [detectability_filter()]
 #'   to identify reliably expressed genes; [get_stars()] to add significance
 #'   annotations; [brca_rna_expr_tumor_normal_filtered] for an example input matrix.
 #'
@@ -56,7 +56,7 @@ nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill"
                       categories = c("normal", "primary", "recurrence", "metastasis"),
                       colors = NULL, shapes = NULL, markersize = NULL, alpha = 0.8, jitter = 0.2,
                       title_size = c(axis = 20, fig = 24), label_size = c(x = 20, y = 16),
-                      legend_size = c(title = 14, elements = 12))
+                      legend_size = c(title = 14, elements = 12), box_width = 0.25)
 {
   # Extracting the vector of counts for that gene
   gene_counts <- object[genename, ]
@@ -70,20 +70,16 @@ nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill"
                                     levels = categories,
                                     labels = labels)
 
-  # Plot
+  # Plot: layers are drawn back-to-front in the order they are added, so the
+  # violin (background density) goes first, the jittered points (raw data) on
+  # top of it, and the boxplot (summary statistics) last so it reads cleanly
+  # on top of the point cloud. The boxplot uses a light neutral fill (#E5E5E5)
+  # so the summary shape is legible without competing with the fill-colored
+  # data points, and has no outlier points of its own, since individual points
+  # are already shown by geom_point().
   p.bs <- ggplot(df.box, aes(x = .data$sample_type, y = log2_gc)) + theme_bw() +
     geom_violin(alpha = 0.1, scale = "width", fill = "yellow", color = "peru",
-		show.legend = FALSE, trim = TRUE) +
-    geom_boxplot(width = 0.6, fill = "gray90") +
-    labs(title = paste("Gene:", genename, symbol),
-         x = expression("Sample Type"),
-         y = expression("log"[2]*"(Normalized Gene Counts)")) +
-    theme(plot.title = element_text(size = title_size["fig"]),
-          axis.title = element_text(size = title_size["axis"]),
-          axis.text.x = element_text(size = label_size["x"]),
-          axis.text.y = element_text(size = label_size["y"]),
-          legend.title = element_text(size = legend_size["title"]),
-          legend.text=element_text(size = legend_size["elements"]))
+		show.legend = FALSE, trim = TRUE)
 
   if (length(variables) == 1) {
     p.bs <- p.bs + geom_point(data = df.box, aes_string(fill = variables["fill"]), shape = 21,
@@ -98,7 +94,22 @@ nice_VSB <- function (object = NULL, annotations, variables = c(fill = "VarFill"
 
   } else { return("Up to two variables allowed") }
 
-  p.bs <- p.bs + scale_fill_manual(name = variables[1], values = colors,
+  p.bs <- p.bs +
+    geom_boxplot(width = box_width, fill = "#E5E5E5", alpha = 0.8, outlier.shape = NA, color = "black") +
+    labs(title = paste("Gene:", genename, symbol),
+         x = expression("Sample Type"),
+         y = expression("log"[2]*"(Normalized Gene Counts)")) +
+    theme(plot.title = element_text(size = title_size["fig"]),
+          axis.title = element_text(size = title_size["axis"]),
+          axis.text.x = element_text(size = label_size["x"]),
+          axis.text.y = element_text(size = label_size["y"]),
+          legend.title = element_text(size = legend_size["title"]),
+          legend.text=element_text(size = legend_size["elements"]))
+
+  # Clean legend title: strip underscores from the raw column name (e.g.
+  # "ER_group" -> "ER group") instead of showing the variable name verbatim.
+  legend_label <- gsub("_", " ", variables[1])
+  p.bs <- p.bs + scale_fill_manual(name = legend_label, values = colors,
                                    guide = guide_legend(override.aes = aes(shape = 21, size = 7)))
 
   return(p.bs)

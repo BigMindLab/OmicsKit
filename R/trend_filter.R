@@ -94,7 +94,7 @@
 #' trend_res$Summary
 #' }
 #'
-#' @seealso [detect_filter()]
+#' @seealso [detectability_filter()]
 #'
 #' @export
 

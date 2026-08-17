@@ -74,7 +74,7 @@
 #' head(cases$Case1)
 #' }
 #'
-#' @seealso [detect_filter()] to pre-filter genes before splitting;
+#' @seealso [detectability_filter()] to pre-filter genes before splitting;
 #'   [nice_Volcano()] to visualize individual comparison results.
 #'
 #' @export
