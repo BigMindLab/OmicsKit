@@ -327,9 +327,11 @@ do_clust <- function(x, method = "ward.D2", max_k = NULL) {
 #'   `geneset_names`. See [get_network_communities()] for a simpler workflow.
 #' @param n_terms Integer. Number of top TF-IDF terms to include in each label.
 #'   Default: `3`.
-#' @param remove_prefix Logical. If `TRUE`, removes the text before the first
-#'   underscore in gene set names (e.g., strips the `"KEGG_"` prefix from
-#'   `"KEGG_GLYCOLYSIS"`). Default: `TRUE`.
+#' @param remove_prefix Logical. If `TRUE`, removes leading collection/
+#'   database-tag prefixes from gene set names before scoring (e.g., strips
+#'   the `"KEGG_"` prefix from `"KEGG_GLYCOLYSIS"`, and both nested prefix
+#'   layers from `"GO_BP::GOBP_KERATINIZATION"` to leave
+#'   `"KERATINIZATION"`). Default: `TRUE`.
 #'
 #' @return A named list with two elements:
 #'   * `$mapping`: A [tibble::tibble()] with columns `geneset`, `community`,
@@ -403,13 +405,13 @@ get_superterm <- function(geneset_names, community_membership,
 
     # Single gene set: split name into words directly
     if (length(nodes) == 1) {
-      clean <- if (remove_prefix) sub("^[^_]+_", "", nodes) else nodes
+      clean <- if (remove_prefix) .strip_geneset_prefix(nodes) else nodes
       words <- strsplit(clean, "[_[:space:]]+")[[1]]
       return(paste(utils::head(words, 3), collapse = "_"))
     }
 
     # Multiple gene sets: TF-IDF pipeline
-    cleaned <- if (remove_prefix) gsub("^[^_]+_", "", nodes) else nodes
+    cleaned <- if (remove_prefix) .strip_geneset_prefix(nodes) else nodes
     cleaned <- tolower(gsub("_", " ", cleaned))
 
     corpus <- tm::Corpus(tm::VectorSource(cleaned))
