@@ -289,10 +289,14 @@ do_clust <- function(x, method = "ward.D2", max_k = NULL) {
 #' set names to produce a short, representative label called a *super-term*.
 #'
 #' **How TF-IDF works here:** each gene set name is treated as a document and
-#' each word as a term. TF-IDF upweights words that are frequent within a
-#' community but rare across all communities, making the resulting label
-#' specific to that cluster rather than generic. A frequency-based fallback is
-#' used when TF-IDF returns no terms (e.g., very small communities).
+#' each word as a term, with one TF-IDF corpus per community (so a community's
+#' label is scored against its own gene sets only). The IDF term uses additive
+#' smoothing, `log2(1 + N/d_t)` instead of the standard `log2(N/d_t)`, so a
+#' word appearing in every one of a community's gene sets -- typically the
+#' word that should name it -- gets a positive weight instead of exactly zero,
+#' while words present in fewer of the community's gene sets still score
+#' higher. A frequency-based fallback is used when TF-IDF returns no terms
+#' (e.g., very small communities).
 #'
 #' Common pathway words (`"pathway"`, `"signaling"`, `"regulation"`, etc.) and
 #' standard English stopwords are removed before scoring.
@@ -416,8 +420,12 @@ get_superterm <- function(geneset_names, community_membership,
                          c(tm::stopwords("english"), pathway_stopwords))
     corpus <- tm::tm_map(corpus, tm::stripWhitespace)
 
-    dtm       <- tm::DocumentTermMatrix(corpus,
-                                        control = list(weighting = tm::weightTfIdf))
+    # Built with default (raw count) weighting, then smoothed-TF-IDF-weighted
+    # post-hoc via .smoothed_tfidf() -- applying a custom weighting function
+    # through DocumentTermMatrix()'s `control = list(weighting = ...)` is
+    # silently ignored for SimpleCorpus input, so it must be a separate call.
+    dtm       <- tm::DocumentTermMatrix(corpus)
+    dtm       <- .smoothed_tfidf(dtm)
     term_freq <- colSums(as.matrix(dtm))
     top_terms <- utils::head(sort(term_freq, decreasing = TRUE), n_terms)
 
@@ -459,6 +467,53 @@ get_superterm <- function(geneset_names, community_membership,
     mapping = mapping,
     summary = summary_tbl
   ))
+}
+
+# Internal helper: strip leading collection/database-tag prefixes from a gene
+# set name, e.g. "GO_BP::GOBP_KERATINIZATION" -> "KERATINIZATION". Some
+# collections nest two prefix layers (an outer "TAG_" segment, then an inner
+# "DB::SUBCOLLECTION_" segment before "::"), which a single `sub("^[^_]+_",
+# "", x)` pass only partially strips -- leaving e.g. "BP::GOBP_" attached,
+# which then survives punctuation removal as the token "bpgobp" and pollutes
+# every community that shares that collection. "::" is only ever used as a
+# collection separator in these naming conventions, never inside a real term,
+# so stripping up to the LAST "::" is safe; a second, single-segment strip
+# (identical to the original one-layer behavior) then removes the remaining
+# inner collection tag (e.g. "GOBP_") the same way "KEGG_"/"HALLMARK_" are
+# stripped from collections that don't use "::" at all.
+.strip_geneset_prefix <- function(x) {
+  x <- sub("^.*::", "", x)
+  sub("^[^_]+_", "", x)
+}
+
+# Internal helper: additive-smoothed TF-IDF weighting for a DocumentTermMatrix
+# or TermDocumentMatrix, applied post-hoc (see get_superterm()). Same
+# structure as tm:::weightTfIdf, except the IDF term uses log2(1 + N/d_t)
+# instead of log2(N/d_t), so a term appearing in every document of the corpus
+# (d_t == N) gets weight log2(2) = 1, not log2(1) = 0. Reviewer-flagged bug:
+# with the standard formula, a word shared by every gene set in a community
+# -- precisely the word that should label it -- was silently zeroed out.
+.smoothed_tfidf <- function(m, normalize = TRUE) {
+  isDTM <- inherits(m, "DocumentTermMatrix")
+
+  # Per-community corpora are tiny (a handful of gene sets/terms), so working
+  # with a dense base matrix is simplest and avoids an extra hard dependency.
+  mat <- as.matrix(m)
+  if (isDTM) mat <- t(mat)   # work as terms (rows) x documents (cols)
+
+  if (normalize) {
+    doc_totals <- colSums(mat)
+    doc_totals[doc_totals == 0] <- 1   # avoid divide-by-zero for empty documents
+    mat <- sweep(mat, 2, doc_totals, "/")
+  }
+
+  n_docs <- ncol(mat)
+  doc_freq <- rowSums(mat > 0)
+  idf <- log2(1 + n_docs / doc_freq)
+  idf[!is.finite(idf)] <- 0
+  mat <- mat * idf   # recycles idf down each column, i.e. per term (row)
+
+  if (isDTM) t(mat) else mat
 }
 
 
